@@ -1,0 +1,1057 @@
+#include "comm.h"
+#include "config.h"
+#include "robot.h"
+#include "reset.h"
+#include "src/esp/WiFiEsp.h"
+#include "file_cmds.h"
+
+unsigned long nextInfoTime = 0;
+bool triggerWatchdog = false;
+
+String cmd;
+String cmdResponse;
+
+// use a ring buffer to increase speed and reduce memory allocation
+ERingBuffer buf(8);
+int reqCount = 0;                // number of requests received
+unsigned long stopClientTime = 0;
+float statControlCycleTime = 0;
+float statMaxControlCycleTime = 0;
+
+
+//HB New map control
+static uint8_t currentMapIndex = 0;
+static bool writeMapFlag = false;
+
+
+// answer Bluetooth with CRC
+void cmdAnswer(String s){
+  byte crc = 0;
+  for (int i=0; i < s.length(); i++) crc += s[i];
+  s += F(",0x");
+  if (crc <= 0xF) s += F("0");
+  s += String(crc, HEX);
+  s += F("\r\n");
+  //CONSOLE.print(s);
+  cmdResponse = s;
+}
+
+
+void WriteMap(String cmd)
+{
+   if (!writeMapFlag) return;
+
+   char mapFileName[32];
+   sprintf(mapFileName, "MAP%d.TXT", currentMapIndex);
+   SDFile mapFile;
+
+   if (cmd == "")
+   {
+      CONSOLE.println("Create map file");
+      SD.remove(mapFileName);
+      return;
+      //mapFile = SD.open(mapFileName, O_WRITE | O_CREAT);
+      //if (mapFile)
+      //{
+      //   mapFile.close();
+      //   return;
+      //}
+   }
+   else
+   {
+      mapFile = SD.open(mapFileName, FILE_WRITE);
+      if (mapFile)
+      {
+         const int BUF_SIZE = 128;
+         char buf[BUF_SIZE];
+
+         cmd.toCharArray(buf, BUF_SIZE-2);
+         int i = strlen(buf);
+         buf[i++] = 13;
+         buf[i++] = 10;
+         buf[i] = 0;
+         mapFile.write(buf);
+         mapFile.flush();
+         mapFile.close();
+         return;
+      }
+   }
+   CONSOLE.println("ERROR opening map file for writing");
+}
+
+
+// request operation
+void cmdControl(String cmd)
+{
+  if (cmd.length()<6) return;
+  int counter = 0;
+  int lastCommaIdx = 0;
+  int mow=-1;
+  int op = -1;
+  float wayPerc = -1;
+  for (int idx=0; idx < cmd.length(); idx++){
+    char ch = cmd[idx];
+    //Serial.print("ch=");
+    //Serial.println(ch);
+    if ((ch == ',') || (idx == cmd.length()-1)){
+      int intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
+      float floatValue = cmd.substring(lastCommaIdx+1, idx+1).toFloat();
+      if (counter == 1){
+          if (intValue >= 0) {
+            motor.enableMowMotor = (intValue == 1);
+            motor.setMowState( (intValue == 1) );
+          }
+      } else if (counter == 2){
+          if (intValue >= 0) op = intValue;
+      } else if (counter == 3){
+          if (floatValue >= 0) setSpeed = floatValue;
+      } else if (counter == 4){
+          if (intValue >= 0) fixTimeout = intValue;
+      } else if (counter == 5){
+          if (intValue >= 0) finishAndRestart = (intValue == 1);
+      } else if (counter == 6){
+          if (floatValue >= 0) maps.setMowingPointPercent(floatValue);
+      } else if (counter == 7){
+          if (intValue > 0) maps.skipNextMowingPoint();
+      } else if (counter == 8){
+          if (intValue >= 0) sonar.enabled = (intValue == 1);
+      }
+      counter++;
+      lastCommaIdx = idx;
+    }
+  }
+  /*CONSOLE.print("linear=");
+  CONSOLE.print(linear);
+  CONSOLE.print(" angular=");
+  CONSOLE.println(angular);*/
+  if (op >= 0) setOperation((OperationType)op, false, true);
+  String s = F("C");
+  cmdAnswer(s);
+}
+
+// request motor
+void cmdMotor(String cmd)
+{
+  if (cmd.length()<6) return;
+  int counter = 0;
+  int lastCommaIdx = 0;
+  float linear=0;
+  float angular=0;
+  for (int idx=0; idx < cmd.length(); idx++){
+    char ch = cmd[idx];
+    //Serial.print("ch=");
+    //Serial.println(ch);
+    if ((ch == ',') || (idx == cmd.length()-1)){
+      float value = cmd.substring(lastCommaIdx+1, idx+1).toFloat();
+      if (counter == 1){
+          linear = value;
+      } else if (counter == 2){
+          angular = value;
+      }
+      counter++;
+      lastCommaIdx = idx;
+    }
+  }
+  /*CONSOLE.print("linear=");
+  CONSOLE.print(linear);
+  CONSOLE.print(" angular=");
+  CONSOLE.println(angular);*/
+  motor.setLinearAngularSpeed(linear, angular, false);
+  String s = F("M");
+  cmdAnswer(s);
+}
+
+void cmdMotorTest(){
+  String s = F("E");
+  cmdAnswer(s);
+  motor.test();
+}
+
+void cmdSensorTest(){
+  String s = F("F");
+  cmdAnswer(s);
+  sensorTest();
+}
+
+
+// request waypoint
+void cmdWaypoint(String cmd)
+{
+  if (cmd.length()<6) return;
+  WriteMap(cmd);
+  int counter = 0;
+  int lastCommaIdx = 0;
+  int widx=0;
+  float x=0;
+  float y=0;
+  bool success = true;
+  for (int idx=0; idx < cmd.length(); idx++){
+    char ch = cmd[idx];
+    //Serial.print("ch=");
+    //Serial.println(ch);
+    if ((ch == ',') || (idx == cmd.length()-1)){
+      float intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
+      float floatValue = cmd.substring(lastCommaIdx+1, idx+1).toFloat();
+      if (counter == 1){
+          widx = intValue;
+      } else if (counter == 2){
+          x = floatValue;
+      } else if (counter == 3){
+          y = floatValue;
+          if (!maps.setPoint(widx, x, y)){
+            success = false;
+            break;
+          }
+          widx++;
+          counter = 1;
+      }
+      counter++;
+      lastCommaIdx = idx;
+    }
+  }
+  /*CONSOLE.print("waypoint (");
+  CONSOLE.print(widx);
+  CONSOLE.print("/");
+  CONSOLE.print(count);
+  CONSOLE.print(") ");
+  CONSOLE.print(x);
+  CONSOLE.print(",");
+  CONSOLE.println(y);*/
+
+  String s = F("W,");
+  s += widx;
+  cmdAnswer(s);
+
+  if (!success){
+    stateSensor = SENS_MEM_OVERFLOW;
+    setOperation(OP_ERROR);
+  }
+}
+
+
+// request waypoints count
+void cmdWayCount(String cmd)
+{
+  if (cmd.length()<6) return;
+  WriteMap(cmd);
+  writeMapFlag = false;
+  int counter = 0;
+  int lastCommaIdx = 0;
+  for (int idx=0; idx < cmd.length(); idx++){
+    char ch = cmd[idx];
+    //Serial.print("ch=");
+    //Serial.println(ch);
+    if ((ch == ',') || (idx == cmd.length()-1)){
+      float intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
+      float floatValue = cmd.substring(lastCommaIdx+1, idx+1).toFloat();
+      if (counter == 1){
+          if (!maps.setWayCount(WAY_PERIMETER, intValue)) return;
+      } else if (counter == 2){
+          if (!maps.setWayCount(WAY_EXCLUSION, intValue)) return;
+      } else if (counter == 3){
+          if (!maps.setWayCount(WAY_DOCK, intValue)) return;
+      } else if (counter == 4){
+          if (!maps.setWayCount(WAY_MOW, intValue)) return;
+      } else if (counter == 5){
+          if (!maps.setWayCount(WAY_FREE, intValue)) return;
+      }
+      counter++;
+      lastCommaIdx = idx;
+    }
+  }
+  String s = F("N");
+  cmdAnswer(s);
+  //maps.dump();
+}
+
+
+// request exclusion count
+void cmdExclusionCount(String cmd)
+{
+  if (cmd.length()<6) return;
+  int counter = 0;
+  int lastCommaIdx = 0;
+  int widx=0;
+  for (int idx=0; idx < cmd.length(); idx++){
+    char ch = cmd[idx];
+    //Serial.print("ch=");
+    //Serial.println(ch);
+    if ((ch == ',') || (idx == cmd.length()-1)){
+      float intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
+      float floatValue = cmd.substring(lastCommaIdx+1, idx+1).toFloat();
+      if (counter == 1){
+          widx = intValue;
+      } else if (counter == 2){
+          if (!maps.setExclusionLength(widx, intValue)) return;
+          widx++;
+          counter = 1;
+      }
+      counter++;
+      lastCommaIdx = idx;
+    }
+  }
+  String s = F("X,");
+  s += widx;
+  cmdAnswer(s);
+}
+
+
+// request position mode
+void cmdPosMode(String cmd)
+{
+  if (cmd.length()<6) return;
+  int counter = 0;
+  int lastCommaIdx = 0;
+  for (int idx=0; idx < cmd.length(); idx++){
+    char ch = cmd[idx];
+    //Serial.print("ch=");
+    //Serial.println(ch);
+    if ((ch == ',') || (idx == cmd.length()-1)){
+      int intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
+      double doubleValue = cmd.substring(lastCommaIdx+1, idx+1).toDouble();
+      if (counter == 1){
+          absolutePosSource = bool(intValue);
+      } else if (counter == 2){
+          absolutePosSourceLon = doubleValue;
+      } else if (counter == 3){
+          absolutePosSourceLat = doubleValue;
+      }
+      counter++;
+      lastCommaIdx = idx;
+    }
+  }
+  CONSOLE.print("absolutePosSource=");
+  CONSOLE.print(absolutePosSource);
+  CONSOLE.print(" lon=");
+  CONSOLE.print(absolutePosSourceLon, 8);
+  CONSOLE.print(" lat=");
+  CONSOLE.println(absolutePosSourceLat, 8);
+  String s = F("P");
+  cmdAnswer(s);
+}
+
+// request version
+void cmdVersion(){
+  String s = F("V,");
+  s += F(VER);
+  cmdAnswer(s);
+}
+
+// request add obstacle
+void cmdObstacle(){
+  String s = F("O");
+  cmdAnswer(s);
+  triggerObstacle();
+}
+
+// perform pathfinder stress test
+void cmdStressTest(){
+  String s = F("Z");
+  cmdAnswer(s);
+  maps.stressTest();
+}
+
+// perform hang test (watchdog should trigger)
+void cmdTriggerWatchdog(){
+  String s = F("Y");
+  cmdAnswer(s);
+  setOperation(OP_IDLE);
+  triggerWatchdog = true;
+}
+
+// perform hang test (watchdog should trigger)
+void cmdGNSSReboot(){
+  String s = F("Y2");
+  cmdAnswer(s);
+  CONSOLE.println("GNNS reboot");
+  gps.reboot();
+}
+
+// switch-off robot
+void cmdSwitchOffRobot(){
+  String s = F("Y3");
+  cmdAnswer(s);
+  setOperation(OP_IDLE);
+  battery.switchOff();
+}
+
+// kidnap test (kidnap detection should trigger)
+void cmdKidnap(){
+  String s = F("K");
+  cmdAnswer(s);
+  CONSOLE.println("kidnapping robot - kidnap detection should trigger");
+  stateX = 0;
+  stateY = 0;
+}
+
+void cmdTriggerRaspiShutdown()
+{
+    String s = F("Y4");
+    cmdAnswer(s);
+    CONSOLE.println("Trigger raspi shutdown");
+    batteryDriver.raspiShutdown();
+}
+
+
+void cmdStartUploadMap(String cmd)
+{
+   if (cmd.length()<6) return;
+   int lastCommaIdx = 4;
+   for (int idx = 5; idx < cmd.length(); idx++) 
+   {
+      char ch = cmd[idx];
+      if ((ch == ',') || (idx == cmd.length() - 1)) 
+      {
+         currentMapIndex = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
+         CONSOLE.print("CurrentMapIndex=");
+         CONSOLE.println(currentMapIndex);
+         writeMapFlag = true;
+         WriteMap("");
+         break;
+      }
+   }
+   String s = F("U");
+   cmdAnswer(s);
+}
+
+
+
+void cmdToggleUseIMU()
+{
+    String s = F("YI");
+    cmdAnswer(s);
+    USE_IMU = !USE_IMU;
+    CONSOLE.print("USE_IMU = ");
+    CONSOLE.println(USE_IMU);
+}
+
+void cmdToggleUseGPSfloatForPosEstimation()
+{
+    String s = F("YP");
+    cmdAnswer(s);
+    USE_GPS_FLOAT_FOR_POS_ESTIMATION = !USE_GPS_FLOAT_FOR_POS_ESTIMATION;
+    maps.useGPSfloatForPosEstimation = USE_GPS_FLOAT_FOR_POS_ESTIMATION;    
+    CONSOLE.print("USE_GPS_FLOAT_FOR_POS_ESTIMATION = ");
+    CONSOLE.println(USE_GPS_FLOAT_FOR_POS_ESTIMATION);
+}
+
+void cmdToggleUseGPSfloatForDeltaEstimationEstimation()
+{
+    String s = F("YD");
+    cmdAnswer(s);
+    USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = !USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
+    maps.useGPSfloatForDeltaEstimation = USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
+    CONSOLE.print("USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = ");
+    CONSOLE.println(USE_GPS_FLOAT_FOR_DELTA_ESTIMATION);
+}
+
+void cmdToggleGPSverbose()
+{
+    String s = F("YV");
+    cmdAnswer(s);
+    gps.verbose = !gps.verbose;
+    CONSOLE.print("gps.verbose = ");
+    CONSOLE.println(gps.verbose);
+}
+
+// toggle GPS solution (invalid,float,fix) for testing
+void cmdToggleGPSSolution(){
+  String s = F("G");
+  cmdAnswer(s);
+  CONSOLE.println("toggle GPS solution");
+  switch (gps.solution){
+    case UBLOX::SOL_INVALID:
+      gps.solutionAvail = true;
+      gps.solution = UBLOX::SOL_FLOAT;
+      gps.relPosN = stateY - 2.0;  // simulate pos. solution jump
+      gps.relPosE = stateX - 2.0;
+      lastFixTime = millis();
+      stateGroundSpeed = 0.1;
+      break;
+    case UBLOX::SOL_FLOAT:
+      gps.solutionAvail = true;
+      gps.solution = UBLOX::SOL_FIXED;
+      stateGroundSpeed = 0.1;
+      gps.relPosN = stateY + 2.0;  // simulate undo pos. solution jump
+      gps.relPosE = stateX + 2.0;
+      break;
+    case UBLOX::SOL_FIXED:
+      gps.solutionAvail = true;
+      gps.solution = UBLOX::SOL_INVALID;
+      break;
+  }
+}
+
+
+// request summary
+void cmdSummary(){
+  String s = F("S,");
+  s += battery.batteryVoltage;
+  s += ",";
+  s += stateX;
+  s += ",";
+  s += stateY;
+  s += ",";
+  s += stateDelta;
+  s += ",";
+  s += gps.solution;
+  s += ",";
+  s += stateOp;
+  s += ",";
+  s += maps.mowPointsIdx;
+  s += ",";
+  s += (millis() - gps.dgpsAge)/1000.0;
+  s += ",";
+  s += stateSensor;
+  s += ",";
+  s += maps.targetPoint.x();
+  s += ",";
+  s += maps.targetPoint.y();
+  s += ",";
+  s += gps.accuracy;
+  s += ",";
+  s += gps.numSV;
+  s += ",";
+  if (stateOp == OP_CHARGE) {
+    s += "-";
+    s += battery.chargingCurrent;
+  } else {
+    s += motor.motorsSenseLP;
+  }
+  s += ",";
+  s += gps.numSVdgps;
+  s += ",";
+  s += maps.mapCRC;
+  cmdAnswer(s);
+}
+
+// request statistics
+void cmdStats(){
+  String s = F("T,");
+  s += statIdleDuration;
+  s += ",";
+  s += statChargeDuration;
+  s += ",";
+  s += statMowDuration;
+  s += ",";
+  s += statMowDurationFloat;
+  s += ",";
+  s += statMowDurationFix;
+  s += ",";
+  s += statMowFloatToFixRecoveries;
+  s += ",";
+  s += statMowDistanceTraveled;
+  s += ",";
+  s += statMowMaxDgpsAge;
+  s += ",";
+  s += statImuRecoveries;
+  s += ",";
+  s += statTempMin;
+  s += ",";
+  s += statTempMax;
+  s += ",";
+  s += gps.chksumErrorCounter;
+  s += ",";
+  //s += ((float)gps.dgpsChecksumErrorCounter) / ((float)(gps.dgpsPacketCounter));
+  s += gps.dgpsChecksumErrorCounter;
+  s += ",";
+  s += statMaxControlCycleTime;
+  s += ",";
+  s += SERIAL_BUFFER_SIZE;
+  s += ",";
+  s += statMowDurationInvalid;
+  s += ",";
+  s += statMowInvalidRecoveries;
+  s += ",";
+  s += statMowObstacles;
+  s += ",";
+  s += freeMemory();
+  s += ",";
+  s += getResetCause();
+  s += ",";
+  s += statGPSJumps;
+  s += ",";
+  s += statMowSonarCounter;
+  s += ",";
+  s += statMowBumperCounter;
+  s += ",";
+  s += statMowGPSMotionTimeoutCounter;
+  cmdAnswer(s);
+}
+
+// clear statistics
+void cmdClearStats(){
+  String s = F("L");
+  statIdleDuration = 0;
+  statChargeDuration = 0;
+  statMowDuration = 0;
+  statMowDurationInvalid = 0;
+  statMowDurationFloat = 0;
+  statMowDurationFix = 0;
+  statMowFloatToFixRecoveries = 0;
+  statMowInvalidRecoveries = 0;
+  statMowDistanceTraveled = 0;
+  statMowMaxDgpsAge = 0;
+  statImuRecoveries = 0;
+  statTempMin = 9999;
+  statTempMax = -9999;
+  gps.chksumErrorCounter = 0;
+  gps.dgpsChecksumErrorCounter = 0;
+  statMaxControlCycleTime = 0;
+  statMowObstacles = 0;
+  statMowBumperCounter = 0;
+  statMowSonarCounter = 0;
+  statMowLiftCounter = 0;
+  statMowGPSMotionTimeoutCounter = 0;
+  statGPSJumps = 0;
+  cmdAnswer(s);
+}
+
+static bool bluetoothLoggingFlag = false;
+
+static void cmdToggleBluetoothLoggingFlag()
+{
+   String s = F("Y2");
+   cmdAnswer(s);
+   bluetoothLoggingFlag = !bluetoothLoggingFlag;
+   CONSOLE.print("Bluetooth logging is ");
+   CONSOLE.println(bluetoothLoggingFlag ? "enabled" : "disabled");
+}
+
+// process request
+void processCmd(bool checkCrc, String cmd)
+{
+  cmdResponse = "";
+  if (cmd.length() < 4) return;
+  byte expectedCrc = 0;
+  int idx = cmd.lastIndexOf(',');
+  if (idx < 1)
+  {
+    if (checkCrc)
+    {
+      CONSOLE.println("CRC ERROR ");
+      return;
+    }
+  } 
+  else 
+  {
+    for (int i=0; i < idx; i++) expectedCrc += cmd[i];
+    String s = cmd.substring(idx+1, idx+5);
+    int crc = strtol(s.c_str(), NULL, 16);
+    if (expectedCrc != crc)
+    {
+      if (checkCrc)
+      {
+        CONSOLE.print("CRC ERROR  received: 0x");
+        CONSOLE.print(crc,HEX);
+        CONSOLE.print(", expected: 0x");
+        CONSOLE.print(expectedCrc,HEX);
+        CONSOLE.println();
+        return;
+      }
+    } 
+    else 
+    {
+      // remove CRC
+      cmd = cmd.substring(0, idx);
+      //CONSOLE.println(cmd);
+    }
+  }
+  if (cmd[0] != 'A') return;
+  if (cmd[1] != 'T') return;
+  if (cmd[2] != '+') return;
+  if (cmd[3] == 'S') cmdSummary();
+  if (cmd[3] == 'M') cmdMotor(cmd);
+  if (cmd[3] == 'C') cmdControl(cmd);
+  if (cmd[3] == 'W') cmdWaypoint(cmd);
+  if (cmd[3] == 'N') cmdWayCount(cmd);
+  if (cmd[3] == 'X') cmdExclusionCount(cmd);
+  if (cmd[3] == 'V') cmdVersion();
+  if (cmd[3] == 'P') cmdPosMode(cmd);
+  if (cmd[3] == 'T') cmdStats();
+  if (cmd[3] == 'L') cmdClearStats();
+  if (cmd[3] == 'E') cmdMotorTest();
+  if (cmd[3] == 'O') cmdObstacle();
+  if (cmd[3] == 'F') cmdSensorTest();
+  if (cmd[3] == 'G') cmdToggleGPSSolution();   // for developers
+  if (cmd[3] == 'K') cmdKidnap();   // for developers
+  if (cmd[3] == 'Z') cmdStressTest();   // for developers
+  if (cmd[3] == 'Q') cmdSwitchOffRobot();
+  if (cmd[3] == 'U') cmdStartUploadMap(cmd);
+  if (cmd[3] == '$') FileSystemCmd(cmd);
+  if (cmd[3] == 'Y') {
+    if (cmd.length() <= 4){
+      cmdTriggerWatchdog();   // for developers
+    } else {
+      if (cmd[4] == '2') cmdToggleBluetoothLoggingFlag();  //  cmdGNSSReboot();   // for developers
+      if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
+      if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
+      if (cmd[4] == '5') cmdGNSSReboot();   // for developers
+      if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
+      if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
+      if (cmd[4] == 'V') cmdToggleGPSverbose();
+    }
+  }
+}
+
+// process console input
+void processConsole(){
+  char ch;
+  if (CONSOLE.available()){
+    battery.resetIdle();
+    while ( CONSOLE.available() ){
+      ch = CONSOLE.read();
+      if ((ch == '\r') || (ch == '\n')) {
+        CONSOLE.println(cmd);
+        processCmd(false, cmd);
+        CONSOLE.print(cmdResponse);
+        cmd = "";
+      } else if (cmd.length() < 500){
+        cmd += ch;
+      }
+    }
+  }
+}
+
+// process Bluetooth input
+void processBLE()
+{
+   if (simulationFlag) return;
+
+   //static bool skip=true;
+   //static int timeOut;
+   char ch;
+   if (BLE.available())
+   {
+       battery.resetIdle();
+       while ( BLE.available() )
+       {
+           ch = BLE.read();
+           if ((ch == '\r') || (ch == '\n'))
+           {
+               if (bluetoothLoggingFlag) CONSOLE.println(cmd);
+               processCmd(true, cmd);
+               if (bluetoothLoggingFlag) CONSOLE.print("BLE:"); // HB
+               if (bluetoothLoggingFlag) CONSOLE.print(cmdResponse); // HB
+               BLE.print(cmdResponse);
+               cmd = "";
+               //skip=false;
+               //timeOut=0;
+               break;
+           }
+           else if (cmd.length() < 500)
+           {
+               cmd += ch;
+           }
+       }
+   }
+}
+
+// process WIFI input
+void processWifi()
+{
+  if (!wifiFound) return;
+  if (!ENABLE_SERVER) return;
+  // listen for incoming clients
+  if (client != NULL){
+    if (stopClientTime != 0) {
+      if (millis() > stopClientTime){
+        client.stop();
+        stopClientTime = 0;
+        client = NULL;
+      }
+      return;
+    }
+  }
+  client = server.available();
+  if (client != NULL) {                               // if you get a client,
+    battery.resetIdle();
+    //CONSOLE.println("New client");             // print a message out the serial port
+    buf.init();                               // initialize the circular buffer
+    unsigned long timeout = millis() + 50;
+    while ( (client.connected()) && (millis() < timeout) ) {              // loop while the client's connected
+      if (client.available()) {               // if there's bytes to read from the client,
+        char c = client.read();               // read a byte, then
+        timeout = millis() + 50;
+        buf.push(c);                          // push it to the ring buffer
+        // you got two newline characters in a row
+        // that's the end of the HTTP request, so send a response
+        if (buf.endsWith("\r\n\r\n")) {
+          cmd = "";
+          while ((client.connected()) && (client.available()) && (millis() < timeout)) {
+            char ch = client.read();
+            timeout = millis() + 50;
+            cmd = cmd + ch;
+            gps.run();
+          }
+          CONSOLE.println(cmd);
+          if (client.connected()) {
+            processCmd(true, cmd);
+            client.print(
+              "HTTP/1.1 200 OK\r\n"
+              "Access-Control-Allow-Origin: *\r\n"
+              "Content-Type: text/html\r\n"
+              "Connection: close\r\n"  // the connection will be closed after completion of the response
+              // "Refresh: 1\r\n"        // refresh the page automatically every 20 sec
+              );
+            client.print("Content-length: ");
+            client.print(cmdResponse.length());
+            client.print("\r\n\r\n");
+            client.print(cmdResponse);
+          }
+          break;
+        }
+      }
+      gps.run();
+    }
+    // give the web browser time to receive the data
+    stopClientTime = millis() + 20;
+    //delay(10);
+    // close the connection
+    //client.stop();
+    //CONSOLE.println("Client disconnected");
+  }
+}
+
+void processUdp()
+{
+      const int SIZE = 255;
+      static char packetBuf[SIZE];
+      int len = udpSerial.readPacket(packetBuf, SIZE);
+      if (len > 0)
+      {
+         CONSOLE.print("Packet received: ");
+         CONSOLE.println(packetBuf);
+         const bool USE_CHECKSUM = true;
+         processCmd(USE_CHECKSUM, packetBuf);
+         CONSOLE.print(cmdResponse);
+         battery.resetIdle();
+      }
+}
+
+void processComm(){
+  processConsole();
+  processBLE();
+  processWifi();
+#if defined(ENABLE_UDP)
+  processUdp();
+#endif
+  if (triggerWatchdog) {
+    CONSOLE.println("hang test - watchdog should trigger and perform a reset");
+    while (true){
+      // do nothing, just hang
+    }
+  }
+}
+
+
+#if 0
+// output summary on console
+void outputConsole(){
+  //return;
+  if (millis() > nextInfoTime){
+    bool started = (nextInfoTime == 0);
+    nextInfoTime = millis() + 5000;
+    unsigned long totalsecs = millis()/1000;
+    unsigned long totalmins = totalsecs/60;
+    unsigned long hour = totalmins/60;
+    unsigned long min = totalmins % 60;
+    unsigned long sec = totalsecs % 60;
+    CONSOLE.print (hour);
+    CONSOLE.print (":");
+    CONSOLE.print (min);
+    CONSOLE.print (":");
+    CONSOLE.print (sec);
+    CONSOLE.print (" ctlDur=");
+    //if (!imuIsCalibrating){
+    if (!started){
+      if (controlLoops > 0){
+        statControlCycleTime = 1.0 / (((float)controlLoops)/5.0);
+      } else statControlCycleTime = 5;
+      statMaxControlCycleTime = max(statMaxControlCycleTime, statControlCycleTime);
+    }
+    controlLoops=0;
+    CONSOLE.print (statControlCycleTime);
+    CONSOLE.print (" op=");
+    CONSOLE.print (stateOp);
+    CONSOLE.print (" freem=");
+    CONSOLE.print (freeMemory ());
+    uint32_t *spReg = (uint32_t*)__get_MSP();   // stack pointer
+    CONSOLE.print (" sp=");
+    CONSOLE.print (*spReg, HEX);
+    CONSOLE.print(" volt=");
+    CONSOLE.print(battery.batteryVoltage);
+    CONSOLE.print(" chg=");
+    CONSOLE.print(battery.chargingCurrent);
+    CONSOLE.print(" tg=");
+    CONSOLE.print(maps.targetPoint.x());
+    CONSOLE.print(",");
+    CONSOLE.print(maps.targetPoint.y());
+    CONSOLE.print(" x=");
+    CONSOLE.print(stateX);
+    CONSOLE.print(" y=");
+    CONSOLE.print(stateY);
+    CONSOLE.print(" delta=");
+    CONSOLE.print(stateDelta);
+    CONSOLE.print(" tow=");
+    CONSOLE.print(gps.iTOW);
+    CONSOLE.print(" lon=");
+    CONSOLE.print(gps.lon,8);
+    CONSOLE.print(" lat=");
+    CONSOLE.print(gps.lat,8);
+    CONSOLE.print(" h=");
+    //HB CONSOLE.print(gps.height,1);
+    CONSOLE.print(gps.height,2);    //HB
+    CONSOLE.print(" n=");
+    CONSOLE.print(gps.relPosN);
+    CONSOLE.print(" e=");
+    CONSOLE.print(gps.relPosE);
+    CONSOLE.print(" d=");
+    CONSOLE.print(gps.relPosD);
+    CONSOLE.print(" sol=");
+    CONSOLE.print(gps.solution);
+    CONSOLE.print(" age=");
+    CONSOLE.print((millis()-gps.dgpsAge)/1000.0);
+
+    //float leftCurrent, rightCurrent, mowCurrent;
+    //motorDriver.getMotorCurrent(leftCurrent, rightCurrent, mowCurrent);
+    CONSOLE.print(" Imot_mA=");    //HB
+    CONSOLE.print(motor.motorLeftSenseLP*1000.,0);
+    CONSOLE.print(",");
+    CONSOLE.print(motor.motorRightSenseLP*1000.,0);
+    CONSOLE.print(",");
+    CONSOLE.print(motor.motorMowSenseLP*1000.,0);
+
+    CONSOLE.println();
+    //logCPUHealth();
+  }
+}
+#else
+#define PRINT(format, value) sprintf(buf, format, value); CONSOLE.print(buf);
+// output summary on console
+void outputConsole(){
+  char buf[40];
+  if (millis() > nextInfoTime){
+    bool started = (nextInfoTime == 0);
+    nextInfoTime = millis() + 5000;
+
+    unsigned long totalsecs = millis()/1000;
+    unsigned long totalmins = totalsecs/60;
+    unsigned long hour = totalmins/60;
+    unsigned long min = totalmins % 60;
+    unsigned long sec = totalsecs % 60;
+    static int headLineCnt = 0;
+    if (headLineCnt == 0) CONSOLE.println("#On-Time  Tctl State   freem Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL   Age   Il   Ir   Im   Temp Hum Flags");
+    headLineCnt = headLineCnt + 1 & 7;
+    PRINT(":%02d:", hour);
+    PRINT("%02d:", min);
+    PRINT("%02d", sec);
+    if (!started){
+      if (controlLoops > 0){
+        statControlCycleTime = 1.0 / (((float)controlLoops)/5.0);
+      } else statControlCycleTime = 5;
+      statMaxControlCycleTime = max(statMaxControlCycleTime, statControlCycleTime);
+    }
+    controlLoops=0;
+    PRINT(" %4.2f", statControlCycleTime);
+    
+    if (stateOp == OP_IDLE)        CONSOLE.print("  IDLE ");
+    else if (stateOp == OP_MOW)    CONSOLE.print("  MOW  ");
+    else if (stateOp == OP_CHARGE) CONSOLE.print(" CHARGE");
+    else if (stateOp == OP_ERROR)  CONSOLE.print("  ERROR");
+    else if (stateOp == OP_DOCK)   CONSOLE.print("  DOCK ");
+    else                           CONSOLE.print("  ???  ");
+
+
+    PRINT(" %6d", freeMemory());
+    //uint32_t *spReg = (uint32_t*)__get_MSP();   // stack pointer
+    //CONSOLE.print (" sp=");
+    //CONSOLE.print (*spReg, HEX);
+    //PRINT(" sp=%-ld", *spReg);
+    PRINT(" %4.1f", battery.batteryVoltage);
+    PRINT(" %4.0f", battery.chargingCurrent*1000.);
+
+    if (simulationFlag)
+    {
+       static float dummyTx = 10.0, dummyTy = -5.0;
+       static float dummySx = 0.0, dummySy = -5.0, dummyStep = 1.;
+       float dummyGx, dummyGy;
+       static bool firstFlag = true;
+
+       if (firstFlag)
+       {
+          firstFlag = false;
+          randomSeed(analogRead(0));
+       }
+
+       dummySx += dummyStep;
+       if (dummySx >= 10.)
+       {
+          dummyTx = -10.;
+          dummyStep = -1.;
+       }
+       else if (dummySx <= -10.)
+       {
+          dummyTx = 10.;
+          dummyStep = 1.;
+       }
+       dummyGx = dummySx + (float)random(-40, 40)*0.01;
+       dummyGy = dummySy + (float)random(-40, 40)*0.01;
+
+       PRINT(" %6.2f", dummyTx);
+       PRINT(" %6.2f", dummyTy);
+       PRINT(" %6.2f", dummySx);
+       PRINT(" %6.2f", dummySy);
+       PRINT(" %6.2f", stateDelta);
+       PRINT(" %6.2f", dummyGx);
+       PRINT(" %6.2f", dummyGy);
+    }
+    else
+    {
+       PRINT(" %6.2f", maps.targetPoint.x());
+       PRINT(" %6.2f", maps.targetPoint.y());
+       PRINT(" %6.2f", stateX);
+       PRINT(" %6.2f", stateY);
+       PRINT(" %6.2f", stateDelta);
+       PRINT(" %6.2f", gps.relPosE);
+       PRINT(" %6.2f", gps.relPosN);
+    }
+    //CONSOLE.print(" tow=");
+    //CONSOLE.print(gps.iTOW);
+    //CONSOLE.print(" lon=");
+    //CONSOLE.print(gps.lon,8);
+    //CONSOLE.print(" lat=");
+    //CONSOLE.print(gps.lat,8);
+    //CONSOLE.print(" h=");
+    PRINT(" %6.2f", gps.relPosD);
+
+	 float gps_height = gps.height - 412;		// 412m ist ungefähr die minimale Höhe des Gartens
+	 gps_height = min(gps_height, 99.99);
+	 gps_height = max(gps_height,-99.99);
+	 PRINT(" %6.2f", gps_height);
+    
+         if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(" INV"); }
+	 else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(" FLT"); }
+	 else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(" FIX"); }
+    else                                         { CONSOLE.print(" ???"); }
+
+    float age = (millis() - gps.dgpsAge) / 1000.0;
+    age = min(age, 999.00);
+    age = max(age,   0.00);
+    PRINT(" %5.1f", age);
+    PRINT(" %4.0f", motor.motorLeftSenseLP*1000.);
+    PRINT(" %4.0f", motor.motorRightSenseLP*1000.);
+    PRINT(" %4.0f", motor.motorMowSenseLP*1000.);
+    
+    PRINT("%5.1f°C", stateTemp); 
+    PRINT("%3.0f%%%", stateHumidity);
+
+    PRINT(" %c", bluetoothLoggingFlag ? 'B' : 'b');
+    PRINT(" %c", USE_GPS_FLOAT_FOR_POS_ESTIMATION ? 'P' : 'p');
+    PRINT(" %c", USE_GPS_FLOAT_FOR_DELTA_ESTIMATION ? 'D' : 'd');
+
+    CONSOLE.println();
+    //logCPUHealth();
+  }
+}
+#endif
