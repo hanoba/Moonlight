@@ -1,0 +1,3 @@
+*.sdf
+__pycache__
+*.user
