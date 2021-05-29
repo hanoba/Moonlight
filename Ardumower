@@ -1,0 +1,61 @@
+<NotepadPlus>
+    <Project name="Moonlight">
+        <File name="battery.cpp" />
+        <File name="battery.h" />
+        <File name="ble.cpp" />
+        <File name="ble.h" />
+        <File name="buzzer.cpp" />
+        <File name="buzzer.h" />
+        <File name="comm.cpp" />
+        <File name="comm.h" />
+        <File name="config.h" />
+        <File name="config_example.h" />
+        <File name="console.h" />
+        <File name="cpu.cpp" />
+        <File name="cpu.h" />
+        <File name="helper.cpp" />
+        <File name="helper.h" />
+        <File name="helper_3dmath.h" />
+        <File name="i2c.cpp" />
+        <File name="i2c.h" />
+        <File name="LinkedList.h" />
+        <File name="map.cpp" />
+        <File name="map.h" />
+        <File name="Moonlight.ino" />
+        <File name="motor.cpp" />
+        <File name="motor.h" />
+        <File name="pid.cpp" />
+        <File name="pid.h" />
+        <File name="pinman.cpp" />
+        <File name="pinman.h" />
+        <File name="rcmodel.cpp" />
+        <File name="rcmodel.h" />
+        <File name="reset.cpp" />
+        <File name="reset.h" />
+        <File name="robot.cpp" />
+        <File name="robot.h" />
+        <File name="RunningMedian.h" />
+        <File name="sdserial.cpp" />
+        <File name="sdserial.h" />
+        <File name="sonar.cpp" />
+        <File name="sonar.h" />
+        <File name="SparkFunHTU21D.cpp" />
+        <File name="SparkFunHTU21D.h" />
+        <File name="udpserial.cpp" />
+        <File name="udpserial.h" />
+        <File name="VL53L0X.cpp" />
+        <File name="VL53L0X.h" />
+        <Folder name="ublox">
+            <File name="src\ublox\ublox.h" />
+            <File name="src\ublox\ublox.cpp" />
+            <File name="src\ublox\SparkFun_Ublox_Arduino_Library.h" />
+            <File name="src\ublox\SparkFun_Ublox_Arduino_Library.cpp" />
+        </Folder>
+    </Project>
+    <Project name="amcp">
+        <File name="C:\Users\Harald\1-Data\8-Projekte\Roboter\amcp\amcp.py" />
+        <File name="C:\Users\Harald\1-Data\8-Projekte\Roboter\amcp\hblog.py" />
+        <File name="C:\Users\Harald\1-Data\8-Projekte\Roboter\amcp\maps.py" />
+        <File name="C:\Users\Harald\1-Data\8-Projekte\Roboter\amcp\plan.py" />
+    </Project>
+</NotepadPlus>
