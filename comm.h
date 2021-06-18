@@ -11,6 +11,7 @@
 
 void processComm();
 void outputConsole();
+void outputConsoleInit();
 
 void processWifi();
 void processConsole();

@@ -8,6 +8,7 @@
 #include "helper.h"
 #include "robot.h"
 #include "Arduino.h"
+#include "sim.h"
 
 
 
@@ -103,7 +104,10 @@ void Motor::speedPWM ( int pwmLeft, int pwmRight, int pwmMow )
 //  omega: rotation speed (rad/s)
 //      V     = (VR + VL) / 2       =>  VR = V + omega * L/2
 //      omega = (VR - VL) / L       =>  VL = V - omega * L/2
-void Motor::setLinearAngularSpeed(float linear, float angular, bool useLinearRamp){
+void Motor::setLinearAngularSpeed(float linear, float angular, bool useLinearRamp)
+{
+   if (sim.SetLinearAngularSpeed(linear, angular)) return;
+
    setLinearAngularSpeedTimeout = millis() + 1000;
    setLinearAngularSpeedTimeoutActive = true;
    if ((activateLinearSpeedRamp) && (useLinearRamp)) {

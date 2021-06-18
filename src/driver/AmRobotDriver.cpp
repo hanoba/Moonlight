@@ -8,6 +8,7 @@
 #include "../../config.h"
 #include "../../helper.h"
 #include "../../robot.h"
+#include "../../sim.h"
 
 
 volatile int odomTicksLeft  = 0;
@@ -116,6 +117,13 @@ void AmMotorDriver::setMotorPwm(int leftPwm, int rightPwm, int mowPwm){
 
 
 void AmMotorDriver::getMotorFaults(bool &leftFault, bool &rightFault, bool &mowFault){ 
+   if (simulationFlag)  //HB
+   {
+      leftFault = false;
+      rightFault = false;
+      mowFault = false;
+      return;
+   }
   if (digitalRead(pinMotorLeftFault) == LOW) {
     leftFault = true;
   }
@@ -143,6 +151,13 @@ void AmMotorDriver::resetMotorFaults(){
 }
 
 void AmMotorDriver::getMotorCurrent(float &leftCurrent, float &rightCurrent, float &mowCurrent){
+   if (simulationFlag)     //HB
+   {
+      leftCurrent = 0.0;
+      rightCurrent = 0.0;
+      mowCurrent = 0.0;
+      return;
+   }
     float scale       = 1.905;   // ADC voltage to amp   
     leftCurrent = ((float)ADC2voltage(analogRead(pinMotorRightSense))) *scale;
     rightCurrent = ((float)ADC2voltage(analogRead(pinMotorLeftSense))) *scale;
@@ -205,18 +220,21 @@ void AmBatteryDriver::run(){
 
     
 float AmBatteryDriver::getBatteryVoltage(){
+   if (simulationFlag) return 26.0;    //HB
   float voltage = ((float)ADC2voltage(analogRead(pinBatteryVoltage))) * batteryFactor;
   return voltage;  
 }
 
 float AmBatteryDriver::getChargeVoltage(){
-  float voltage = ((float)ADC2voltage(analogRead(pinChargeVoltage))) * batteryFactor;
+   if (simulationFlag) return 0.0;     //HB
+   float voltage = ((float)ADC2voltage(analogRead(pinChargeVoltage))) * batteryFactor;
   return voltage;
 }
 
 
 float AmBatteryDriver::getChargeCurrent(){    
-  float amps = ((float)ADC2voltage(analogRead(pinChargeCurrent))) * currentFactor;    
+   if (simulationFlag) return 0.0;     //HB
+   float amps = ((float)ADC2voltage(analogRead(pinChargeCurrent))) * currentFactor;
 	return amps;
 }
 
@@ -255,10 +273,7 @@ void AmBatteryDriver::keepPowerOn(bool flag)
     delay(1000);
 
     // switch ArduMower off
-    while (true)
-    {
-        digitalWrite(pinBatterySwitch, LOW);
-    }
+    digitalWrite(pinBatterySwitch, LOW);
 }
 
 

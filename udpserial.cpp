@@ -8,8 +8,9 @@
 #include "src/esp/WiFiEsp.h"
 #include "src/esp/WiFiEspUdp.h"
 #include "console.h"
+#include "sim.h"
 
-extern bool simulationFlag;
+//extern bool simulationFlag;
 
 //#if defined(_SAM3XA_)                 // Arduino Due
 //  #define CONSOLE SerialUSB
@@ -32,6 +33,14 @@ int packetIdx = 0;
 bool udpStarted = false;
 bool udpActive = false;
 
+IPAddress remoteIP_home1(192,168,178,42);     // HBA004                  UDP_SERVER_IP_SIM);
+IPAddress remoteIP_home2(192,168,178,26);     // MagicMirror PI
+
+IPAddress remoteIP_garten1(192,168,20,101);   // Garten Surface Pro     UDP_SERVER_IP);
+IPAddress remoteIP_garten2(192,168,20,27);    // Garten PI              
+
+IPAddress remoteIP1;
+IPAddress remoteIP2;
 
 void UdpSerial::begin(unsigned long baud){  
   CONSOLE.begin(baud);
@@ -42,6 +51,16 @@ void UdpSerial::beginUDP(){
   ////Udp.beginPacket(remoteIP, UDP_SERVER_PORT);
   // Udp.endPacket();
   udpStarted = true;  
+  if (simulationFlag)
+  {
+     remoteIP1 = remoteIP_home1;
+     remoteIP2 = remoteIP_home2;
+  }
+  else
+  {
+     remoteIP1 = remoteIP_garten1;
+     remoteIP2 = remoteIP_garten2;
+  }
 }
 
 
@@ -69,10 +88,18 @@ size_t UdpSerial::write(uint8_t data)
       packetIdx++;
       if (packetIdx == PACKET_BUFFER_SIZE-1 || data == '\n')
       {
-         IPAddress remoteIP_sim(UDP_SERVER_IP_SIM);
-         IPAddress remoteIP(UDP_SERVER_IP);
+         //IPAddress remoteIP_sim(UDP_SERVER_IP_SIM);
+         //IPAddress remoteIP(UDP_SERVER_IP);
          packetBuffer[packetIdx] = 0;
-         Udp.beginPacket(simulationFlag ? remoteIP_sim : remoteIP, UDP_SERVER_PORT);
+         //Udp.beginPacket(simulationFlag ? remoteIP_sim : remoteIP, UDP_SERVER_PORT);
+
+         // send to PC
+         Udp.beginPacket(remoteIP1, UDP_SERVER_PORT);
+         Udp.write(packetBuffer);              
+         Udp.endPacket();
+
+         // send Raspi
+         Udp.beginPacket(remoteIP2, UDP_SERVER_PORT);
          Udp.write(packetBuffer);              
          Udp.endPacket();
 #ifdef ENABLE_SD_LOG

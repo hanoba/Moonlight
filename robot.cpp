@@ -28,12 +28,14 @@
 #include "reset.h"
 #include "cpu.h"
 #include "i2c.h"
+#include "sim.h"
+#include "rtc.h"
 
 
 // #define I2C_SPEED  10000
 #define _BV(x) (1 << (x))
 
-bool simulationFlag = false;
+Sim sim;
 
 const signed char orientationMatrix[9] = {
   1, 0, 0,
@@ -237,7 +239,10 @@ bool loadState(){
   }
   uint32_t marker = 0;
   stateFile.read((uint8_t*)&marker, sizeof(marker));
-  if (marker != 0x10001003){
+  maps.mapID = marker & 15;
+  if (maps.mapID==0 || maps.mapID > 10) maps.mapID==3;
+  if ((marker & 0xFFFFfff0) != 0x10001000)
+  {
     CONSOLE.print("ERROR: invalid marker: ");
     CONSOLE.println(marker, HEX);
     return false;
@@ -299,7 +304,8 @@ bool saveState(){
     CONSOLE.println("ERROR opening file for writing");
     return false;
   }
-  uint32_t marker = 0x10001003;
+  if (maps.mapID==0 || maps.mapID > 10) maps.mapID==3;
+  uint32_t marker = 0x10001000 | maps.mapID;
   res &= (stateFile.write((uint8_t*)&marker, sizeof(marker)) != 0); 
   res &= (stateFile.write((uint8_t*)&maps.mapCRC, sizeof(maps.mapCRC)) != 0); 
 
@@ -659,7 +665,8 @@ bool checkAT24C32() {
 
 
 // robot start routine
-void start(){    
+void start()
+{    
   pinMan.begin();       
   // keep battery switched ON
   pinMode(pinBatterySwitch, OUTPUT);    
@@ -668,6 +675,8 @@ void start(){
   pinMode(pinButton, INPUT_PULLUP);
   buzzer.begin();      
   CONSOLE.begin(CONSOLE_BAUDRATE);  
+
+
   CONSOLE.println(VER);
 
 #if defined(ENABLE_RASPI_SHUTDOWN)
@@ -679,34 +688,46 @@ void start(){
 
   Wire.begin();      
   analogReadResolution(12);  // configure ADC 12 bit resolution
-  unsigned long timeout = millis() + 2000;
-  while (millis() < timeout)
+  //unsigned long timeout = millis() + 2000;
+  //while (millis() < timeout)
+  //{
+  //  if (!checkAT24C32())
+  //  {
+  //    CONSOLE.println(F("PCB not powered ON or RTC module missing"));      
+  //    simulationFlag = true;
+  //    CONSOLE.println(F("Simulation mode enabled!"));
+  //    I2Creset();
+  //    Wire.begin();    
+  //    #ifdef I2C_SPEED
+  //      Wire.setClock(I2C_SPEED);     
+  //    #endif
+  //  } else break;
+  //}  
+  //delay(1500);
+  if (ReadAT24C32(0) == 56)
   {
-    if (!checkAT24C32())
-    {
-      CONSOLE.println(F("PCB not powered ON or RTC module missing"));      
-      simulationFlag = true;
-      CONSOLE.println(F("Simulation mode enabled!"));
-      I2Creset();
-      Wire.begin();    
-      #ifdef I2C_SPEED
-        Wire.setClock(I2C_SPEED);     
-      #endif
-    } else break;
-  }  
-  delay(1500);
-    
-  #if defined(ENABLE_SD)
-    if (SD.begin(SDCARD_SS_PIN)){
-      CONSOLE.println("SD card found!");
-      #if defined(ENABLE_SD_LOG)        
-        sdSerial.beginSD();  
-      #endif
-    } else {
-      CONSOLE.println("no SD card found");                
-    }    
-  #endif 
-  
+     simulationFlag = true;
+     CONSOLE.println(F("Simulation mode enabled!"));
+  }
+
+
+#if defined(ENABLE_SD)
+  if (SD.begin(SDCARD_SS_PIN))
+  {
+     CONSOLE.println("SD card found!");
+     SdCardDateTimeInit();
+#if defined(ENABLE_SD_LOG)        
+     sdSerial.beginSD();
+#endif
+  }
+  else
+  {
+     CONSOLE.println("no SD card found");
+  }
+#endif 
+
+  outputConsoleInit();
+
   logResetCause();
   
   CONSOLE.println(VER);          
@@ -800,7 +821,10 @@ void calcStats(){
 // to fusion GPS heading (long-term) and IMU heading (short-term)
 // with IMU: heading (stateDelta) is computed by gyro (stateDeltaIMU)
 // without IMU: heading (stateDelta) is computed by odometry (deltaOdometry)
-void computeRobotState(){  
+void computeRobotState()
+{
+   if (sim.ComputeRobotState()) return;
+
   long leftDelta = motor.motorLeftTicks-stateLeftTicks;
   long rightDelta = motor.motorRightTicks-stateRightTicks;  
   stateLeftTicks = motor.motorLeftTicks;
@@ -824,20 +848,25 @@ void computeRobotState(){
     resetLastPos = true;
   }
   
-  if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
+  //HB if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
+  if ((gps.solutionAvail) && gps.solution == UBLOX::SOL_FIXED)
   {
       gps.solutionAvail = false;        
       stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * gps.groundSpeed;    
       //CONSOLE.println(stateGroundSpeed);
       float distGPS = sqrt( sq(posN-lastPosN)+sq(posE-lastPosE) );
-      if ((distGPS > 0.3) || (resetLastPos))
+      const float DIST_GPS_JUMP = 0.3;     //HB in meter
+      if ((distGPS > DIST_GPS_JUMP) || (resetLastPos))
       {
-          if (distGPS > 0.3) {
+#define ENABLE_GPS_JUMP_DETECTION 0     //HB
+#if ENABLE_GPS_JUMP_DETECTION
+          if (distGPS > DIST_GPS_JUMP) {
             gpsJump = true;
             statGPSJumps++;
             CONSOLE.print("GPS jump: ");
             CONSOLE.println(distGPS);
           }
+#endif
           resetLastPos = false;
           lastPosN = posN;
           lastPosE = posE;

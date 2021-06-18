@@ -104,6 +104,15 @@
     <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\SD.h">
       <Filter>ArduinoLib</Filter>
     </ClInclude>
+    <ClInclude Include="sim.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\utility\SdFat.h">
+      <Filter>ArduinoLib</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="battery.cpp">
@@ -167,6 +176,12 @@
       <Filter>src\driver</Filter>
     </ClCompile>
     <ClCompile Include="file_cmds.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="sim.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

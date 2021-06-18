@@ -156,6 +156,7 @@ class Map
     bool shouldMow;  // start mowing?       
     
     long mapCRC;  // map data CRC
+    uint32_t mapID;  //HB
         
     void begin();    
     void run();    

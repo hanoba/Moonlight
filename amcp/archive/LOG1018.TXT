@@ -1,0 +1,17 @@
+You're connected with SSID=Hanobau1 and IP=192.168.178.71
+MPU ID=0x0
+MPU6050/9150/9250/9255 not found - Did you connect AD0 to 3.3v and choose it in config.h?
+resuming is activated
+state load... ok
+dumpState:  X=0.01 Y=0.00 delta=0.00 mapCRC=-91231 mowPointsIdx=0 dockPointsIdx=0 freePointsIdx=0 wayMode=3 op=0 sensor=0 sonar.enabled=0 fixTimeout=0 absolutePosSource=0 lon=0.00 lat=0.00
+CHARGER CONNECTED
+enableCharging 1
+setOperation op=2 OP_CHARGE
+dumpState:  X=0.01 Y=0.00 delta=0.00 mapCRC=-91231 mowPointsIdx=0 dockPointsIdx=0 freePointsIdx=0 wayMode=3 op=2 sensor=0 sonar.enabled=0 fixTimeout=0 absolutePosSource=0 lon=0.00 lat=0.00
+save state... ok
+#On-Time  Tctl State   freem Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im   Temp Hum Flags
+:00:00:19 0.00 CHARGE  77703 25.2  123  10.00  -5.00   1.00  -5.00   0.00   1.33  -4.69   0.00 -99.99 INVAL  19.2  0/0    31   31   62 25.0øC 50% b p d
+ERROR motor overload duration=0  current=0.80,0.81,1.24
+:00:00:24 0.02 CHARGE  77703 24.7 1110  10.00  -5.00   2.00  -5.00   0.00   2.12  -4.77   0.00 -99.99 INVAL  24.1  0/0  1744 1764 2625 25.0øC 50% b p d
+Packet received: AT+$L,LOG*,0x68
+SWITCHING OFF (undervoltage)

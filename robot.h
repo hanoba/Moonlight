@@ -22,9 +22,12 @@
 #include "map.h"   
 #include "src/ublox/ublox.h"
 #include "src/esp/WiFiEsp.h"
+#include "sim.h"
 
-#define VER "Ardumower Moonlight,1.0.168.3 HB 2021-05-27"
+#define VER "Ardumower Moonlight,1.0.168.12 HB 2021-06-17"
 
+#define CONTROL_PERIOD_MS 20
+#define LOG_PERIOD_MS 3000
 
 enum OperationType {
       OP_IDLE,      
@@ -55,7 +58,7 @@ enum Sensor {
       SENS_STOP_BUTTON,
 };
 
-extern bool simulationFlag;
+//extern bool simulationFlag;
 
 extern OperationType stateOp; // operation
 extern Sensor stateSensor; // last triggered sensor
@@ -127,6 +130,7 @@ extern VL53L0X tof;
 extern PinManager pinMan;
 extern Map maps;
 extern UBLOX gps;
+extern Sim sim;
 
 int freeMemory();
 void start();
