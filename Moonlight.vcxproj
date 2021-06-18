@@ -21,32 +21,32 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{21C03B9A-FC0A-45E1-B6B5-8EE369DA08CB}</ProjectGuid>
     <RootNamespace>Moonlight</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -118,6 +118,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\SD.h" />
+    <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\utility\SdFat.h" />
     <ClInclude Include="battery.h" />
     <ClInclude Include="ble.h" />
     <ClInclude Include="buzzer.h" />
@@ -138,8 +139,10 @@
     <ClInclude Include="rcmodel.h" />
     <ClInclude Include="reset.h" />
     <ClInclude Include="robot.h" />
+    <ClInclude Include="rtc.h" />
     <ClInclude Include="RunningMedian.h" />
     <ClInclude Include="sdserial.h" />
+    <ClInclude Include="sim.h" />
     <ClInclude Include="sonar.h" />
     <ClInclude Include="SparkFunHTU21D.h" />
     <ClInclude Include="src\driver\AmRobotDriver.h" />
@@ -162,7 +165,9 @@
     <ClCompile Include="rcmodel.cpp" />
     <ClCompile Include="reset.cpp" />
     <ClCompile Include="robot.cpp" />
+    <ClCompile Include="rtc.cpp" />
     <ClCompile Include="sdserial.cpp" />
+    <ClCompile Include="sim.cpp" />
     <ClCompile Include="sonar.cpp" />
     <ClCompile Include="SparkFunHTU21D.cpp" />
     <ClCompile Include="src\driver\AmRobotDriver.cpp" />

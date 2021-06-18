@@ -2,8 +2,10 @@
 #include "sdserial.h"
 #include "file_cmds.h"
 #include "config.h"
+#include "robot.h"
+#include "map.h"
 
-
+Sd2Card card;
 SDFile root;
 const char *SOF_MARK = "$$$SOF$$$";
 const char *EOF_MARK = "$$$EOF$$$";
@@ -20,6 +22,43 @@ static bool match(char *fileName, String pattern)
    }
    return true;
 }
+
+
+//------------------------------------------------------------------------------
+/** List directory contents to Serial.
+
+\param[in] flags The inclusive OR of
+
+LS_DATE - %Print file modification date
+
+LS_SIZE - %Print file size.
+
+LS_R - Recursive list of subdirectories.
+
+\param[in] indent Amount of space before file name. Used for recursive
+list to indicate subdirectory level.
+*/
+//void SdFile::ls(uint8_t flags, uint8_t indent) 
+static void FileSystemCmd_tree_Serial()
+{
+   SdFile root;
+   SdVolume volume;
+   if (!card.init(SPI_HALF_SPEED, SDCARD_SS_PIN))
+   {
+      CONSOLE.println("SD Card Error");
+      return;
+   }
+   if (!volume.init(card))
+   {
+      CONSOLE.println("SD Card Error");
+      return;
+   }
+   root.openRoot(volume);
+   // list all files in the card with date and size
+   root.ls(LS_R | LS_DATE | LS_SIZE);
+   root.close();
+}
+
 
 static void FileSystemCmd_ls(String pattern)
 {
@@ -137,15 +176,19 @@ static void FileSystemCmd_cat(String fileName)
    dataFile.close();
 }
 
-
 void FileSystemCmd(String cmd)
 {
    udpSerial.DisableLogging();
-   CONSOLE.println(SOF_MARK);
-   String fileName = cmd.substring(6);
-        if (cmd[4] == 'L') FileSystemCmd_ls(fileName);
-   else if (cmd[4] == 'C') FileSystemCmd_cat(fileName);
-   else if (cmd[4] == 'R') FileSystemCmd_rm(fileName);
-   CONSOLE.println(EOF_MARK);
+   if (cmd[4] == 'T') FileSystemCmd_tree_Serial();
+   //else if (cmd[4] == 'M') FileSystemCmd_ReadMapFile(cmd.substring(6).toInt());
+   else
+   {
+      CONSOLE.println(SOF_MARK);
+      String fileName = cmd.substring(6);
+      if (cmd[4] == 'L') FileSystemCmd_ls(fileName);
+      else if (cmd[4] == 'C') FileSystemCmd_cat(fileName);
+      else if (cmd[4] == 'R') FileSystemCmd_rm(fileName);
+      CONSOLE.println(EOF_MARK);
+   }
    udpSerial.EnableLogging();
 }

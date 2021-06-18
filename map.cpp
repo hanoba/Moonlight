@@ -45,8 +45,8 @@ float Point::y(){
 
 
 Point::Point(float ax, float ay){
-  px = ax * 100;
-  py = ay * 100;
+  px = ax*100 + (ax>0 ? 0.5 : -0.5);
+  py = ay*100 + (ay>0 ? 0.5 : -0.5);
 }
 
 void Point::assign(Point &fromPoint){
@@ -55,12 +55,16 @@ void Point::assign(Point &fromPoint){
 }
 
 void Point::setXY(float ax, float ay){
-  px = ax * 100;
-  py = ay * 100;
+  px = ax * 100 + (ax>0 ? 0.5 : -0.5);
+  py = ay * 100 + (ay>0 ? 0.5 : -0.5);
 }
 
 long Point::crc(){
-  return (px + py);  
+   //CONSOLE.print("CRC: ");
+   //CONSOLE.print(px);
+   //CONSOLE.print("   ");
+   //CONSOLE.println(py);
+   return (px + py);
 }
 
 bool Point::read(File &file){
@@ -470,6 +474,7 @@ void Map::begin(){
   freePointsIdx = 0;
   dockPointsIdx = 0;
   mapCRC = 0;  
+  mapID = 3;
   CONSOLE.print("sizeof Point=");
   CONSOLE.println(sizeof(Point));  
   load();

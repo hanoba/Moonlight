@@ -80,6 +80,8 @@ def Screen2Map(poly):
         (x,y) = poly[i]
         x =  (x - originX)*invScalingFactor
         y = -(y - originY)*invScalingFactor
+        x = round(x,2)
+        y = round(y,2)
         poly[i] = (x,y)
 
 
@@ -219,7 +221,7 @@ def LoadMaps():
             Map2Screen(wpoly)
         wayPoints.append(wpoly)
             
-def StoreMaps():
+def StoreMaps(fileName):
     for m in range(1,10):
         if len(perimeters[m]) > 2:
             #process perimeter
@@ -242,38 +244,14 @@ def StoreMaps():
             maps_json[m] = { }
     with open('tmp.json', 'w') as outfile:
         json.dump(maps_json, outfile)
-    print("Storing maps in maps2.json")
-    os.system("python -m json.tool tmp.json >maps2.json")
+    os.system("python -m json.tool tmp.json >"+fileName)
 
 
-def SendCmd(cmd):
-   sleep(0.1)
-   for transmission in range(3):
-      print("[maps.SendCmd] " + cmd)
-      udp.send(cmd)
-      
-      print("[maps.SendCmd] Wait for answer: " + cmd[3])
-      timeOutCounter = 5
-      # longer timeout for N and C commands
-      if cmd[3]=="N" or cmd[3]=="C": timeOutCounter = 20
-      while True:
-         answer = udp.receive()
-         if answer != "":
-            print(answer, end='')
-            if answer[0] == cmd[3]: return SUCCESS
-         sleep(0.1)
-         timeOutCounter = timeOutCounter - 1
-         if timeOutCounter == 0: break;
-      print("[maps.SendCmd] TIMEOUT ERROR - Transmission #", transmission);
-   return ERROR
-
-
-
-def UploadMap(m, startMowingFlag):
+def UploadMap(m):
    errorFlag = True
    if len(perimeters[m]) >= 4:
        cmd = str.format('AT+U,{:d}',m+1)
-       if SendCmd(cmd): return True
+       if udp.ExecCmd(cmd)=="": return ERROR
        #process perimeter
        perimeter = perimeters[m].copy()
        Screen2Map(perimeter)
@@ -285,7 +263,7 @@ def UploadMap(m, startMowingFlag):
            (x1,y1) = perimeter[i]
            i = i + 1
            if i<plen:
-               (x2,y2) = perimeter[j]
+               (x2,y2) = perimeter[i]
                cmd = str.format('AT+W,{:d},{:.2f},{:.2f},{:.2f},{:.2f}',j,x1,y1,x2,y2)
                i = i + 1
                j = j + 2
@@ -293,7 +271,7 @@ def UploadMap(m, startMowingFlag):
                cmd = str.format('AT+W,{:d},{:.2f},{:.2f}',j,x1,y1)
                j = j + 1
                break
-           if SendCmd(cmd)==ERROR: return ERROR
+           if udp.ExecCmd(cmd)=="": return ERROR
    if len(wayPoints[m]) >= 2:
        # process waypoints
        waypoints = wayPoints[m].copy()
@@ -312,26 +290,40 @@ def UploadMap(m, startMowingFlag):
            else:
                cmd = str.format('AT+W,{:d},{:.2f},{:.2f}',j,x1,y1)
                j = j + 1
-               break
-           if SendCmd(cmd)==ERROR: return ERROR
+           if udp.ExecCmd(cmd)=="": return ERROR
        # AT+N, iWayPerimeter, iWayExclusion, iWayDock, iWayMow, iWayFree
        cmd = str.format('AT+N,{:d},0,0,{:d},0',plen,wlen)
-       if SendCmd(cmd)==ERROR: return ERROR
-       if startMowingFlag:
-           sleep(1)
-           # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
-           #bEnableMowMotor = -1          # off
-           #iOperationType = 1            # 1=OP_MOW
-           fSpeed = 0.39                 # m/s
-           #iFixTimeout = 0               # 0 = no fix timeout
-           #bFinishAndRestart = 0         # disabled
-           #fMowingPointPercent = -1      # 
-           #bSkipNextMowingPoint = -1     # disabled
-           #bEnableSonar = 0              # disabled
-           cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-           if SendCmd(cmd)==ERROR: return ERROR
+       if udp.ExecCmd(cmd)=="": return ERROR
+       sleep(1)
    return SUCCESS
 
+
+def ComputeMapChecksum(m):
+   checkSum = int(0)
+   if len(perimeters[m]) >= 4:
+       #process perimeter
+       perimeter = perimeters[m].copy()
+       Screen2Map(perimeter)
+       plen = len(perimeter)
+       i = 0
+       j = 0
+       while True:
+           if i >=plen: break
+           (x1,y1) = perimeter[i]
+           checkSum += int(math.floor(x1*100+0.5)) + int(math.floor(y1*100+0.5))
+           i = i + 1
+   if len(wayPoints[m]) >= 2:
+       # process waypoints
+       waypoints = wayPoints[m].copy()
+       Screen2Map(waypoints)
+       wlen = len(waypoints)
+       i = 0
+       while True:
+           if i >=wlen: break
+           (x1,y1) = waypoints[i]
+           checkSum += int(math.floor(x1*100+0.5)) + int(math.floor(y1*100+0.5))
+           i = i + 1
+   return checkSum
 
 
 def main():

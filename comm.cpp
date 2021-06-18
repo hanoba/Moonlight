@@ -4,6 +4,10 @@
 #include "reset.h"
 #include "src/esp/WiFiEsp.h"
 #include "file_cmds.h"
+#include "sim.h"
+#include "rtc.h"
+
+static void processCmd(bool checkCrc, String cmd);
 
 unsigned long nextInfoTime = 0;
 bool triggerWatchdog = false;
@@ -20,7 +24,7 @@ float statMaxControlCycleTime = 0;
 
 
 //HB New map control
-static uint8_t currentMapIndex = 0;
+//static uint8_t currentMapIndex = 0;
 static bool writeMapFlag = false;
 
 
@@ -42,20 +46,15 @@ void WriteMap(String cmd)
    if (!writeMapFlag) return;
 
    char mapFileName[32];
-   sprintf(mapFileName, "MAP%d.TXT", currentMapIndex);
+   sprintf(mapFileName, "MAP%d.TXT", maps.mapID);
    SDFile mapFile;
 
    if (cmd == "")
    {
-      CONSOLE.println("Create map file");
+      CONSOLE.print("Create map file ");
+      CONSOLE.println(mapFileName);
       SD.remove(mapFileName);
       return;
-      //mapFile = SD.open(mapFileName, O_WRITE | O_CREAT);
-      //if (mapFile)
-      //{
-      //   mapFile.close();
-      //   return;
-      //}
    }
    else
    {
@@ -77,6 +76,139 @@ void WriteMap(String cmd)
       }
    }
    CONSOLE.println("ERROR opening map file for writing");
+}
+
+
+// Get/set data/time of the RTC
+void cmdRtc(String cmd)
+{
+   DateTime dateTime = {};
+   String s = F("D,");
+
+   if (cmd.length()<6)
+   {
+      GetDateTime(dateTime);
+      String dateTimeText = DateTime2String(dateTime);
+      CONSOLE.print("Current date and time: ");
+      CONSOLE.println(dateTimeText);
+      s += dateTimeText;
+   }
+   else
+   {
+      int counter = 0;
+      int lastCommaIdx = 0;
+
+      for (int idx = 0; idx < cmd.length(); idx++) 
+      {
+         char ch = cmd[idx];
+         if ((ch == ',') || (idx == cmd.length() - 1)) 
+         {
+            int intValue = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
+            if (counter == 1) dateTime.year = intValue % 100;
+            else if (counter == 2) dateTime.month = intValue;
+            else if (counter == 3) dateTime.monthday = intValue;
+            else if (counter == 4) dateTime.hour = intValue;
+            else if (counter == 5) dateTime.minute = intValue;
+            else if (counter == 6) dateTime.second = intValue;
+            else if (counter == 7) dateTime.weekday = intValue + 1;
+
+            counter++;
+            lastCommaIdx = idx;
+         }
+      }
+      if (counter == 8
+         && dateTime.month >= 1    && dateTime.month <= 12
+         && dateTime.monthday >= 1 && dateTime.monthday <= 31
+         && dateTime.hour >= 0     && dateTime.hour <= 23
+         && dateTime.minute >= 0   && dateTime.minute <= 59
+         && dateTime.second >= 0   && dateTime.second <= 59
+         && dateTime.weekday >= 1  && dateTime.weekday <= 7)
+      {
+         DateTime newDateTime;
+         SetDateTime(dateTime);
+         outputConsoleInit();    // adjust timestamp
+
+         GetDateTime(newDateTime);
+         String dateTimeText = DateTime2String(newDateTime);
+         CONSOLE.print("New date and time: ");
+         CONSOLE.println(dateTimeText);
+         s += dateTimeText;
+      }
+      else
+      {
+         CONSOLE.print("Illegal date/time: ");
+         CONSOLE.println(cmd);
+         s += F("ERROR");
+      }
+   }
+   cmdAnswer(s);
+}
+
+
+static void cmdReadMapFile(String cmd)
+{
+   long mapCheckSum = 0;
+   int mapId = cmd.substring(5).toInt();
+   if (mapId<1 || mapId>10)
+   {
+      CONSOLE.print("Illegal MapId: ");
+      CONSOLE.println(mapId);
+   }
+   else
+   {
+      char fileName[16];
+      sprintf(fileName, "MAP%d.TXT", mapId);
+      CONSOLE.print("Loading map from file ");
+      CONSOLE.println(fileName);
+
+      udpSerial.DisableLogging();
+      SDFile dataFile = SD.open(fileName);
+
+      // if the file is available, read it:
+      if (dataFile)
+      {
+         const bool NO_CHECKSUM_CHECK = false;
+         const int LINE_SIZE = 256;
+         char line[LINE_SIZE];
+         maps.mapID = mapId;
+         int i = 0;
+         while (dataFile.available())
+         {
+            char ch = dataFile.read();
+            //CONSOLE.write(ch);
+            if (ch != 10)
+            {
+               if (ch == 13 || i == LINE_SIZE - 1)
+               {
+                  line[i] = 0;
+                  processCmd(NO_CHECKSUM_CHECK, line);
+                  i = 0;
+                  watchdogReset();
+               }
+               else
+               {
+                  line[i++] = ch;
+               }
+            }
+         }
+         if (i)
+         {
+            line[i] = 0;
+            processCmd(NO_CHECKSUM_CHECK, line);
+         }
+         mapCheckSum = maps.mapCRC;
+      }
+      else 
+      {
+         CONSOLE.print("error opening file ");
+         CONSOLE.println(fileName);
+      }
+      dataFile.close();
+      udpSerial.EnableLogging();
+   }
+   String s = F("R,");
+   s += mapCheckSum;
+   cmdAnswer(s);
 }
 
 
@@ -332,6 +464,7 @@ void cmdPosMode(String cmd)
 
 // request version
 void cmdVersion(){
+   Serial.println("cmdVersion");
   String s = F("V,");
   s += F(VER);
   cmdAnswer(s);
@@ -402,9 +535,9 @@ void cmdStartUploadMap(String cmd)
       char ch = cmd[idx];
       if ((ch == ',') || (idx == cmd.length() - 1)) 
       {
-         currentMapIndex = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
-         CONSOLE.print("CurrentMapIndex=");
-         CONSOLE.println(currentMapIndex);
+         maps.mapID = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
+         CONSOLE.print("MapID=");
+         CONSOLE.println(maps.mapID);
          writeMapFlag = true;
          WriteMap("");
          break;
@@ -657,40 +790,52 @@ void processCmd(bool checkCrc, String cmd)
       //CONSOLE.println(cmd);
     }
   }
+  //CONSOLE.print("ProcessCmd : ");
+  //cONSOLE.println(cmd[3]);
   if (cmd[0] != 'A') return;
   if (cmd[1] != 'T') return;
   if (cmd[2] != '+') return;
-  if (cmd[3] == 'S') cmdSummary();
-  if (cmd[3] == 'M') cmdMotor(cmd);
-  if (cmd[3] == 'C') cmdControl(cmd);
-  if (cmd[3] == 'W') cmdWaypoint(cmd);
-  if (cmd[3] == 'N') cmdWayCount(cmd);
-  if (cmd[3] == 'X') cmdExclusionCount(cmd);
-  if (cmd[3] == 'V') cmdVersion();
-  if (cmd[3] == 'P') cmdPosMode(cmd);
-  if (cmd[3] == 'T') cmdStats();
-  if (cmd[3] == 'L') cmdClearStats();
-  if (cmd[3] == 'E') cmdMotorTest();
-  if (cmd[3] == 'O') cmdObstacle();
-  if (cmd[3] == 'F') cmdSensorTest();
-  if (cmd[3] == 'G') cmdToggleGPSSolution();   // for developers
-  if (cmd[3] == 'K') cmdKidnap();   // for developers
-  if (cmd[3] == 'Z') cmdStressTest();   // for developers
-  if (cmd[3] == 'Q') cmdSwitchOffRobot();
-  if (cmd[3] == 'U') cmdStartUploadMap(cmd);
-  if (cmd[3] == '$') FileSystemCmd(cmd);
-  if (cmd[3] == 'Y') {
-    if (cmd.length() <= 4){
-      cmdTriggerWatchdog();   // for developers
-    } else {
-      if (cmd[4] == '2') cmdToggleBluetoothLoggingFlag();  //  cmdGNSSReboot();   // for developers
-      if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
-      if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
-      if (cmd[4] == '5') cmdGNSSReboot();   // for developers
-      if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
-      if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
-      if (cmd[4] == 'V') cmdToggleGPSverbose();
-    }
+  else if (cmd[3] == 'S') cmdSummary();
+  else if (cmd[3] == 'M') cmdMotor(cmd);
+  else if (cmd[3] == 'C') cmdControl(cmd);
+  else if (cmd[3] == 'W') cmdWaypoint(cmd);
+  else if (cmd[3] == 'N') cmdWayCount(cmd);
+  else if (cmd[3] == 'X') cmdExclusionCount(cmd);
+  else if (cmd[3] == 'V') cmdVersion();
+  else if (cmd[3] == 'P') cmdPosMode(cmd);
+  else if (cmd[3] == 'T') cmdStats();
+  else if (cmd[3] == 'L') cmdClearStats();
+  else if (cmd[3] == 'E') cmdMotorTest();
+  else if (cmd[3] == 'O') cmdObstacle();
+  else if (cmd[3] == 'F') cmdSensorTest();
+  else if (cmd[3] == 'G') cmdToggleGPSSolution();   // for developers
+  else if (cmd[3] == 'K') cmdKidnap();   // for developers
+  else if (cmd[3] == 'Z') cmdStressTest();   // for developers
+  else if (cmd[3] == 'Q') cmdSwitchOffRobot();
+  else if (cmd[3] == 'R') cmdReadMapFile(cmd);
+  else if (cmd[3] == 'U') cmdStartUploadMap(cmd);
+  else if (cmd[3] == '$') FileSystemCmd(cmd);
+  else if (cmd[3] == 'D') cmdRtc(cmd);
+  else if (cmd[3] == 'Y') 
+  {
+      if (cmd.length() <= 4)
+      {
+         cmdTriggerWatchdog();   // for developers
+      } 
+      else 
+      {
+         if (cmd[4] == '2') cmdToggleBluetoothLoggingFlag();  //  cmdGNSSReboot();   // for developers
+         if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
+         if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
+         if (cmd[4] == '5') cmdGNSSReboot();   // for developers
+         if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
+         if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
+         if (cmd[4] == 'V') cmdToggleGPSverbose();
+      }
+  }
+  else
+  {
+     CONSOLE.println("Illegal command");
   }
 }
 
@@ -929,26 +1074,43 @@ void outputConsole(){
 #else
 #define PRINT(format, value) sprintf(buf, format, value); CONSOLE.print(buf);
 // output summary on console
-void outputConsole(){
+
+static uint32_t timestampOffset_sec;
+
+void outputConsoleInit()
+{
+   DateTime now;
+
+   GetDateTime(now);
+   timestampOffset_sec = now.second + (now.minute + now.hour * 60) * 60 - millis()/1000;
+   CONSOLE.print("Current datetime: ");
+   CONSOLE.println(DateTime2String(now));
+}
+
+void outputConsole()
+{
   char buf[40];
+  static const float DEGREE = 180 / PI;
+
   if (millis() > nextInfoTime){
     bool started = (nextInfoTime == 0);
-    nextInfoTime = millis() + 5000;
+    nextInfoTime = millis() + LOG_PERIOD_MS;
 
-    unsigned long totalsecs = millis()/1000;
+    unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
     unsigned long totalmins = totalsecs/60;
     unsigned long hour = totalmins/60;
     unsigned long min = totalmins % 60;
     unsigned long sec = totalsecs % 60;
     static int headLineCnt = 0;
-    if (headLineCnt == 0) CONSOLE.println("#On-Time  Tctl State   freem Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL   Age   Il   Ir   Im   Temp Hum Flags");
+    if (headLineCnt == 0) CONSOLE.println("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map  WayPts ");
     headLineCnt = headLineCnt + 1 & 7;
     PRINT(":%02d:", hour);
     PRINT("%02d:", min);
     PRINT("%02d", sec);
     if (!started){
       if (controlLoops > 0){
-        statControlCycleTime = 1.0 / (((float)controlLoops)/5.0);
+        //HB statControlCycleTime = 1.0 / (((float)controlLoops)/5.0);
+         statControlCycleTime = (float) LOG_PERIOD_MS / (1000*controlLoops);
       } else statControlCycleTime = 5;
       statMaxControlCycleTime = max(statMaxControlCycleTime, statControlCycleTime);
     }
@@ -963,14 +1125,12 @@ void outputConsole(){
     else                           CONSOLE.print("  ???  ");
 
 
-    PRINT(" %6d", freeMemory());
-    //uint32_t *spReg = (uint32_t*)__get_MSP();   // stack pointer
-    //CONSOLE.print (" sp=");
-    //CONSOLE.print (*spReg, HEX);
-    //PRINT(" sp=%-ld", *spReg);
+    //PRINT(" %6d", freeMemory());
     PRINT(" %4.1f", battery.batteryVoltage);
     PRINT(" %4.0f", battery.chargingCurrent*1000.);
 
+#define MOWER_DUMMY_MOVEMENT  0
+#if MOWER_DUMMY_MOVEMENT
     if (simulationFlag)
     {
        static float dummyTx = 10.0, dummyTy = -5.0;
@@ -1007,48 +1167,48 @@ void outputConsole(){
        PRINT(" %6.2f", dummyGy);
     }
     else
+#endif
     {
        PRINT(" %6.2f", maps.targetPoint.x());
        PRINT(" %6.2f", maps.targetPoint.y());
        PRINT(" %6.2f", stateX);
        PRINT(" %6.2f", stateY);
-       PRINT(" %6.2f", stateDelta);
+       //PRINT(" %6.2f", stateDelta);
+       PRINT(" %5.0f°", stateDelta*DEGREE);
        PRINT(" %6.2f", gps.relPosE);
        PRINT(" %6.2f", gps.relPosN);
     }
-    //CONSOLE.print(" tow=");
-    //CONSOLE.print(gps.iTOW);
-    //CONSOLE.print(" lon=");
-    //CONSOLE.print(gps.lon,8);
-    //CONSOLE.print(" lat=");
-    //CONSOLE.print(gps.lat,8);
-    //CONSOLE.print(" h=");
-    PRINT(" %6.2f", gps.relPosD);
+    PRINT(" %5.0f°", gps.relPosD*DEGREE);
 
 	 float gps_height = gps.height - 412;		// 412m ist ungefähr die minimale Höhe des Gartens
 	 gps_height = min(gps_height, 99.99);
 	 gps_height = max(gps_height,-99.99);
 	 PRINT(" %6.2f", gps_height);
     
-         if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(" INV"); }
-	 else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(" FLT"); }
-	 else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(" FIX"); }
-    else                                         { CONSOLE.print(" ???"); }
+         if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(" INVAL"); }
+	 else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(" FLOAT"); }
+	 else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(" FIX  "); }
+    else                                         { CONSOLE.print(" ???  "); }
 
     float age = (millis() - gps.dgpsAge) / 1000.0;
     age = min(age, 999.00);
     age = max(age,   0.00);
     PRINT(" %5.1f", age);
+    PRINT("/%-2d", gps.numSVdgps)
+    PRINT(" %2d", gps.numSV)
     PRINT(" %4.0f", motor.motorLeftSenseLP*1000.);
     PRINT(" %4.0f", motor.motorRightSenseLP*1000.);
     PRINT(" %4.0f", motor.motorMowSenseLP*1000.);
     
-    PRINT("%5.1f°C", stateTemp); 
+    PRINT("%3.0f°C", stateTemp); 
     PRINT("%3.0f%%%", stateHumidity);
 
     PRINT(" %c", bluetoothLoggingFlag ? 'B' : 'b');
     PRINT(" %c", USE_GPS_FLOAT_FOR_POS_ESTIMATION ? 'P' : 'p');
     PRINT(" %c", USE_GPS_FLOAT_FOR_DELTA_ESTIMATION ? 'D' : 'd');
+    PRINT(" MAP%d", maps.mapID);
+    PRINT(" %3d", maps.mowPointsIdx);
+    PRINT("/%-3d", maps.mowPoints.numPoints);
 
     CONSOLE.println();
     //logCPUHealth();

@@ -6,6 +6,7 @@
 #include "sdserial.h"
 #include <SD.h>
 #include "console.h"
+#include "rtc.h"
 
 
 //#if defined(_SAM3XA_)                 // Arduino Due
@@ -30,23 +31,35 @@ void SDSerial::begin(unsigned long baud){
   CONSOLE.begin(baud);
 }  
 
-void SDSerial::beginSD(){  
-  
-  for (int i=1000; i < 9000; i++){
-    logFileName = "log";
-    logFileName += i;
-    logFileName += ".txt";    
-    if (!SD.exists(logFileName)) {
-      CONSOLE.print("logfile: ");
-      CONSOLE.println(logFileName);    
-      sdStarted = true;
-      break; 
-      //SD.remove(UPDATE_FILE);
-      //updateFile.close();
-      //uint32_t updateSize = updateFile.size();
-      //updateFile.seek(SDU_SIZE);      
-    }
-  }  
+void SDSerial::beginSD()
+{  
+   DateTime now;
+   char buf[16];
+
+   GetDateTime(now);
+
+   sprintf(buf, "%02d%02d%02d%02d.txt", now.month, now.monthday, now.hour, now.minute);
+   logFileName = (String)buf;
+
+   CONSOLE.print("logfile: ");
+   CONSOLE.println(logFileName);    
+   sdStarted = true;
+
+   // for (int i=10; i < 99; i++){
+   //   logFileName = time;
+   //   logFileName += i;
+   //   logFileName += ".txt";    
+   //   if (!SD.exists(logFileName)) {
+   //     CONSOLE.print("logfile: ");
+   //     CONSOLE.println(logFileName);    
+   //     sdStarted = true;
+   //     break; 
+   //     //SD.remove(UPDATE_FILE);
+   //     //updateFile.close();
+   //     //uint32_t updateSize = updateFile.size();
+   //     //updateFile.seek(SDU_SIZE);      
+   //   }
+   // }  
 }
 
 //HB write SD is used in "udpserial.cpp"

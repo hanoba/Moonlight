@@ -16,6 +16,7 @@
 #include "ble.h"
 #include <Arduino.h>
 #include "config.h"
+#include "sim.h"
 
 //#ifdef SUNRAY_HB_NO_BT
 //String BLEConfig::read(){ String s;   CONSOLE.print("BLE: ");   return s; }
@@ -23,7 +24,7 @@
 //void BLEConfig::run(){ CONSOLE.print("trying to detect Bluetooth 4.0/BLE module (make sure your phone is NOT connected)"); }
 //#else
 
-extern bool simulationFlag;
+//extern bool simulationFlag;
 
 
 #define BTserial Serial2
