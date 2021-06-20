@@ -1,6 +1,23 @@
 # FILE:  mower.py
-#
-# Importieren der Pygame-Bibliothek
+# DESCRIPTION: This file conatins the following functions
+#  - GetSummary
+#  - SyncRtc
+#  - GetRtcDateTime
+#  - ComputeMapChecksum
+#  - GetVersionNumber
+#  - ToggleBluetoothLogging
+#  - ToggleUseGPSfloatForDeltaEstimation
+#  - ToggleUseGPSfloatForPosEstimation
+#  - ToggleSmoothCurves
+#  - ToggleGpsLogging
+#  - ReadMapFromSdCard
+#  - StartMowing
+#  - SwitchOffRobot
+#  - PrintStatistics
+#  - ClearStatistics
+#  - UploadMap
+#  - StopMowing
+# 
 import math
 import maps
 import udp
@@ -29,7 +46,9 @@ CMD_TriggerRaspiShutdown = "AT+Y4"
 CMD_ToggleBluetoothLogging = "AT+Y2"
 CMD_ToggleUseGPSfloatForPosEstimation = "AT+YP"
 CMD_ToggleUseGPSfloatForDeltaEstimation = "AT+YD"
-CMD_ToggleGPSLogging = "AT+YV"
+CMD_ToggleSmoothCurves = "AT+YS"
+CMD_ToggleEnablePathFinder = "AT+YF"
+CMD_ToggleGpsLogging = "AT+YG"
 CMD_GetSummary = "AT+S"
 CMD_GetRtcDateTime = "AT+D"
 
@@ -58,7 +77,7 @@ def GetSummary():
    fields = answer.split(",")
    
    checkSum = int(fields[16])
-   stateDelta = float(fields[4])*180/math.pi;
+   stateDelta = round(float(fields[4])*180/math.pi,0);
    
    textStateOp = ["IDLE", "MOW", "CHARGE", "ERROR", "DOCK", "???"]
    stateOp = int(fields[ 6])
@@ -120,6 +139,18 @@ def ToggleBluetoothLogging():
 def ToggleUseGPSfloatForDeltaEstimation():
    udp.ExecCmd(CMD_ToggleUseGPSfloatForDeltaEstimation)
 
+def ToggleUseGPSfloatForPosEstimation():
+   udp.ExecCmd(CMD_ToggleUseGPSfloatForPosEstimation)
+
+def ToggleSmoothCurves():
+   udp.ExecCmd(CMD_ToggleSmoothCurves)
+
+def ToggleEnablePathFinder():
+   udp.ExecCmd(CMD_ToggleEnablePathFinder)
+
+def ToggleGpsLogging():
+   udp.ExecCmd(CMD_ToggleGpsLogging)
+   
 def ReadMapFromSdCard(mapId):
    udp.send(str.format('AT+R,{:d}', mapId))
    mapIndex = mapId - 1
@@ -143,9 +174,6 @@ def StartMowing():
    #bEnableSonar = 0              # disabled
    cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
    udp.ExecCmd(cmd)
-
-def ToggleUseGPSfloatForPosEstimation():
-   udp.ExecCmd(CMD_ToggleUseGPSfloatForPosEstimation)
 
 def SwitchOffRobot():
    udp.ExecCmd(CMD_SwitchOffRobot)

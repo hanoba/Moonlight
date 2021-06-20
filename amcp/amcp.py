@@ -18,7 +18,6 @@ RIGHT = 3
 r=3
 iCurrentRefPoint = r
 editMode = False
-   
 
 currentMapIndex = 3
 currentMapChecksum = 0
@@ -26,27 +25,8 @@ currentMapChecksum = 0
 showCurrentWayPoints = False
 numMaps = 0
 
-#CMD_PrintVersionNumber = "AT+V"
-#CMD_PrintStatistics = "AT+T"
-#CMD_ClearStatistics = "AT+L"
-#CMD_MotorTest = "AT+E"
-#CMD_TriggerObstacle = "AT+O"
-#CMD_SensorTest = "AT+F"
-#CMD_ToggleGpsSolution = "AT+G"
-#CMD_KidnappingTest = "AT+K"
-#CMD_StopMowing = "AT+C,-1,0,-1,-1,-1,-1,-1,-1"
-#CMD_StressTest = "AT+Z"
-#CMD_TriggerWatchdogTest = "AT+Y"
-#CMD_SwitchOffRobot = "AT+Y3"
-#CMD_TriggerRaspiShutdown = "AT+Y4"
-#CMD_ToggleBluetoothLogging = "AT+Y2"
-#CMD_ToggleUseGPSfloatForPosEstimation = "AT+YP"
-#CMD_ToggleUseGPSfloatForDeltaEstimation = "AT+YD"
-#CMD_ToggleGPSLogging = "AT+YV"
 FONT_SIZE = 14
 LINE_SPACING = FONT_SIZE + 1
-
-
 
 def SetCurrentMapIndex(index):
     global currentMapIndex, currentMapChecksum
@@ -129,9 +109,13 @@ def PrintHelpText():
    WriteTextBox("<u>   Upload current map                  ")
    WriteTextBox("<i>   Stop mowing                         ")
    #WriteTextBox("<DEL> ClearStatistics                     ")
-   WriteTextBox("<0>   Select reference points             ")
-   WriteTextBox("<1> to <9> Select perimeter 1 to 9        ")
-   WriteTextBox("<F2>  Save maps to file maps2.json        ")
+   WriteTextBox("<+>   Add point                           ")
+   WriteTextBox("<BS>  Remove point                        ")
+   WriteTextBox("<x>   Exclusion points                    ")
+   WriteTextBox("<#>   Select reference points             ")
+   WriteTextBox("<1> to <9> Select MAP1 to MAP9            ")
+   WriteTextBox("<0>   Select MAP10                        ")
+   #WriteTextBox("<F2>  Save maps to file maps.json         ")
    WriteTextBox("<F4>  Toggle edit mode                    ")
    WriteTextBox("<F5>  Show/hide waypoints                 ")
    WriteTextBox("<F6>  Create waypoints                    ")
@@ -257,11 +241,6 @@ dy=1
 SetCurrentMapIndex(currentMapIndex)
 r=0
 
-theme_dark = pygame_menu.themes.THEME_DARK.copy()
-theme_dark.widget_font_size=20
-theme_dark.title_font_size=30
-menu = pygame_menu.Menu('Main Menu', 600, 800, theme=theme_dark)
-
 
 def ArdumowerControlProgram():
    global currentMapIndex
@@ -271,29 +250,53 @@ def ArdumowerControlProgram():
    global iCurrentRefPoint 
    global showCurrentWayPoints
    global numMaps
-   global menu
+   global menu, config_menu
    global editMode
-   
+
+   #------------------------------------------------------------------------------------------------- 
+   # Create Config Menu
+   #------------------------------------------------------------------------------------------------- 
+   theme_dark = pygame_menu.themes.THEME_DARK.copy()
+   theme_dark.widget_font_size=20
+   theme_dark.title_font_size=30
+   config_menu = pygame_menu.Menu('Configuration Menu', 600, 400, theme=theme_dark)
+
+   config_menu.add.button('Toggle Bluetooth Logging (b)', mower.ToggleBluetoothLogging)
+   config_menu.add.button('Toggle UseGPSfloatForPosEstimation (p)', mower.ToggleUseGPSfloatForPosEstimation)
+   config_menu.add.button('Toggle UseGPSfloatForDeltaEstimation (d)', mower.ToggleUseGPSfloatForDeltaEstimation)
+   config_menu.add.button('Toggle SmoothCurves', mower.ToggleSmoothCurves)
+   config_menu.add.button('Toggle EnablePathFinder', mower.ToggleEnablePathFinder)
+   config_menu.add.button('Toggle GPS Logging', mower.ToggleGpsLogging)
+   config_menu.add.button('Sync RTC with current time', mower.SyncRtc)
+   config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
+   config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
+   config_menu.add.button('Return to Main Menu', pygame_menu.events.BACK)
+
+   #------------------------------------------------------------------------------------------------- 
+   # Create Main Menu
+   #------------------------------------------------------------------------------------------------- 
+   theme_dark = pygame_menu.themes.THEME_DARK.copy()
+   theme_dark.widget_font_size=20
+   theme_dark.title_font_size=30
+   menu = pygame_menu.Menu('Main Menu', 600, 700, theme=theme_dark)
+
    menu.add.button('Show/Hide MainMenu (ESC)', CmdShowHideMainMenu)
    menu.add.button('Upload current map (u)', CmdUploadMap)
    menu.add.button('Start mowing (m)', mower.StartMowing)
    menu.add.button('Stop mowing (i)', mower.StopMowing)
    menu.add.button('Switch Off Robot (o)', mower.SwitchOffRobot)
    menu.add.button('Get Version Number (v)', mower.GetVersionNumber)
-   menu.add.button('Toggle Bluetooth Logging (b)', mower.ToggleBluetoothLogging)
-   menu.add.button('Toggle UseGPSfloatForPosEstimation (p)', mower.ToggleUseGPSfloatForPosEstimation)
-   menu.add.button('Toggle UseGPSfloatForDeltaEstimation (d)', mower.ToggleUseGPSfloatForDeltaEstimation)
    menu.add.button('PrintStatistics (s)', mower.PrintStatistics)
    menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
-   menu.add.button('Store Maps (F2)', CmdStoreMaps)
+   menu.add.button('Store Maps', CmdStoreMaps)
+   menu.add.button('Export Maps in SunrayApp format', CmdExportMaps)
    menu.add.button('Show/Hide Waypoints (F5)', CmdToggleShowWaypoints)
    menu.add.button('Create Waypoints (F6)', CmdCreateWaypoints)
    menu.add.button('Make Square Parallel (F7)', CmdMakeSquareParallel)
    menu.add.button('Read Map From SD Card (r)', CmdReadMapFromSdCard)
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
    menu.add.button('Get RTC Date & Time', mower.GetRtcDateTime)
-   menu.add.button('Sync RTC with current time', mower.SyncRtc)
-   menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps2.json')
+   menu.add.button('Mower Configuration', config_menu)
    menu.add.button('Quit (q)', pygame_menu.events.EXIT)
 
    # solange die Variable True ist, soll das Spiel laufen
@@ -306,6 +309,7 @@ def ArdumowerControlProgram():
          if event.type == pygame.QUIT:
                programActive = False
          elif event.type == pygame.KEYDOWN:
+               PrintGuiMessage("")
                if event.key == pygame.K_ESCAPE:
                   CmdShowHideMainMenu()
                elif not menu.is_enabled():
@@ -325,8 +329,6 @@ def ArdumowerControlProgram():
                      (x,y) = maps.perimeters[currentMapIndex][r]
                      maps.perimeters[currentMapIndex][r] = (x,y+1)
                      PrintDistance()
-                  elif event.key == pygame.K_0:
-                     SetCurrentMapIndex(9)
                   elif event.key == pygame.K_1:
                      SetCurrentMapIndex(0)
                   elif event.key == pygame.K_2:
@@ -345,6 +347,12 @@ def ArdumowerControlProgram():
                      SetCurrentMapIndex(7)
                   elif event.key == pygame.K_9:
                      SetCurrentMapIndex(8)
+                  elif event.key == pygame.K_0:
+                     SetCurrentMapIndex(9)
+                  elif event.key == pygame.K_x:       # exclusion points
+                     SetCurrentMapIndex(10)
+                  elif event.key == pygame.K_HASH:    # references points
+                     SetCurrentMapIndex(11)
                   elif event.key == pygame.K_b:
                      mower.ToggleBluetoothLogging()
                   elif event.key == pygame.K_c:
@@ -383,13 +391,29 @@ def ArdumowerControlProgram():
                      redoPerimeter=lastPerimeter
                      r -= 1
                      if r<0: r=len(maps.perimeters[currentMapIndex])-1
+                  elif event.key == pygame.K_BACKSPACE and editMode:
+                     lastPerimeter=maps.perimeters[currentMapIndex].copy()
+                     redoPerimeter=lastPerimeter
+                     maps.perimeters[currentMapIndex].pop(r)
+                     r -= 1
+                     if r<0: r=len(maps.perimeters[currentMapIndex])-1
+                  # add point
+                  elif event.key == pygame.K_PLUS and editMode:
+                     lastPerimeter=maps.perimeters[currentMapIndex].copy()
+                     redoPerimeter=lastPerimeter
+                     maps.perimeters[currentMapIndex].append((0,0))
+                     k=len(maps.perimeters[currentMapIndex])-1
+                     while k>r:
+                        maps.perimeters[currentMapIndex][k] = maps.perimeters[currentMapIndex][k-1]
+                        k = k - 1
+                     r = r + 1
                   elif event.key == pygame.K_TAB and editMode:
                      lastPerimeter=maps.perimeters[currentMapIndex].copy()
                      redoPerimeter=lastPerimeter
                      r += 1
                      if r>=len(maps.perimeters[currentMapIndex]): r=0
-                  elif event.key == pygame.K_F2:
-                     CmdStoreMaps()
+                  #elif event.key == pygame.K_F2:
+                  #   CmdStoreMaps()
                   elif event.key == pygame.K_F4:
                      editMode = not editMode
                   elif event.key == pygame.K_F5:
@@ -449,7 +473,7 @@ def ArdumowerControlProgram():
       PrintLogMsg()
    
       # Draw maps.perimeters
-      imax = min(9, len(maps.perimeters))
+      imax = min(11, len(maps.perimeters))
       for i in range(imax):
          if len(maps.perimeters[i]) > 0:
             color = ORANGE
@@ -458,7 +482,8 @@ def ArdumowerControlProgram():
                else: color = WHITE
             pygame.draw.lines(screen, color,  True, maps.perimeters[i], 1)
             #text = font.render(chr(48+i+1), True, GREEN, BLUE)
-            mapNum = "{0:d}".format(i+1)
+            if i==10: mapNum = "X"                 # exclusion points
+            else: mapNum = "{0:d}".format(i+1)
             text = font.render(mapNum, True, GREEN, BLUE)
             textRect = text.get_rect()
             # set the center of the rectangular object.
@@ -468,13 +493,18 @@ def ArdumowerControlProgram():
             screen.blit(text, textRect)
    
       # Draw reference points
-      iRefPoints=9
+      iRefPoints=11
       if len(maps.perimeters[iRefPoints]) > 0:
          for k in range(len(maps.perimeters[iRefPoints])):
-            color = WHITE
-            if k == iCurrentRefPoint: color = ORANGE
+            if currentMapIndex == iRefPoints:
+               if editMode: color = RED
+               else: color = WHITE
+            else: color = ORANGE
+            #if k == iCurrentRefPoint: color = ORANGE
             #pygame.draw.circle(screen, color, maps.perimeters[iRefPoints][k], 3)
-            DrawCross(color, maps.perimeters[iRefPoints][k])
+            DrawCross(color, maps.perimeters[iRefPoints][k])      
+      # Remember last reference point
+      if currentMapIndex == iRefPoints: iCurrentRefPoint = r
       
       # draw maps.perimeters[currentMapIndex]
       # pygame.draw.lines(screen, BLUE,  True, maps.perimeters[currentMapIndex], 1)
@@ -482,9 +512,6 @@ def ArdumowerControlProgram():
       if showCurrentWayPoints and len(maps.wayPoints[currentMapIndex]) > 2: 
          pygame.draw.lines(screen, WHITE, False, maps.wayPoints[currentMapIndex], 1)
          pygame.draw.circle(screen, RED, maps.wayPoints[currentMapIndex][0], 3)
-      
-      # Remember last reference point
-      if currentMapIndex == 9: iCurrentRefPoint = r
       
       PrintDistance()
       PrintMouseDistance()
@@ -503,57 +530,6 @@ def ArdumowerControlProgram():
       clock.tick(60)
 
 
-## Return values of AT+S (summary) command
-##  0 = F("S,");
-##  1 = battery.batteryVoltage;
-##  2 = stateX;
-##  3 = stateY;
-##  4 = stateDelta;
-##  5 = gps.solution;
-##  6 = stateOp;
-##  7 = maps.mowPointsIdx;
-##  8 = (millis() - gps.dgpsAge)/1000.0;
-##  9 = stateSensor;
-## 10 = maps.targetPoint.x();
-## 11 = maps.targetPoint.y();
-## 12 = gps.accuracy;
-## 13 = gps.numSV;
-## 14 = charge current or motor current
-## 15 = gps.numSVdgps;
-## 16 = maps.mapCRC;
-#def GetSummary():
-#   answer = udp.ExecCmd("AT+S")
-#   if answer=="": return
-#   fields = answer.split(",")
-#   checkSum = int(fields[16])
-#   print("BatteryVoltage =", float(fields[1]))
-#   print("MowPoint.Index =", int(fields[7]))
-#   print("MapCRC =", checkSum)
-#   return checkSum
-#
-#def PrintGuiMessage(msg):
-#   global guiMessage
-#   guiMessage = msg
-#   print("[GuiMessage] " + msg)
-#
-#def CmdSyncRtc():
-#   now = datetime.now()
-#   cmd = now.strftime("AT+D,%y,%m,%d,%H,%M,%S,%w")
-#   answer = udp.ExecCmd(cmd)
-#   if answer=="": return
-#   PrintGuiMessage(answer);
-#
-#def CmdGetRtcDateTime():
-#   answer = udp.ExecCmd("AT+D")
-#   if answer=="": return
-#   answer = answer[2:len(answer)-7]
-#   PrintGuiMessage(answer);
-#   
-#def CmdComputeMapChecksum():
-#   #checksum = maps.ComputeMapChecksum(currentMapIndex)
-#   #print("[amcp] Map checksum:", checksum)
-#   PrintGuiMessage("Checksum computed by mower: {}".format(GetSummary()))
-
 def CmdShowHideMainMenu():
    global editMode
    editMode = False
@@ -567,125 +543,29 @@ def CmdToggleShowWaypoints():
    global showCurrentWayPoints
    showCurrentWayPoints = not showCurrentWayPoints
 
-#def CmdGetVersionNumber():
-#   result = udp.ExecCmd(CMD_PrintVersionNumber)
-#   if result != "": 
-#      PrintGuiMessage(result[2:len(result)-7])
-#
-#def CmdToggleBluetoothLogging():
-#   udp.send(CMD_ToggleBluetoothLogging)
-#
-#def CmdToggleUseGPSfloatForDeltaEstimation():
-#   udp.send(CMD_ToggleUseGPSfloatForDeltaEstimation)
-#
 def CmdReadMapFromSdCard():
    mapId = currentMapIndex + 1
    mower.ReadMapFromSdCard(mapId)
 
-#def CmdStartMowing():
-#   # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
-#   #bEnableMowMotor = -1          # off
-#   #iOperationType = 1            # 1=OP_MOW
-#   fSpeed = 0.25                 # m/s
-#   #iFixTimeout = 0               # 0 = no fix timeout
-#   #bFinishAndRestart = 0         # disabled
-#   #fMowingPointPercent = -1      # 
-#   #bSkipNextMowingPoint = -1     # disabled
-#   #bEnableSonar = 0              # disabled
-#   cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-#   #if SendCmd(cmd)==ERROR: print("[CmdStartMowing] ERROR")
-#   udp.send(cmd)
-
 def CmdStoreMaps():
-   global menu
-   data = menu.get_input_data()
+   global config_menu
+   data = config_menu.get_input_data()
    mapsFileName = data.get('ID_MAPS_FILE_NAME')
    maps.StoreMaps(mapsFileName)
    PrintGuiMessage("Maps successfully stored in file " + mapsFileName)
 
-   
-#def CmdToggleUseGPSfloatForPosEstimation():
-#   udp.send(CMD_ToggleUseGPSfloatForPosEstimation)
-#
-#def CmdSwitchOffRobot():
-#   udp.send(CMD_SwitchOffRobot)
+def CmdExportMaps():
+   global config_menu
+   data = config_menu.get_input_data()
+   exportFileName = data.get('ID_EXPORT_FILE_NAME')
+   maps.ExportMaps(exportFileName, garten)
+   PrintGuiMessage("Maps successfully exported to file " + exportFileName)
 
-# statIdleDuration;
-# statChargeDuration;
-# statMowDuration;
-# statMowDurationFloat;
-# statMowDurationFix;
-# statMowFloatToFixRecoveries;
-# statMowDistanceTraveled;
-# statMowMaxDgpsAge;
-# statImuRecoveries;
-# statTempMin;
-# statTempMax;
-# gps.chksumErrorCounter;
-# gps.dgpsChecksumErrorCounter;
-# statMaxControlCycleTime;
-# SERIAL_BUFFER_SIZE;
-# statMowDurationInvalid;
-# statMowInvalidRecoveries;
-# statMowObstacles;
-# freeMemory();
-# getResetCause();
-# statGPSJumps;
-# statMowSonarCounter;
-# statMowBumperCounter;
-# statMowGPSMotionTimeoutCounter;
-#def CmdPrintStatistics():
-#   answer = udp.ExecCmd(CMD_PrintStatistics)
-#   if answer=="": return
-#   fields = answer.split(",")
-#   i=1
-#   print("statIdleDuration               :", fields[i+0])
-#   print("statChargeDuration             :", fields[i+1])
-#   print("statMowDuration                :", fields[i+2])
-#   print("statMowDurationFloat           :", fields[i+3])
-#   print("statMowDurationFix             :", fields[i+4])
-#   print("statMowFloatToFixRecoveries    :", fields[i+5])
-#   print("statMowDistanceTraveled        :", fields[i+6])
-#   print("statMowMaxDgpsAge              :", fields[i+7])
-#   print("statImuRecoveries              :", fields[i+8])
-#   print("statTempMin                    :", fields[i+9])
-#   print("statTempMax                    :", fields[i+10])
-#   print("gps.chksumErrorCounter         :", fields[i+11])
-#   print("gps.dgpsChecksumErrorCounter   :", fields[i+12]) 
-#   print("statMaxControlCycleTime        :", fields[i+13])
-#   print("SERIAL_BUFFER_SIZE             :", fields[i+14])
-#   print("statMowDurationInvalid         :", fields[i+15])
-#   print("statMowInvalidRecoveries       :", fields[i+16])
-#   print("statMowObstacles               :", fields[i+17])
-#   print("freeMemory()                   :", fields[i+18])
-#   print("getResetCause()                :", fields[i+19])
-#   print("statGPSJumps                   :", fields[i+20])
-#   print("statMowSonarCounter            :", fields[i+21])
-#   print("statMowBumperCounter           :", fields[i+22])
-#   print("statMowGPSMotionTimeoutCounter :", fields[i+23])
-#
-#def CmdClearStatistics():
-#   udp.send(CMD_ClearStatistics)
-#
+
 def CmdUploadMap():
    mapId = currentMapIndex + 1
    mower.UploadMap(mapId)
 
-#def CmdUploadMap():
-#   PrintGuiMessage("Uploading map started...");
-#   if maps.UploadMap(currentMapIndex)==maps.ERROR:
-#      print("[CmdUploadMap] ERROR during map upload")
-#   else:
-#      checksum = maps.ComputeMapChecksum(currentMapIndex)
-#      print("[maps.ComputeMapChecksum] Checksum = ", checksum)
-#      reportedChecksum = GetSummary()
-#      if reportedChecksum == checksum:
-#         PrintGuiMessage("Map upload completed successfully")
-#      else:
-#         PrintGuiMessage("Map upload checksum error")
-#
-#def CmdStopMowing():
-#   udp.send(CMD_StopMowing)
    
 def CmdCreateWaypoints():
    global lastPerimeter

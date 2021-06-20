@@ -24,10 +24,12 @@
 #include "src/esp/WiFiEsp.h"
 #include "sim.h"
 
-#define VER "Ardumower Moonlight,1.0.168.12 HB 2021-06-17"
+#define VER "Ardumower Moonlight,1.0.168.14 HB 2021-06-20"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 3000
+extern bool SMOOTH_CURVES;
+extern bool ENABLE_PATH_FINDER;
 
 enum OperationType {
       OP_IDLE,      

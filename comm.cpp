@@ -26,7 +26,8 @@ float statMaxControlCycleTime = 0;
 //HB New map control
 //static uint8_t currentMapIndex = 0;
 static bool writeMapFlag = false;
-
+bool SMOOTH_CURVES = SMOOTH_CURVES_DEFAULT;
+bool ENABLE_PATH_FINDER = ENABLE_PATH_FINDER_DEFAULT;
 
 // answer Bluetooth with CRC
 void cmdAnswer(String s){
@@ -548,7 +549,6 @@ void cmdStartUploadMap(String cmd)
 }
 
 
-
 void cmdToggleUseIMU()
 {
     String s = F("YI");
@@ -556,6 +556,26 @@ void cmdToggleUseIMU()
     USE_IMU = !USE_IMU;
     CONSOLE.print("USE_IMU = ");
     CONSOLE.println(USE_IMU);
+}
+
+
+void cmdToggleSmoothCurves()
+{
+    String s = F("YS");
+    cmdAnswer(s);
+    SMOOTH_CURVES = !SMOOTH_CURVES;
+    CONSOLE.print("SMOOTH_CURVES = ");
+    CONSOLE.println(SMOOTH_CURVES);
+}
+
+
+void cmdToggleEnablePathFinder()
+{
+    String s = F("YF");
+    cmdAnswer(s);
+    ENABLE_PATH_FINDER = !ENABLE_PATH_FINDER;
+    CONSOLE.print("ENABLE_PATH_FINDER = ");
+    CONSOLE.println(ENABLE_PATH_FINDER);
 }
 
 void cmdToggleUseGPSfloatForPosEstimation()
@@ -578,9 +598,9 @@ void cmdToggleUseGPSfloatForDeltaEstimationEstimation()
     CONSOLE.println(USE_GPS_FLOAT_FOR_DELTA_ESTIMATION);
 }
 
-void cmdToggleGPSverbose()
+void cmdToggleGpsLogging()
 {
-    String s = F("YV");
+    String s = F("YG");
     cmdAnswer(s);
     gps.verbose = !gps.verbose;
     CONSOLE.print("gps.verbose = ");
@@ -828,9 +848,11 @@ void processCmd(bool checkCrc, String cmd)
          if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
          if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
          if (cmd[4] == '5') cmdGNSSReboot();   // for developers
-         if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
          if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
-         if (cmd[4] == 'V') cmdToggleGPSverbose();
+         if (cmd[4] == 'F') cmdToggleEnablePathFinder();
+         if (cmd[4] == 'G') cmdToggleGpsLogging();
+         if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
+         if (cmd[4] == 'S') cmdToggleSmoothCurves();
       }
   }
   else
@@ -1098,11 +1120,12 @@ void outputConsole()
 
     unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
     unsigned long totalmins = totalsecs/60;
-    unsigned long hour = totalmins/60;
+    unsigned long totalhours = totalmins/60;
+    unsigned long hour = totalhours % 24;
     unsigned long min = totalmins % 60;
     unsigned long sec = totalsecs % 60;
     static int headLineCnt = 0;
-    if (headLineCnt == 0) CONSOLE.println("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map  WayPts ");
+    if (headLineCnt == 0) CONSOLE.println("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags  Map  WayPts ");
     headLineCnt = headLineCnt + 1 & 7;
     PRINT(":%02d:", hour);
     PRINT("%02d:", min);
@@ -1194,8 +1217,8 @@ void outputConsole()
     age = min(age, 999.00);
     age = max(age,   0.00);
     PRINT(" %5.1f", age);
-    PRINT("/%-2d", gps.numSVdgps)
-    PRINT(" %2d", gps.numSV)
+    PRINT(" %-2d", gps.numSVdgps)
+    PRINT("/%2d", gps.numSV)
     PRINT(" %4.0f", motor.motorLeftSenseLP*1000.);
     PRINT(" %4.0f", motor.motorRightSenseLP*1000.);
     PRINT(" %4.0f", motor.motorMowSenseLP*1000.);
@@ -1204,8 +1227,11 @@ void outputConsole()
     PRINT("%3.0f%%%", stateHumidity);
 
     PRINT(" %c", bluetoothLoggingFlag ? 'B' : 'b');
-    PRINT(" %c", USE_GPS_FLOAT_FOR_POS_ESTIMATION ? 'P' : 'p');
-    PRINT(" %c", USE_GPS_FLOAT_FOR_DELTA_ESTIMATION ? 'D' : 'd');
+    PRINT("%c", USE_GPS_FLOAT_FOR_POS_ESTIMATION ? 'P' : 'p');
+    PRINT("%c", USE_GPS_FLOAT_FOR_DELTA_ESTIMATION ? 'D' : 'd');
+    PRINT("%c", gps.verbose ? 'G' : 'g');
+    PRINT("%c", SMOOTH_CURVES ? 'S' : 's');
+    PRINT("%c", ENABLE_PATH_FINDER ? 'F' : 'f');
     PRINT(" MAP%d", maps.mapID);
     PRINT(" %3d", maps.mowPointsIdx);
     PRINT("/%-3d", maps.mowPoints.numPoints);
