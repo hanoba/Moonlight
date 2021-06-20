@@ -6,4 +6,4 @@ def GetGuiMessage():
 def PrintGuiMessage(msg):
    global guiMessage
    guiMessage = msg
-   print("[GuiMessage] " + guiMessage)
+   if msg != "": print("[GuiMessage] " + guiMessage)

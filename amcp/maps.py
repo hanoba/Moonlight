@@ -199,7 +199,7 @@ def ReadRectangle():
 def LoadMaps():
     global maps_json
     global numMaps
-    with open('maps2.json') as json_file:
+    with open('maps.json') as json_file:
         maps_json = json.load(json_file)
     numMaps = len(maps_json)
     print(numMaps)
@@ -220,9 +220,10 @@ def LoadMaps():
                 wpoly.append((point["X"], point["Y"]))
             Map2Screen(wpoly)
         wayPoints.append(wpoly)
-            
+
 def StoreMaps(fileName):
-    for m in range(1,10):
+    #for m in range(1,10):
+    for m in range(0,12):
         if len(perimeters[m]) > 2:
             #process perimeter
             perimeter = perimeters[m].copy()
@@ -240,6 +241,51 @@ def StoreMaps(fileName):
                 (x,y) = waypoints[i]
                 w.append({'X': x, 'Y': y})
             maps_json[m] = {'perimeter': p, 'exclusions': [], 'waypoints': w, 'dockpoints': []}
+        else:
+            maps_json[m] = { }
+    with open('tmp.json', 'w') as outfile:
+        json.dump(maps_json, outfile)
+    os.system("python -m json.tool tmp.json >"+fileName)
+
+# export maps in Ardumower App format
+def ExportMaps(fileName, garten):
+    # use garten as perimeter
+    perimeter = garten.copy()
+    Screen2Map(perimeter)
+    p = []
+    for i in range(len(perimeter)):
+        (x,y) = perimeter[i]
+        timestamp = '2021-04-20T15:19:37.433Z'
+        p.append({'X': x, 'Y': y, 'delta': 0.01, 'timestamp': timestamp})
+        
+    # use MapId=11 as exclusion point
+    perimeter = perimeters[10].copy()
+    Screen2Map(perimeter)
+    e1 = []
+    for i in range(len(perimeter)):
+        (x,y) = perimeter[i]
+        timestamp = '2021-04-20T15:19:37.433Z'
+        e1.append({'X': x, 'Y': y, 'delta': 0.01, 'timestamp': timestamp})
+    e = [ e1 ]
+        
+    for m in range(0,10):
+        if len(perimeters[m]) > 2:
+            #process perimeter
+            ##perimeter = perimeters[m].copy()
+            ##Screen2Map(perimeter)
+            ##p = []
+            ##for i in range(len(perimeter)):
+            ##    (x,y) = perimeter[i]
+            ##    timestamp = '2021-04-20T15:19:37.433Z'
+            ##    p.append({'X': x, 'Y': y, 'delta': 0.01, 'timestamp': timestamp})
+            # process waypoints
+            waypoints = wayPoints[m].copy()
+            Screen2Map(waypoints)
+            w = []
+            for i in range(len(waypoints)):
+                (x,y) = waypoints[i]
+                w.append({'X': x, 'Y': y})
+            maps_json[m] = {'perimeter': p, 'exclusions': e, 'waypoints': w, 'dockpoints': []}
         else:
             maps_json[m] = { }
     with open('tmp.json', 'w') as outfile:
