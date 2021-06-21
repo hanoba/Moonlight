@@ -367,7 +367,7 @@ void cmdWayCount(String cmd)
 {
   if (cmd.length()<6) return;
   WriteMap(cmd);
-  writeMapFlag = false;
+  //writeMapFlag = false;
   int counter = 0;
   int lastCommaIdx = 0;
   for (int idx=0; idx < cmd.length(); idx++){
@@ -402,6 +402,8 @@ void cmdWayCount(String cmd)
 void cmdExclusionCount(String cmd)
 {
   if (cmd.length()<6) return;
+  WriteMap(cmd);
+  writeMapFlag = false;
   int counter = 0;
   int lastCommaIdx = 0;
   int widx=0;

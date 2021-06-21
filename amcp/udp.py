@@ -99,14 +99,14 @@ def close():
   
 def ExecCmd(cmd):
    sleep(0.1)
+   print("[udp.ExecCmd] " + cmd)
    for transmission in range(3):
-      print("[udp.ExecCmd] " + cmd)
       send(cmd)
       
       print("[udp.ExecCmd] Wait for answer: " + cmd[3])
       timeOutCounter = 5
       # longer timeout for N, C and S commands
-      if cmd[3]=="N" or cmd[3]=="C" or cmd[3]=="S" or cmd[3]=="R": timeOutCounter = 20
+      if cmd[3]=="N" or cmd[3]=="C" or cmd[3]=="S" or cmd[3]=="R" or cmd[3]=="X": timeOutCounter = 20
       while True:
          answer = receive()
          if answer != "":
@@ -115,7 +115,7 @@ def ExecCmd(cmd):
          sleep(0.1)
          timeOutCounter = timeOutCounter - 1
          if timeOutCounter == 0: break;
-      #print("[udp.ExecCmd] TIMEOUT ERROR - Transmission #", transmission)
+      print("[udp.ExecCmd] Retransmission #", transmission+1)
    print("[udp.ExecCmd] ERROR: Transmission failed")
    return ""
 

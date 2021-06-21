@@ -1,5 +1,5 @@
 *.sdf
-__pycache__
+amcp/__pycache__
 *.user
 x64
 .vs

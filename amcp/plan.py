@@ -1,5 +1,12 @@
 import math
-import maps
+
+def Move(poly, mx, my):
+    length = len(poly)
+    for i in range(length):
+        (x,y) = poly[i]
+        poly[i] = (x+mx,y+my)
+    return
+
 
 def Garten_old():
     # Gartenplan - x-Achse parallel zum oberen Zaun
@@ -73,7 +80,7 @@ def Gartenhaus():
     haus = [(0,0),(7.23,0),(7.23,4.67),(0,4.67)]
     mx = 44.70 - 10.30 - 7.23 # 5.10 + 4.00 + 16.60
     my = -4.76-0.5
-    maps.Move(haus,mx,my)
+    Move(haus,mx,my)
     return haus
 
 def Terrasse():
@@ -82,12 +89,12 @@ def Terrasse():
     mx = 44.70 - 10.30 - 7.23 # 5.10 + 4.00 + 16.60
     my = -4.76-0.5
     terrasse = [(xx,0),(xx+6.08,0),(xx+6.08,-4.45),(xx,-4.45)]
-    maps.Move(terrasse,mx,my)
+    Move(terrasse,mx,my)
     return terrasse
     
 def Schuppen():
     schuppen = [(0,0),(4.00,0),(4.00,4.50),(0,4.50)]
     mx = 5.10 + 1.6 - 0.5
     my = -4.50-0.50 - 0.3
-    maps.Move(schuppen,mx,my)
+    Move(schuppen,mx,my)
     return schuppen
