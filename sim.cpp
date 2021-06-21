@@ -12,8 +12,8 @@ extern float stateDeltaGPS;
 Sim::Sim()
 {
    activeFlag = false;
-   posX = -10.0;
-   posY = -10.0;
+   posX = -6.0;
+   posY = -3.0;
    delta = 0.0;
    deltaStep = 0.0;
    posStep = 0.0;

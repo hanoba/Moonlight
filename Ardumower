@@ -53,15 +53,18 @@
         </Folder>
     </Project>
     <Project name="amcp">
-        <File name="amcp\amcp.bat" />
         <File name="amcp\amcp.py" />
         <File name="amcp\hblog.py" />
         <File name="amcp\maps.py" />
         <File name="amcp\plan.py" />
         <File name="amcp\udp.py" />
+        <File name="amcp\mower.py" />
     </Project>
-    <Project name="amcf">
-        <File name="amcp\amfs.bat" />
-        <File name="amcp\amfs.py" />
+    <Project name="amcmd">
+        <File name="amcp\amcmd.py" />
+    </Project>
+    <Project name="bat">
+        <File name="amcp\amcmd.bat" />
+        <File name="amcp\amcp.bat" />
     </Project>
 </NotepadPlus>

@@ -55,7 +55,6 @@ def PrintMouseDistance():
    textRect.topleft = ((50, 50+0*LINE_SPACING))
    screen.blit(text, textRect)
 
-
 def PrintRefPointDistance():
    if len(maps.perimeters[9]) == 0: 
         return
@@ -66,7 +65,6 @@ def PrintRefPointDistance():
    textRect.topleft = ((50, 50+1*LINE_SPACING))
    screen.blit(text, textRect)
 
-
 def PrintDistance():
    distance = "Distance current/last edit point:      {0:7.2f} m".format(maps.Distance(maps.perimeters[currentMapIndex][r], lastPerimeter[r]))
    text = bigFont.render(distance, True, WHITE, BLACK)
@@ -74,7 +72,27 @@ def PrintDistance():
    textRect.topleft = ((50, 50+2*LINE_SPACING))
    screen.blit(text, textRect)
 
-def PrintVersionNumber():
+def PrintMousePosition():
+   pos = [ pygame.mouse.get_pos() ]
+   maps.Screen2Map(pos)
+   (x,y) = pos[0]
+   position = "{0:7.2f}{1:7.2f} m".format(x, y)
+   text = bigFont.render(position, True, WHITE, BLACK)
+   textRect = text.get_rect()
+   textRect.topleft = ((500, 50+0*LINE_SPACING))
+   screen.blit(text, textRect)
+
+def PrintCurrentPointPosition():
+   pos = [ maps.perimeters[currentMapIndex][r] ]
+   maps.Screen2Map(pos)
+   (x,y) = pos[0]
+   position = "{0:7.2f}{1:7.2f} m".format(x, y)
+   text = bigFont.render(position, True, WHITE, BLACK)
+   textRect = text.get_rect()
+   textRect.topleft = ((500, 50+1*LINE_SPACING))
+   screen.blit(text, textRect)
+
+def ShowGuiMessage():
    if GetGuiMessage() != "":
       text = bigFont.render(GetGuiMessage(), True, WHITE, BLACK)
       textRect = text.get_rect()
@@ -180,14 +198,6 @@ gartenImg = pygame.image.load("garten-google-maps-zoom.png")
 clock = pygame.time.Clock()
 
 # Schleife Hauptprogramm
-garten_old = plan.Garten_old()
-maps.Plan2Map(garten_old)
-maps.Map2Screen(garten_old)
-
-garten = plan.Garten()
-maps.Plan2Map(garten)
-maps.Map2Screen(garten)
-
 rx = maps.cos_phi
 ry = maps.sin_phi
 
@@ -201,19 +211,6 @@ sh=0.16
 sr=-3.57
 messungen = [(-3.15+rx*mr+hx*mh, -5.62+ry*mr+hy*mh),(-17.76+rx*sr+hx*sh,-9.68+ry*sr+hy*sh), (-21.77, -13.99)]
 maps.Map2Screen(messungen)
-
-haus = plan.Gartenhaus()
-maps.Plan2Map(haus)
-maps.Map2Screen(haus)
-
-terrasse = plan.Terrasse()
-maps.Plan2Map(terrasse)
-maps.Map2Screen(terrasse)
-
-# Schuppen
-schuppen = plan.Schuppen()
-maps.Plan2Map(schuppen)
-maps.Map2Screen(schuppen)
 
 # waypoints
 maps.LoadMaps()
@@ -292,6 +289,7 @@ def ArdumowerControlProgram():
    menu.add.button('Export Maps in SunrayApp format', CmdExportMaps)
    menu.add.button('Show/Hide Waypoints (F5)', CmdToggleShowWaypoints)
    menu.add.button('Create Waypoints (F6)', CmdCreateWaypoints)
+   menu.add.button('Create Bumper Waypoints', CmdCreateBumperWaypoints)
    menu.add.button('Make Square Parallel (F7)', CmdMakeSquareParallel)
    menu.add.button('Read Map From SD Card (r)', CmdReadMapFromSdCard)
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
@@ -357,16 +355,16 @@ def ArdumowerControlProgram():
                      mower.ToggleBluetoothLogging()
                   elif event.key == pygame.K_c:
                      mower.ClearStatistics()
-                  elif event.key == pygame.K_d:
-                     mower.ToggleUseGPSfloatForDeltaEstimation()
+                  #elif event.key == pygame.K_d:
+                  #   mower.ToggleUseGPSfloatForDeltaEstimation()
                   elif event.key == pygame.K_i:
                      mower.StopMowing()
                   elif event.key == pygame.K_m:
                      mower.StartMowing()
                   elif event.key == pygame.K_o:
                      mower.SwitchOffRobot()
-                  elif event.key == pygame.K_p:
-                     mower.ToggleUseGPSfloatForPosEstimation()
+                  #elif event.key == pygame.K_p:
+                  #   mower.ToggleUseGPSfloatForPosEstimation()
                   elif event.key == pygame.K_q:
                      programActive = False
                   elif event.key == pygame.K_r:
@@ -416,6 +414,8 @@ def ArdumowerControlProgram():
                   #   CmdStoreMaps()
                   elif event.key == pygame.K_F4:
                      editMode = not editMode
+                     if editMode: PrintGuiMessage("Edit mode enabled")
+                     else: PrintGuiMessage("Edit mode disabled")
                   elif event.key == pygame.K_F5:
                      CmdToggleShowWaypoints()
                   elif event.key == pygame.K_F6 and editMode:
@@ -443,10 +443,10 @@ def ArdumowerControlProgram():
       
       # Garten und Gebäude zeichnen
       # pygame.draw.lines(screen, WHITE, True, garten_old, 3)
-      pygame.draw.lines(screen, GREEN, True, garten, 3)
-      pygame.draw.lines(screen, BLUE,  True, haus, 3)
-      pygame.draw.lines(screen, BLUE,  True, terrasse, 3)
-      pygame.draw.lines(screen, BLUE,  True, schuppen, 3)
+      pygame.draw.lines(screen, GREEN, True, maps.garten, 3)
+      pygame.draw.lines(screen, BLUE,  True, maps.haus, 3)
+      pygame.draw.lines(screen, BLUE,  True, maps.terrasse, 3)
+      pygame.draw.lines(screen, BLUE,  True, maps.schuppen, 3)
    
       # Nullpunkt
       # pygame.draw.circle(screen, WHITE, origin, 6)
@@ -473,17 +473,17 @@ def ArdumowerControlProgram():
       PrintLogMsg()
    
       # Draw maps.perimeters
-      imax = min(11, len(maps.perimeters))
+      imax = min(maps.MAP_INDEX_PERIMETER_WITH_EXCLUSION+1, len(maps.perimeters))    # 11
       for i in range(imax):
          if len(maps.perimeters[i]) > 0:
-            color = ORANGE
+            if i==maps.MAP_INDEX_PERIMETER_WITH_EXCLUSION: color = PURPLE
+            else: color = ORANGE
             if i==currentMapIndex:
                if editMode: color = RED
                else: color = WHITE
-            pygame.draw.lines(screen, color,  True, maps.perimeters[i], 1)
-            #text = font.render(chr(48+i+1), True, GREEN, BLUE)
-            if i==10: mapNum = "X"                 # exclusion points
+            if i==maps.MAP_INDEX_PERIMETER_WITH_EXCLUSION: mapNum = "X"                 # exclusion points
             else: mapNum = "{0:d}".format(i+1)
+            pygame.draw.lines(screen, color,  True, maps.perimeters[i], 1)
             text = font.render(mapNum, True, GREEN, BLUE)
             textRect = text.get_rect()
             # set the center of the rectangular object.
@@ -493,7 +493,7 @@ def ArdumowerControlProgram():
             screen.blit(text, textRect)
    
       # Draw reference points
-      iRefPoints=11
+      iRefPoints=maps.MAP_INDEX_REFERENCE_POINTS    # 11
       if len(maps.perimeters[iRefPoints]) > 0:
          for k in range(len(maps.perimeters[iRefPoints])):
             if currentMapIndex == iRefPoints:
@@ -516,7 +516,9 @@ def ArdumowerControlProgram():
       PrintDistance()
       PrintMouseDistance()
       PrintRefPointDistance()
-      PrintVersionNumber()
+      PrintMousePosition()
+      PrintCurrentPointPosition()
+      ShowGuiMessage()
       
       # Draw menu
       if menu.is_enabled():
@@ -558,7 +560,7 @@ def CmdExportMaps():
    global config_menu
    data = config_menu.get_input_data()
    exportFileName = data.get('ID_EXPORT_FILE_NAME')
-   maps.ExportMaps(exportFileName, garten)
+   maps.ExportMaps(exportFileName)
    PrintGuiMessage("Maps successfully exported to file " + exportFileName)
 
 
@@ -572,6 +574,14 @@ def CmdCreateWaypoints():
    global showCurrentWayPoints
    lastPerimeter=maps.perimeters[currentMapIndex].copy()
    maps.wayPoints[currentMapIndex] = maps.CreateWaypoints(maps.perimeters[currentMapIndex], r)
+   showCurrentWayPoints = True
+
+   
+def CmdCreateBumperWaypoints():
+   global lastPerimeter
+   global showCurrentWayPoints
+   lastPerimeter=maps.perimeters[currentMapIndex].copy()
+   maps.wayPoints[currentMapIndex] = maps.CreateBumperWaypoints(maps.perimeters[currentMapIndex], r)
    showCurrentWayPoints = True
 
 def CmdMakeSquareParallel():

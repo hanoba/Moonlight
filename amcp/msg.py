@@ -1,4 +1,4 @@
-guiMessage=""
+guiMessage="Hallo"
 
 def GetGuiMessage():
    return guiMessage

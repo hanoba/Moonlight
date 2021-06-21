@@ -277,7 +277,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 //#define ENABLE_PATH_FINDER  true     // path finder is experimental (can be slow - you may have to wait until robot actually starts)
 //#define ENABLE_PATH_FINDER  false
-#define ENABLE_PATH_FINDER_DEFAULT  false
+#define ENABLE_PATH_FINDER_DEFAULT  true
 #define ALLOW_ROUTE_OUTSIDE_PERI_METER 1.0   // max. distance (m) to allow routing from outside perimeter 
                                               // (increase if you get 'no map route' errors near perimeter)
 
