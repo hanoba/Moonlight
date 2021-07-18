@@ -46,21 +46,23 @@ void UdpSerial::begin(unsigned long baud){
   CONSOLE.begin(baud);
 }  
 
-void UdpSerial::beginUDP(){  
-  Udp.begin(localPort);  
-  ////Udp.beginPacket(remoteIP, UDP_SERVER_PORT);
-  // Udp.endPacket();
-  udpStarted = true;  
-  if (simulationFlag)
-  {
-     remoteIP1 = remoteIP_home1;
-     remoteIP2 = remoteIP_home2;
-  }
-  else
-  {
-     remoteIP1 = remoteIP_garten1;
-     remoteIP2 = remoteIP_garten2;
-  }
+void UdpSerial::beginUDP()
+{  
+   Udp.begin(localPort);  
+   ////Udp.beginPacket(remoteIP, UDP_SERVER_PORT);
+   // Udp.endPacket();
+   udpStarted = true;  
+   //if (simulationFlag)
+   if (sim.homeFlag)
+   {
+      remoteIP1 = remoteIP_home1;
+      remoteIP2 = remoteIP_home2;
+   }
+   else
+   {
+      remoteIP1 = remoteIP_garten1;
+      remoteIP2 = remoteIP_garten2;
+   }
 }
 
 

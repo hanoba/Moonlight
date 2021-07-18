@@ -402,8 +402,9 @@ static void checkWiFi(int baud)
 
 void startWIFI()
 {
-   const char *ssid = simulationFlag ? WIFI_SSID_SIM : WIFI_SSID;    // your network SSID (name)
-   const char *pass = simulationFlag ? WIFI_PASS_SIM : WIFI_PASS;    // your network password
+   const char *ssid = simulationFlag ? WIFI_SSID_HOME : WIFI_SSID;    // your network SSID (name)
+   const char *pass = simulationFlag ? WIFI_PASS_HOME : WIFI_PASS;    // your network password
+   bool tryHomeFirstFlag = simulationFlag;
 
    WIFI.begin(WIFI_BAUDRATE); 
    WIFI.print("AT\r\n");  
@@ -443,15 +444,37 @@ void startWIFI()
      } 
      else 
      {
-         while ( status != WL_CONNECTED) 
+         //while ( status != WL_CONNECTED) 
+         while (true)
          {
+            if (tryHomeFirstFlag)
+            {
+               watchdogReset();
+               WiFi.disconnect();
+               delay(500);
+               watchdogReset();
+               CONSOLE.print("Attempting to connect to WPA SSID: ");
+               CONSOLE.println(WIFI_SSID_HOME);      
+               status = WiFi.begin(WIFI_SSID_HOME, WIFI_PASS_HOME);
+               if (status == WL_CONNECTED)
+               {
+                  sim.homeFlag = true;
+                  break;
+               }
+            }
+            tryHomeFirstFlag = true;
             watchdogReset();
             WiFi.disconnect();
             delay(500);
             watchdogReset();
             CONSOLE.print("Attempting to connect to WPA SSID: ");
-            CONSOLE.println(ssid);      
-            status = WiFi.begin(ssid, pass);
+            CONSOLE.println(WIFI_SSID);      
+            status = WiFi.begin(WIFI_SSID, WIFI_PASS);
+            if (status == WL_CONNECTED)
+            {
+               sim.homeFlag = false;
+               break;
+            }
  
             #ifdef WIFI_IP  
               IPAddress localIp(WIFI_IP);
@@ -930,20 +953,24 @@ void computeRobotState()
 
 // should robot move?
 bool robotShouldMove(){
-  return ( (fabs(motor.linearSpeedSet) > 0.001) ||  (fabs(motor.angularSpeedSet) > 0.001) );
+   bool shouldMoveFlag;
+   if (sim.RobotShouldMove(shouldMoveFlag)) return shouldMoveFlag;
+   return ( (fabs(motor.linearSpeedSet) > 0.001) ||  (fabs(motor.angularSpeedSet) > 0.001) );
 }
 
 
 void triggerObstacle(){
-  CONSOLE.println("triggerObstacle");    
-  statMowObstacles++;    
-  if ((OSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK)){    
-    driveReverseStopTime = millis() + 3000;      
-  } else { 
-    stateSensor = SENS_OBSTACLE;
-    setOperation(OP_ERROR);
-    buzzer.sound(SND_ERROR, true);        
-  }
+   CONSOLE.println("triggerObstacle");    
+   statMowObstacles++;    
+   if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
+   {
+      driveReverseStopTime = millis() + 3000;
+      //driveReverseStopTime = millis() + 2000;    
+   } else { 
+      stateSensor = SENS_OBSTACLE;
+      setOperation(OP_ERROR);
+      buzzer.sound(SND_ERROR, true);        
+   }
 }
 
 
@@ -981,60 +1008,64 @@ void detectSensorMalfunction(){
 
 
 // detect obstacle (bumper, sonar, ToF) 
-void detectObstacle(){  
-  if (!robotShouldMove()) return;  
-  if (TOF_ENABLE){
-    if (millis() >= nextToFTime){
-      nextToFTime = millis() + 200;
-      int v = tof.readRangeContinuousMillimeters();        
-      if (!tof.timeoutOccurred()) {     
-        tofMeasurements.add(v);        
-        float avg = 0;
-        if (tofMeasurements.getAverage(avg) == tofMeasurements.OK){
-          //CONSOLE.println(avg);
-          if (avg < TOF_OBSTACLE_CM * 10){
-            CONSOLE.println("ToF obstacle!");    
-            triggerObstacle();                
-            return; 
-          }
-        }      
-      } 
-    }    
-  }   
-  
-  if (BUMPER_ENABLE){
-    if ( (millis() > linearMotionStartTime + 5000) && (bumper.obstacle()) ){  
-      CONSOLE.println("bumper obstacle!");    
-      statMowBumperCounter++;
-      triggerObstacle();    
-      return;
-    }
-  }
-  if (sonar.obstacle() && (maps.wayMode != WAY_DOCK)){
-    CONSOLE.println("sonar obstacle!");    
-    statMowSonarCounter++;
-    if (SONAR_TRIGGER_OBSTACLES){
-      triggerObstacle();
-      return;
-    }        
-  }  
-  // check if GPS motion (obstacle detection)  
-  if (millis() > nextGPSMotionCheckTime){        
-    resetGPSMotionMeasurement();
-    float dX = lastGPSMotionX - stateX;
-    float dY = lastGPSMotionY - stateY;
-    float delta = sqrt( sq(dX) + sq(dY) );    
-    if (delta < 0.05){
-      if (GPS_MOTION_DETECTION){
-        CONSOLE.println("gps no motion => obstacle!");
-        statMowGPSMotionTimeoutCounter++;
-        triggerObstacle();
-        return;
+void detectObstacle()
+{  
+   if (!robotShouldMove()) return;  
+   if (TOF_ENABLE)
+   {
+     if (millis() >= nextToFTime){
+       nextToFTime = millis() + 200;
+       int v = tof.readRangeContinuousMillimeters();        
+       if (!tof.timeoutOccurred()) {     
+         tofMeasurements.add(v);        
+         float avg = 0;
+         if (tofMeasurements.getAverage(avg) == tofMeasurements.OK){
+           //CONSOLE.println(avg);
+           if (avg < TOF_OBSTACLE_CM * 10){
+             CONSOLE.println("ToF obstacle!");    
+             triggerObstacle();                
+             return; 
+           }
+         }      
+       } 
+     }    
+   }   
+   
+   if (BUMPER_ENABLE)
+   {
+      if ( (millis() > linearMotionStartTime + 5000) && (bumper.obstacle()) )
+      {  
+         CONSOLE.println("bumper obstacle!");    
+         statMowBumperCounter++;
+         triggerObstacle();    
+         return;
       }
-    }
-    lastGPSMotionX = stateX;      
-    lastGPSMotionY = stateY;      
-  }    
+   }
+   if (sonar.obstacle() && (maps.wayMode != WAY_DOCK)){
+     CONSOLE.println("sonar obstacle!");    
+     statMowSonarCounter++;
+     if (SONAR_TRIGGER_OBSTACLES){
+       triggerObstacle();
+       return;
+     }        
+   }  
+   // check if GPS motion (obstacle detection)  
+   if (millis() > nextGPSMotionCheckTime){        
+     resetGPSMotionMeasurement();
+     float dX = lastGPSMotionX - stateX;
+     float dY = lastGPSMotionY - stateY;
+     float delta = sqrt( sq(dX) + sq(dY) );    
+     if (delta < 0.05){
+       if (GPS_MOTION_DETECTION){
+         CONSOLE.println("gps no motion => obstacle!");
+         statMowGPSMotionTimeoutCounter++;
+         triggerObstacle();
+         return;
+       }
+     }
+     lastGPSMotionX = stateX;      
+     lastGPSMotionY = stateY;      
+   }    
 }
 
 
@@ -1135,7 +1166,9 @@ void trackLine(){
     //CONSOLE.print(",");        
     //CONSOLE.println(angular/PI*180.0);            
     if (maps.trackReverse) linear *= -1;   // reverse line tracking needs negative speed
-    if (!SMOOTH_CURVES) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
+    //HB if (!SMOOTH_CURVES) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
+    if (SMOOTH_CURVES) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
+    else  angular = max(-PI/16, min(PI/16, angular));
   }
   if (fixTimeout != 0){
     if (millis() > lastFixTime + fixTimeout * 1000.0){
@@ -1221,175 +1254,230 @@ void trackLine(){
 
 
 // robot main loop
-void run(){  
-  robotDriver.run();
-  buzzer.run();
-  stopButton.run();
-  battery.run();
-  batteryDriver.run();
-  motorDriver.run();
-  motor.run();
-  sonar.run();
-  maps.run();  
-  rcmodel.run();
+void run()
+{  
+   robotDriver.run();
+   buzzer.run();
+   stopButton.run();
+   battery.run();
+   batteryDriver.run();
+   motorDriver.run();
+   motor.run();
+   sonar.run();
+   maps.run();  
+   rcmodel.run();
+ 
+   //------------------------------------------------------------------------------------------------- 
+   // state saving every 5 sec
+   //------------------------------------------------------------------------------------------------- 
+   if (millis() >= nextSaveTime)
+   {  
+      nextSaveTime = millis() + 5000;
+      saveState();
+   }
+   
+   //------------------------------------------------------------------------------------------------- 
+   // Handle temperature and humidity
+   //------------------------------------------------------------------------------------------------- 
+   if (millis() > nextTempTime)
+   {
+      // https://learn.sparkfun.com/tutorials/htu21d-humidity-sensor-hookup-guide
+      nextTempTime = millis() + 60000;
+      if (simulationFlag)
+      {
+         stateTemp = 25.0;
+         stateHumidity = 50.0;
+      }
+      else
+      {
+         stateTemp = myHumidity.readTemperature();
+         stateHumidity = myHumidity.readHumidity();
+      }
+ 	   statTempMin = min(statTempMin, stateTemp);
+ 	   statTempMax = max(statTempMax, stateTemp);
+      //CONSOLE.print("temp=");
+      //CONSOLE.print(stateTemp,1);
+      //CONSOLE.print("  humidity=");
+      //CONSOLE.print(stateHumidity,0);    
+      //CONSOLE.print(" ");    
+      //logCPUHealth();    
+   }
 
-  // state saving
-  if (millis() >= nextSaveTime){  
-    nextSaveTime = millis() + 5000;
-    saveState();
-  }
-  
-  // temp
-  if (millis() > nextTempTime)
-  {
-    // https://learn.sparkfun.com/tutorials/htu21d-humidity-sensor-hookup-guide
-    nextTempTime = millis() + 60000;
-    if (simulationFlag)
-    {
-       stateTemp = 25.0;
-       stateHumidity = 50.0;
-    }
-    else
-    {
-       stateTemp = myHumidity.readTemperature();
-       stateHumidity = myHumidity.readHumidity();
-    }
-	statTempMin = min(statTempMin, stateTemp);
-	statTempMax = max(statTempMax, stateTemp);
-   //CONSOLE.print("temp=");
-   //CONSOLE.print(stateTemp,1);
-   //CONSOLE.print("  humidity=");
-   //CONSOLE.print(stateHumidity,0);    
-   //CONSOLE.print(" ");    
-   //logCPUHealth();    
-  }
-  // IMU
-  if (millis() > nextImuTime){
-    nextImuTime = millis() + 150;        
-    //imu.resetFifo();    
-    if (imuIsCalibrating) {
-      motor.stopImmediately(true);   
-      if (millis() > nextImuCalibrationSecond){
-        nextImuCalibrationSecond = millis() + 1000;  
-        imuCalibrationSeconds++;
-        CONSOLE.print("IMU gyro calibration (robot must be static)... ");        
-        CONSOLE.println(imuCalibrationSeconds);        
-        buzzer.sound(SND_PROGRESS, true);        
-        if (imuCalibrationSeconds >= 9){
-          imuIsCalibrating = false;
-          CONSOLE.println();                
-          lastIMUYaw = 0;          
-          imu.resetFifo();
-          imuDataTimeout = millis() + 10000;
-        }
-      }       
-    } else {
-      readIMU();    
-    }
-  }
-  
-  gps.run();
-    
-  calcStats();  
-  
-  
-  if (millis() >= nextControlTime){        
-    nextControlTime = millis() + 20; 
-    controlLoops++;    
-    
-    computeRobotState();
-
-    if (gpsJump){
-      // gps jump: restart current operation from new position
-      CONSOLE.println("restarting due to gps jump");
-      gpsJump = false;
-      motor.stopImmediately(true);
-      setOperation(stateOp, true);    // restart current operation
-    }  
-
-    if (!imuIsCalibrating){     
-      
-      if (battery.chargerConnected() != stateChargerConnected) {    
-        stateChargerConnected = battery.chargerConnected(); 
-        if (stateChargerConnected){      
-          stateChargerConnected = true;
-          setOperation(OP_CHARGE);                
-        }           
-      }     
-      if (battery.chargerConnected()){
-        if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE)){
-          maps.setIsDocked(true);               
-          maps.setRobotStatePosToDockingPos(stateX, stateY, stateDelta);                       
-        }
-        battery.resetIdle();        
+   //------------------------------------------------------------------------------------------------- 
+   // Handle IMU
+   //------------------------------------------------------------------------------------------------- 
+   if (millis() > nextImuTime)
+   {
+      nextImuTime = millis() + 150;        
+      //imu.resetFifo();    
+      if (imuIsCalibrating) {
+        motor.stopImmediately(true);   
+        if (millis() > nextImuCalibrationSecond){
+          nextImuCalibrationSecond = millis() + 1000;  
+          imuCalibrationSeconds++;
+          CONSOLE.print("IMU gyro calibration (robot must be static)... ");        
+          CONSOLE.println(imuCalibrationSeconds);        
+          buzzer.sound(SND_PROGRESS, true);        
+          if (imuCalibrationSeconds >= 9){
+            imuIsCalibrating = false;
+            CONSOLE.println();                
+            lastIMUYaw = 0;          
+            imu.resetFifo();
+            imuDataTimeout = millis() + 10000;
+          }
+        }       
       } else {
-        if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE)){
-          maps.setIsDocked(false);
-        }
+        readIMU();    
       }
+   }
+   
+   //-------------------------------------------------------------------------------------------------
+   // Handle GPS and compute Statistics
+   //------------------------------------------------------------------------------------------------- 
+   gps.run();
+   calcStats();  
+   
+   //------------------------------------------------------------------------------------------------- 
+   // Control robot every 20 ms
+   //------------------------------------------------------------------------------------------------- 
+   if (millis() >= nextControlTime)
+   {        
+      nextControlTime = millis() + 20; 
+      controlLoops++;    
       
+      computeRobotState();
       
-      if ((stateOp == OP_MOW) ||  (stateOp == OP_DOCK)) {              
-        if (driveReverseStopTime > 0){
-          // obstacle avoidance
-          motor.setLinearAngularSpeed(-0.1,0);
-          if (millis() > driveReverseStopTime){
-            CONSOLE.println("driveReverseStopTime");
-            motor.stopImmediately(false);
-            driveReverseStopTime = 0;
-            maps.addObstacle(stateX, stateY);
-            Point pt;
-            if (!maps.findObstacleSafeMowPoint(pt)){
-              setOperation(OP_DOCK, true); // dock if no more (valid) mowing points
-            } else setOperation(stateOp, true);    // continue current operation
-          }
-        } else {          
-          // line tracking
-          trackLine();
-          detectSensorMalfunction();
-          detectObstacle();       
-        }        
-        battery.resetIdle();
-        if (battery.underVoltage()){
-          stateSensor = SENS_BAT_UNDERVOLTAGE;
-          setOperation(OP_IDLE);
-          //buzzer.sound(SND_OVERCURRENT, true);        
-        } 
-        if (battery.shouldGoHome()){
-          if (DOCKING_STATION){
-            setOperation(OP_DOCK);
-          }
-        }
-        if (stopButton.triggered()){
-          CONSOLE.println("stopButton triggered!");
-          stateSensor = SENS_STOP_BUTTON;
-          setOperation(OP_IDLE);
-        }
-      }
-      else if (stateOp == OP_CHARGE){      
-        if (battery.chargerConnected()){
-          if (battery.chargingHasCompleted()){
-            if ((DOCKING_STATION) && (!dockingInitiatedByOperator)) {
-              if (maps.mowPointsIdx > 0){  // if mowing not completed yet
-                if (DOCK_AUTO_START) { // automatic continue mowing allowed?
-                  setOperation(OP_MOW); // continue mowing
-                }
-              }
+      if (gpsJump)
+      {
+         // gps jump: restart current operation from new position
+         CONSOLE.println("restarting due to gps jump");
+         gpsJump = false;
+         motor.stopImmediately(true);
+         setOperation(stateOp, true);    // restart current operation
+      }  
+      
+      if (!imuIsCalibrating)
+      {       
+         //-------------------------------------------------------------------------------------------------
+         // Handle charging / docking station
+         //------------------------------------------------------------------------------------------------- 
+         if (battery.chargerConnected() != stateChargerConnected) 
+         {    
+            stateChargerConnected = battery.chargerConnected(); 
+            if (stateChargerConnected)
+            {      
+              stateChargerConnected = true;
+              setOperation(OP_CHARGE);                
+            }           
+         }     
+         if (battery.chargerConnected())
+         {
+            if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE))
+            {
+              maps.setIsDocked(true);               
+              maps.setRobotStatePosToDockingPos(stateX, stateY, stateDelta);                       
             }
-          }
-        } else {
-          setOperation(OP_IDLE);        
-        }
+            battery.resetIdle();        
+         } 
+         else 
+         {
+            if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE))
+            {
+               maps.setIsDocked(false);
+            }
+         }
+         
+         
+         if ((stateOp == OP_MOW) ||  (stateOp == OP_DOCK)) 
+         {              
+            //------------------------------------------------------------------------------------------------- 
+            // Handle drive reverse after obstacle detection
+            //------------------------------------------------------------------------------------------------- 
+            if (driveReverseStopTime > 0)
+            {
+               // obstacle avoidance
+               motor.setLinearAngularSpeed(-0.2,0);
+               if (millis() > driveReverseStopTime)
+               {
+                  CONSOLE.println("driveReverseStopTime");
+                  motor.stopImmediately(false);
+                  driveReverseStopTime = 0;
+                  if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
+                  {
+                     maps.addObstacle(stateX, stateY);
+                     Point pt;
+                     if (!maps.findObstacleSafeMowPoint(pt))
+                     {
+                        setOperation(OP_DOCK, true); // dock if no more (valid) mowing points
+                     }  else setOperation(stateOp, true);    // continue current operation
+                  }
+                  else 
+                  {
+                     maps.skipNextMowingPoint();
+                     maps.skipNextMowingPoint();
+                     setOperation(stateOp, true);    // continue current operation
+                  }
+               }
+            } 
+            //-------------------------------------------------------------------------------------------------
+            // Line tracking
+            //-------------------------------------------------------------------------------------------------
+            else 
+            {          
+               trackLine();
+               detectSensorMalfunction();
+               detectObstacle();       
+            }        
+            battery.resetIdle();
+            if (battery.underVoltage())
+            {
+               stateSensor = SENS_BAT_UNDERVOLTAGE;
+               setOperation(OP_IDLE);
+               //buzzer.sound(SND_OVERCURRENT, true);        
+            } 
+            if (battery.shouldGoHome())
+            {
+               if (DOCKING_STATION)
+               {
+                  setOperation(OP_DOCK);
+               }
+            }
+            if (stopButton.triggered())
+            {
+               CONSOLE.println("stopButton triggered!");
+               stateSensor = SENS_STOP_BUTTON;
+               setOperation(OP_IDLE);
+            }
+         }
+         else if (stateOp == OP_CHARGE){      
+           if (battery.chargerConnected()){
+             if (battery.chargingHasCompleted()){
+               if ((DOCKING_STATION) && (!dockingInitiatedByOperator)) {
+                 if (maps.mowPointsIdx > 0){  // if mowing not completed yet
+                   if (DOCK_AUTO_START) { // automatic continue mowing allowed?
+                     setOperation(OP_MOW); // continue mowing
+                   }
+                 }
+               }
+             }
+           } else {
+             setOperation(OP_IDLE);        
+           }
+         }
+      } // !imuIsCalibrating
+      if (stopButton.LongKeyPress())
+      {
+         setOperation(OP_IDLE);
+         battery.switchOff();
       }
-      
-      
-    }    
-  }
-    
-  // ----- read serial input (BT/console) -------------
-  processComm();
-  outputConsole();       
-  watchdogReset();     
+   } // robot control every 20 ms
+     
+   //------------------------------------------------------------------------------------------------- 
+   // read serial input (BT/UDP/console)
+   //------------------------------------------------------------------------------------------------- 
+   processComm();
+   outputConsole();       
+   watchdogReset();     
 }
 
 

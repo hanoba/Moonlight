@@ -299,7 +299,10 @@ void AmBumperDriver::getTriggeredBumper(bool &leftBumper, bool &rightBumper){
   rightBumper = rightPressed;
 }
 
-bool AmBumperDriver::obstacle(){
+bool AmBumperDriver::obstacle()
+{
+  bool obstacleFlag;
+  if (sim.Obstacle(obstacleFlag)) return obstacleFlag;
   return (leftPressed || rightPressed);
 }
     
@@ -312,15 +315,45 @@ void AmBumperDriver::run(){
 
 
 void AmStopButtonDriver::begin(){
+  nextControlTime = 0;
+  pressed = false;  
+  pressDuration = 1;
 }
 
-void AmStopButtonDriver::run(){
-
+void AmStopButtonDriver::run()
+{
+   unsigned long t = millis();
+   if (t < nextControlTime) return;
+   nextControlTime = t + 100;                                       // save CPU resources by running at 10 Hz
+   if (digitalRead(pinButton)== LOW)
+   {
+      if (pressDuration==0) pressed = true;
+      pressDuration++;
+   }
+   else
+   {
+      pressDuration = 0;
+   }
 }
 
-bool AmStopButtonDriver::triggered(){
-  return false; 
+bool AmStopButtonDriver::triggered()
+{
+   bool _pressed = pressed;
+   pressed = false;
+   return _pressed;
 }
+
+
+bool AmStopButtonDriver::LongKeyPress()
+{
+   if (pressDuration >= 20)
+   {
+      pressDuration = 1;
+      return true;
+   }
+   return false;
+}
+
 
 
 

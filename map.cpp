@@ -1827,5 +1827,4 @@ void Map::testIntegerCalcs(){
     CONSOLE.print(",");
   }   
 }
-  
-  
+    

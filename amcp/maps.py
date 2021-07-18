@@ -100,6 +100,8 @@ def NewMap():
 # Garten
 garten = plan.Garten()
 Plan2Map(garten)
+gmap = garten.copy()
+print(gmap)
 Map2Screen(garten)
 
 # Gartenhaus
@@ -117,6 +119,44 @@ schuppen = plan.Schuppen()
 Plan2Map(schuppen)
 Map2Screen(schuppen)
 
+def IsInTriangleOld(xp, yp, triangle):
+   #print(triangle)
+   (xa, ya) = triangle[0]
+   (xb, yb) = triangle[1]
+   (xc, yc) = triangle[2]
+   a = (yb-yp)*(xa-xp) - (ya-yp)*(xb-xp)
+   b = (yc-yp)*(xa-xp) - (ya-yp)*(xc-xp)
+   if a*b > 0: return True
+   a = (ya-yp)*(xb-xp) - (yb-yp)*(xa-xp)
+   b = (yc-yp)*(xb-xp) - (yb-yp)*(xc-xp)
+   if a*b > 0: return True
+   return False
+
+def IsInTriangle(xp, yp, xa, ya, xb, yb, xc, yc):
+   #print(triangle)
+   #(xa, ya) = triangle[0]
+   #(xb, yb) = triangle[1]
+   #(xc, yc) = triangle[2]
+   ABC =  abs(xa*(yb-yc) + xb*(yc-ya) + xc*(ya-yb))
+   ABCP = abs(xa*(yb-yp) + xb*(yc-ya) + xc*(yp-yb) + xp*(ya-yc))
+   ABPC = abs(xa*(yb-yc) + xb*(yp-ya) + xp*(yc-yb) + xc*(ya-yp))
+   APBC = abs(xa*(yp-yc) + xp*(yb-ya) + xb*(yc-yp) + xc*(ya-yb))
+   return max([ABCP, ABPC, APBC]) <= ABC
+
+def IsInGarten(xp, yp):
+   xa = -32.0785930264506
+   ya = -13.2325080556693
+   xb =   3.8013106740782
+   yb =  12.8357678835018
+   xc =  16.3663945990013
+   yc =  -8.0508496788145
+   xd = -28.2104329694310
+   yd = -20.0747984450987
+   #t1 = [gmap[0], gmap[1], gmap[2]]
+   #t2 = [gmap[2], gmap[3], gmap[0]]
+   if IsInTriangle(xp, yp, xa, ya, xb, yb, xc, yc): return True
+   if IsInTriangle(xp, yp, xc, yc, xd, yd, xa, ya): return True
+   return False
 
 def Move(poly, mx, my):
     length = len(poly)
