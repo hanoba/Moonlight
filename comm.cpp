@@ -1118,7 +1118,7 @@ void outputConsole()
 
   if (millis() > nextInfoTime){
     bool started = (nextInfoTime == 0);
-    nextInfoTime = millis() + LOG_PERIOD_MS;
+    nextInfoTime = millis() + (simulationFlag ? 1000: LOG_PERIOD_MS);
 
     unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
     unsigned long totalmins = totalsecs/60;

@@ -76,8 +76,10 @@ def PrintMousePosition():
    pos = [ pygame.mouse.get_pos() ]
    maps.Screen2Map(pos)
    (x,y) = pos[0]
+   if maps.IsInGarten(x, y): color = WHITE
+   else: color = RED
    position = "{0:7.2f}{1:7.2f} m".format(x, y)
-   text = bigFont.render(position, True, WHITE, BLACK)
+   text = bigFont.render(position, True, color, BLACK)
    textRect = text.get_rect()
    textRect.topleft = ((500, 50+0*LINE_SPACING))
    screen.blit(text, textRect)
@@ -275,7 +277,7 @@ def ArdumowerControlProgram():
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
    theme_dark.widget_font_size=20
    theme_dark.title_font_size=30
-   menu = pygame_menu.Menu('Main Menu', 600, 700, theme=theme_dark)
+   menu = pygame_menu.Menu('Main Menu', 600, 800, theme=theme_dark)
 
    menu.add.button('Show/Hide MainMenu (ESC)', CmdShowHideMainMenu)
    menu.add.button('Upload current map (u)', CmdUploadMap)
@@ -290,7 +292,7 @@ def ArdumowerControlProgram():
    menu.add.button('Show/Hide Waypoints (F5)', CmdToggleShowWaypoints)
    menu.add.button('Create Waypoints (F6)', CmdCreateWaypoints)
    menu.add.button('Create Bumper Waypoints', CmdCreateBumperWaypoints)
-   menu.add.button('Make Square Parallel (F7)', CmdMakeSquareParallel)
+   menu.add.button('Convert Rectangle To Trapezoid (F7)', CmdConvertRectangleToTrapezoid)
    menu.add.button('Read Map From SD Card (r)', CmdReadMapFromSdCard)
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
    menu.add.button('Get RTC Date & Time', mower.GetRtcDateTime)
@@ -584,7 +586,7 @@ def CmdCreateBumperWaypoints():
    maps.wayPoints[currentMapIndex] = maps.CreateBumperWaypoints(maps.perimeters[currentMapIndex], r)
    showCurrentWayPoints = True
 
-def CmdMakeSquareParallel():
+def CmdConvertRectangleToTrapezoid():
    global lastPerimeter
    lastPerimeter=maps.perimeters[currentMapIndex].copy()
    maps.MakeParallel(maps.perimeters[currentMapIndex], r)

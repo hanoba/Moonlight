@@ -8,8 +8,11 @@ class Sim
    float speed;
 public:
    bool activeFlag = false;
+   bool homeFlag = true;
    bool SetLinearAngularSpeed(float lin, float ang);
    bool ComputeRobotState();
+   bool Obstacle(bool& obstacleFlag);
+   bool RobotShouldMove(bool& shouldMoveFlag);
    Sim();
 };
 

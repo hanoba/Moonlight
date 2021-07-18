@@ -1,5 +1,6 @@
 *.sdf
 amcp/__pycache__
+amcp/log
 *.user
 x64
 .vs

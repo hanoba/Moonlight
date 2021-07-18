@@ -167,8 +167,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 #define START_AP  false             // should WIFI module start its own access point?
 //#define WIFI_IP   192,168,178,10    // choose IP e.g. 192.168.4.1  (comment out for dynamic IP/DHCP)
-#define WIFI_SSID_SIM "Hanobau1"        // choose WiFi network ID
-#define WIFI_PASS_SIM "1846162556"      // choose WiFi network password
+#define WIFI_SSID_HOME "Hanobau1"        // choose WiFi network ID
+#define WIFI_PASS_HOME "1846162556"      // choose WiFi network password
 #define WIFI_SSID "AndroidHanoba"        // choose WiFi network ID
 #define WIFI_PASS "18461956"      // choose WiFi network password
 
@@ -206,9 +206,13 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // see Wiki on how to install bumperduino or freewheel sensor:
 // https://wiki.ardumower.de/index.php?title=Bumper_sensor
 // https://wiki.ardumower.de/index.php?title=Free_wheel_sensor
-// #define BUMPER_ENABLE true
-#define BUMPER_ENABLE false
-#define BUMPER_DEADTIME 1000  // linear motion dead-time (ms) after bumper is allowed to trigger
+#define BUMPER_ENABLE true
+//#define BUMPER_ENABLE false
+// Note (HB): BUMPER_DEADTIME is not used anywhere in the firmware!
+//#define BUMPER_DEADTIME 1000  // linear motion dead-time (ms) after bumper is allowed to trigger
+
+// true = use a map with all detected obstacles
+#define MOONLIGHT_ADD_OBSTACLE_TO_MAP false
 
 
 // ----- battery charging current measurement (INA169) --------------
@@ -262,8 +266,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 // ------ experimental options -------------------------
 
-#define OSTACLE_AVOIDANCE true   // try to find a way around obstacle
-//#define OSTACLE_AVOIDANCE false  // stop robot on obstacle
+#define OBSTACLE_AVOIDANCE true   // try to find a way around obstacle
+//#define OBSTACLE_AVOIDANCE false  // stop robot on obstacle
 #define OBSTACLE_DIAMETER 1.2   // choose diameter of obstacles placed in front of robot (m) for obstacle avoidance
 
 // detect robot being kidnapped? robot will go into error if distance to tracked path is greater than 1m

@@ -24,9 +24,9 @@
 #include "src/esp/WiFiEsp.h"
 #include "sim.h"
 
-// 168 = Sunray version used as baseline
-//  16 = Moonlight version
-#define VER "Ardumower Moonlight,V168.16 HB 2021-06-21"
+// 168 = Sunray firmware version used as baseline
+// .XX = Moonlight firmware version
+#define VER "Ardumower Moonlight, V168.24 HB 2021-07-18"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 3000
