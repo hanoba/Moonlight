@@ -18,6 +18,7 @@ Sim::Sim()
    delta = 0.0;
    deltaStep = 0.0;
    posStep = 0.0;
+   nextGpsMsgTime = 0;
 }
 
 bool Sim::SetLinearAngularSpeed(float linear, float angular)
@@ -40,17 +41,26 @@ bool Sim::ComputeRobotState()
    stateX = posX;
    stateY = posY;
    stateDelta = delta;
-   stateDeltaGPS = delta;
-   gps.solutionAvail = true;
-   gps.solution = UBLOX::SOL_FIXED;
-   gps.numSV = 30;
-   gps.numSVdgps = 28;
-   gps.groundSpeed = speed;
-   gps.relPosD = delta;
-   gps.relPosE = posX;
-   gps.relPosN = posY;
-   gps.height = 415;
-   gps.dgpsAge = millis();
+   if (millis() >= nextGpsMsgTime)
+   {        
+      nextGpsMsgTime = millis() + 1700;
+      stateDeltaGPS = delta;
+      gps.solutionAvail = true;
+      gps.solution = UBLOX::SOL_FIXED;
+      gps.numSV = 30;
+      gps.numSVdgps = 28;
+      gps.groundSpeed = speed;
+      gps.relPosD = delta;
+      gps.relPosE = posX;
+      gps.relPosN = posY;
+      gps.height = 415;
+      gps.dgpsAge = millis();
+
+      // simulate GPS logging
+      char buf[64];
+      sprintf(buf,"x=%6.2f y=%6.2f SOL=%d\r\n", gps.relPosE, gps.relPosN, gps.solution);
+      sdSerial.writeGpsLogSD(buf);
+   }
    return true;
 }
 

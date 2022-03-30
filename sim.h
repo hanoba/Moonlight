@@ -6,6 +6,7 @@ class Sim
    float delta;         // simulated mower direction
    float deltaStep;
    float speed;
+   unsigned long nextGpsMsgTime;    // for GPS logging
 public:
    bool activeFlag = false;
    bool homeFlag = true;

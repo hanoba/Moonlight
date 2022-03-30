@@ -212,7 +212,12 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 //#define BUMPER_DEADTIME 1000  // linear motion dead-time (ms) after bumper is allowed to trigger
 
 // true = use a map with all detected obstacles
-#define MOONLIGHT_ADD_OBSTACLE_TO_MAP false
+#define MOONLIGHT_ADD_OBSTACLE_TO_MAP 0
+
+// Behaviour for MOONLIGHT_GPS_JUMP==1:
+//  - dgpsAge refers to last FIX
+//  - GPS JUMP refers to position state
+#define MOONLIGHT_GPS_JUMP 1
 
 
 // ----- battery charging current measurement (INA169) --------------
@@ -277,7 +282,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // drive curves smoothly?
 //#define SMOOTH_CURVES  true
 //#define SMOOTH_CURVES  false
-#define SMOOTH_CURVES_DEFAULT  false
+#define SMOOTH_CURVES_DEFAULT  true
 
 //#define ENABLE_PATH_FINDER  true     // path finder is experimental (can be slow - you may have to wait until robot actually starts)
 //#define ENABLE_PATH_FINDER  false

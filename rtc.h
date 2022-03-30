@@ -18,3 +18,4 @@ void SdCardDateTimeInit();
 void WriteAT24C32(unsigned int address, byte data);
 byte ReadAT24C32(unsigned int address);
 
+void GetTimeStamp(char *buf);

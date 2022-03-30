@@ -25,6 +25,7 @@ SDSerial sdSerial;
 
 void SDSerial::begin(unsigned long baud){  
   logFileName = "";
+  gpsLogFileName = "";
   packetIdx = 0;
   sdStarted = false;
   sdActive = false;
@@ -40,6 +41,9 @@ void SDSerial::beginSD()
 
    sprintf(buf, "%02d%02d%02d%02d.txt", now.month, now.monthday, now.hour, now.minute);
    logFileName = (String)buf;
+
+   sprintf(buf, "%02d%02d%02d%02d.gps", now.month, now.monthday, now.hour, now.minute);
+   gpsLogFileName = (String)buf;
 
    CONSOLE.print("logfile: ");
    CONSOLE.println(logFileName);    
@@ -71,7 +75,25 @@ void SDSerial::writeSD(char *buf)
      logFile.flush();
      logFile.close();            
    } else {
-     CONSOLE.println("ERROR opening file for writing");
+     CONSOLE.println(F("ERROR opening logFile for writing"));
+   }
+}
+
+void SDSerial::writeGpsLogSD(char *buf)
+{
+   gpsLogFile = SD.open(SDSerial::gpsLogFileName, FILE_WRITE);
+   if (gpsLogFile)
+   {   
+      char timeStamp[16];
+      GetTimeStamp(timeStamp);
+      gpsLogFile.write(timeStamp);              
+      gpsLogFile.write(buf);              
+      gpsLogFile.flush();
+      gpsLogFile.close();            
+   } 
+   else 
+   {
+      CONSOLE.println(F("ERROR opening gpsLogFile for writing"));
    }
 }
 

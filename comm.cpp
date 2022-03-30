@@ -1099,14 +1099,14 @@ void outputConsole(){
 #define PRINT(format, value) sprintf(buf, format, value); CONSOLE.print(buf);
 // output summary on console
 
-static uint32_t timestampOffset_sec;
+//static uint32_t timestampOffset_sec;
 
 void outputConsoleInit()
 {
    DateTime now;
 
    GetDateTime(now);
-   timestampOffset_sec = now.second + (now.minute + now.hour * 60) * 60 - millis()/1000;
+   //timestampOffset_sec = now.second + (now.minute + now.hour * 60) * 60 - millis()/1000;
    CONSOLE.print("Current datetime: ");
    CONSOLE.println(DateTime2String(now));
 }
@@ -1120,18 +1120,20 @@ void outputConsole()
     bool started = (nextInfoTime == 0);
     nextInfoTime = millis() + (simulationFlag ? 1000: LOG_PERIOD_MS);
 
-    unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
-    unsigned long totalmins = totalsecs/60;
-    unsigned long totalhours = totalmins/60;
-    unsigned long hour = totalhours % 24;
-    unsigned long min = totalmins % 60;
-    unsigned long sec = totalsecs % 60;
+    //unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
+    //unsigned long totalmins = totalsecs/60;
+    //unsigned long totalhours = totalmins/60;
+    //unsigned long hour = totalhours % 24;
+    //unsigned long min = totalmins % 60;
+    //unsigned long sec = totalsecs % 60;
     static int headLineCnt = 0;
-    if (headLineCnt == 0) CONSOLE.println("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags  Map  WayPts ");
+    if (headLineCnt == 0) CONSOLE.println(F("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags  Map  WayPts "));
     headLineCnt = headLineCnt + 1 & 7;
-    PRINT(":%02d:", hour);
-    PRINT("%02d:", min);
-    PRINT("%02d", sec);
+    //PRINT(":%02d:", hour);
+    //PRINT("%02d:", min);
+    //PRINT("%02d", sec);
+    GetTimeStamp(buf);
+    CONSOLE.print(buf);
     if (!started){
       if (controlLoops > 0){
         //HB statControlCycleTime = 1.0 / (((float)controlLoops)/5.0);
@@ -1140,7 +1142,7 @@ void outputConsole()
       statMaxControlCycleTime = max(statMaxControlCycleTime, statControlCycleTime);
     }
     controlLoops=0;
-    PRINT(" %4.2f", statControlCycleTime);
+    PRINT("%4.2f", statControlCycleTime);
     
     if (stateOp == OP_IDLE)        CONSOLE.print("  IDLE ");
     else if (stateOp == OP_MOW)    CONSOLE.print("  MOW  ");
