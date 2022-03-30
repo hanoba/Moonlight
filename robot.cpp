@@ -878,17 +878,29 @@ void computeRobotState()
       stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * gps.groundSpeed;    
       //CONSOLE.println(stateGroundSpeed);
       float distGPS = sqrt( sq(posN-lastPosN)+sq(posE-lastPosE) );
+#if MOONLIGHT_GPS_JUMP
+      // Detect jumps relative to current robot position (stateX/stateY)
+      float distGpsState = sqrt( sq(posN-stateY)+sq(posE-stateX) );
+      const float DIST_GPS_STATE = 2.0;     //HB in meter
+      if (distGpsState > DIST_GPS_STATE)
+      {
+             //gpsJump = true;
+             //statGPSJumps++;
+             CONSOLE.print(F("GPS jump: "));
+             CONSOLE.println(distGpsState);
+      } 
+#endif
       const float DIST_GPS_JUMP = 0.3;     //HB in meter
       if ((distGPS > DIST_GPS_JUMP) || (resetLastPos))
       {
 #define ENABLE_GPS_JUMP_DETECTION 0     //HB
 #if ENABLE_GPS_JUMP_DETECTION
-          if (distGPS > DIST_GPS_JUMP) {
+         if (distGPS > DIST_GPS_JUMP) {
             gpsJump = true;
             statGPSJumps++;
             CONSOLE.print("GPS jump: ");
             CONSOLE.println(distGPS);
-          }
+         }
 #endif
           resetLastPos = false;
           lastPosN = posN;
@@ -1166,9 +1178,9 @@ void trackLine(){
     //CONSOLE.print(",");        
     //CONSOLE.println(angular/PI*180.0);            
     if (maps.trackReverse) linear *= -1;   // reverse line tracking needs negative speed
-    //HB if (!SMOOTH_CURVES) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
-    if (SMOOTH_CURVES) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
-    else  angular = max(-PI/16, min(PI/16, angular));
+    if (!SMOOTH_CURVES) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
+    //if (SMOOTH_CURVES) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
+    //else  angular = max(-PI/16, min(PI/16, angular));
   }
   if (fixTimeout != 0){
     if (millis() > lastFixTime + fixTimeout * 1000.0){

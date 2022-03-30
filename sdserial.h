@@ -19,7 +19,9 @@
 class SDSerial: public Stream{
   public:
     String logFileName;
+    String gpsLogFileName;
     File logFile;
+    File gpsLogFile;
     char packetBuffer[100];          // buffer to packet
     int packetIdx;
     bool sdStarted;
@@ -27,6 +29,7 @@ class SDSerial: public Stream{
     virtual void begin(unsigned long baud);
     void beginSD();
     void writeSD(char *buf);
+    void writeGpsLogSD(char *buf);
     virtual size_t write(uint8_t);
     virtual int available();
     virtual int read();

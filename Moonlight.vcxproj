@@ -171,6 +171,8 @@
     <ClCompile Include="sonar.cpp" />
     <ClCompile Include="SparkFunHTU21D.cpp" />
     <ClCompile Include="src\driver\AmRobotDriver.cpp" />
+    <ClCompile Include="src\ublox\SparkFun_Ublox_Arduino_Library.cpp" />
+    <ClCompile Include="src\ublox\ublox.cpp" />
     <ClCompile Include="udpserial.cpp" />
     <ClCompile Include="VL53L0X.cpp" />
   </ItemGroup>

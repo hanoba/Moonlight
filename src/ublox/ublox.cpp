@@ -417,6 +417,17 @@ void UBLOX::dispatchMessage() {
               relPosE = ((float)this->unpack_int32(12))/100.0;
               relPosD = ((float)this->unpack_int32(16))/100.0;              
               solution = (UBLOX::SolType)((this->unpack_int32(60) >> 3) & 3);              
+
+              // GPS logging to file on SD card
+              // char buf[32];
+              // sprintf(buf,"x=%6.2f y=%6.2f SOL=%d\r\n", relPosE, relPosN, solution);
+              // sdSerial.writeGpsLogSD(buf);
+
+#if MOONLIGHT_GPS_JUMP
+              if (solution==SOL_FIXED) dgpsAge = millis();
+#else
+              dgpsAge = millis();
+#endif
               solutionAvail = true;
               if (verbose){
                 CONSOLE.print("UBX-NAV-RELPOSNED ");
@@ -455,7 +466,9 @@ void UBLOX::dispatchMessage() {
               byte flags = (byte)this->unpack_int8(1);
               if ((flags & 1) != 0) dgpsChecksumErrorCounter++;
               dgpsPacketCounter++;
+#if MOONLIGHT_GPS_JUMP==0
               dgpsAge = millis();
+#endif
             }
             break;            
         }

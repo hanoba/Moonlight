@@ -106,7 +106,7 @@ def ExecCmd(cmd):
       print("[udp.ExecCmd] Wait for answer: " + cmd[3])
       timeOutCounter = 5
       # longer timeout for N, C and S commands
-      if cmd[3]=="N" or cmd[3]=="C" or cmd[3]=="S" or cmd[3]=="R" or cmd[3]=="X": timeOutCounter = 20
+      if cmd[3]=="N" or cmd[3]=="C" or cmd[3]=="S" or cmd[3]=="R" or cmd[3]=="X" or cmd[3]=="W" or cmd[3]=="R": timeOutCounter = 20
       while True:
          answer = receive()
          if answer != "":

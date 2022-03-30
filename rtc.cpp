@@ -136,3 +136,24 @@ void SdCardDateTimeInit()
    SdFile::dateTimeCallback(SdCardDateTime);
 }
 
+
+void GetTimeStamp(char *buf)
+{
+   static uint32_t timestampOffset_sec;
+   static bool firstFlag = true;
+   if (firstFlag)
+   {
+      firstFlag = false;
+      DateTime now;
+      GetDateTime(now);
+      timestampOffset_sec = now.second + (now.minute + now.hour * 60) * 60 - millis()/1000;
+   }
+
+   unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
+   unsigned long totalmins = totalsecs/60;
+   unsigned long totalhours = totalmins/60;
+   unsigned long hour = totalhours % 24;
+   unsigned long min = totalmins % 60;
+   unsigned long sec = totalsecs % 60;
+   sprintf(buf, ":%02d:%02d:%02d ", hour, min, sec);
+}
