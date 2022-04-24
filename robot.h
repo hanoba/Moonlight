@@ -26,7 +26,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.28 HB 2022-04-09"
+#define VER "Ardumower Moonlight, V168.29 HB 2022-04-24"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 5000
@@ -39,6 +39,7 @@ enum OperationType {
       OP_CHARGE,      
       OP_ERROR,    
       OP_DOCK,            
+      OP_UNDOCK
 };    
 
 enum Sensor {

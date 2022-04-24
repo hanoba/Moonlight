@@ -123,6 +123,7 @@ def PrintHelpText():
   #WriteTextBox("<b>   ToggleBluetoothLogging    ")
    WriteTextBox("<m>   Start mowing              ")
    WriteTextBox("<d>   Start docking             ")
+   WriteTextBox("<a>   Start undocking           ")
    WriteTextBox("<o>   SwitchOffRobot            ")
   #WriteTextBox("<p>   ToggleUseGPSfloatForPosEst")
   #WriteTextBox("<d>   ToggleUseGPSfloatForDeltaE")
@@ -284,7 +285,8 @@ def ArdumowerControlProgram():
    menu.add.button('Upload current map (u)', CmdUploadMap)
    menu.add.button('Start mowing (m)', mower.StartMowing)
    menu.add.button('Stop mowing (i)', mower.StopMowing)
-   menu.add.button('Statt docking (d)', mower.StartDocking)
+   menu.add.button('Start docking (d)', mower.StartDocking)
+   menu.add.button('Start undocking', mower.StartUndocking)
    menu.add.button('Switch Off Robot (o)', mower.SwitchOffRobot)
    menu.add.button('Get Version Number (v)', mower.GetVersionNumber)
    menu.add.button('PrintStatistics (s)', mower.PrintStatistics)
@@ -363,6 +365,8 @@ def ArdumowerControlProgram():
                   #   mower.ToggleUseGPSfloatForDeltaEstimation()
                   elif event.key == pygame.K_d:
                      mower.StartDocking()
+                  elif event.key == pygame.K_a:
+                     mower.StartUndocking()
                   elif event.key == pygame.K_i:
                      mower.StopMowing()
                   elif event.key == pygame.K_m:
@@ -459,7 +463,7 @@ def ArdumowerControlProgram():
       DrawCross(WHITE, origin)
       
       # DockPoints zeichnen
-      #pygame.draw.lines(screen, PURPLE,  True, maps.dockPoints, 3)
+      if len(maps.dockPoints) > 1: pygame.draw.lines(screen, PURPLE,  True, maps.dockPoints, 3)
       
       # Messungen
       pygame.draw.circle(screen, RED, messungen[0], 2)
