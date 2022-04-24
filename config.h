@@ -107,10 +107,12 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 //HB #define WHEEL_BASE_CM         36         // wheel-to-wheel distance (cm)
 //#define WHEEL_BASE_CM         37         // original wheel-to-wheel distance (cm)
-#define WHEEL_BASE_CM         44.5         // Luftrad wheel-to-wheel distance (cm)
+//#define WHEEL_BASE_CM         44.5         // Luftrad wheel-to-wheel distance (cm)
+#define WHEEL_BASE_CM         35.7         // Neue 30cm Rad
 
 //#define WHEEL_DIAMETER        250        //HB original wheel diameter (mm) 
-#define WHEEL_DIAMETER        260        // Luftrad wheel diameter (mm) 
+//#define WHEEL_DIAMETER        260        // Luftrad wheel diameter (mm) 
+#define WHEEL_DIAMETER        300        // Neues 30cm Rad wheel diameter (mm) 
 
 //#define ENABLE_ODOMETRY_ERROR_DETECTION  true    //HB use this to detect odometry erros
 #define ENABLE_ODOMETRY_ERROR_DETECTION  false

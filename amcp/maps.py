@@ -101,13 +101,25 @@ def NewMap():
 garten = plan.Garten()
 Plan2Map(garten)
 gmap = garten.copy()
-print(gmap)
+#print(gmap)
 Map2Screen(garten)
 
 # Gartenhaus
 haus = plan.Gartenhaus()
 Plan2Map(haus)
 Map2Screen(haus)
+
+# DockPoints
+dx0 =  3.87
+dy0 = -2.23
+dx2 =  2.40
+dy2 = -0.14
+dx1 = (dx0+dx2)/2
+dy1 = (dy0+dy2)/2
+#dockPoints = [(3.87,-2.23),(2.58,-0.4),(2.4,-0.14)]
+#dockPoints = [(dx0,dy0),(dx1,dy1),(dx2,dy2)]
+dockPoints = []
+Map2Screen(dockPoints)
 
 # Terrasse
 terrasse = plan.Terrasse()
@@ -414,85 +426,6 @@ def ExportMaps(fileName):
     os.system("python -m json.tool tmp.json >"+fileName)
 
 
-##def UploadMap(m):
-##   errorFlag = True
-##   if len(perimeters[m]) >= 4:
-##       cmd = str.format('AT+U,{:d}',m+1)
-##       if udp.ExecCmd(cmd)=="": return ERROR
-##       #process perimeter
-##       perimeter = perimeters[m].copy()
-##       Screen2Map(perimeter)
-##       plen = len(perimeter)
-##       i = 0
-##       j = 0
-##       while True:
-##           if i >=plen: break
-##           (x1,y1) = perimeter[i]
-##           i = i + 1
-##           if i<plen:
-##               (x2,y2) = perimeter[i]
-##               cmd = str.format('AT+W,{:d},{:.2f},{:.2f},{:.2f},{:.2f}',j,x1,y1,x2,y2)
-##               i = i + 1
-##               j = j + 2
-##           else:
-##               cmd = str.format('AT+W,{:d},{:.2f},{:.2f}',j,x1,y1)
-##               j = j + 1
-##               break
-##           if udp.ExecCmd(cmd)=="": return ERROR
-##   if len(wayPoints[m]) >= 2:
-##       # process waypoints
-##       waypoints = wayPoints[m].copy()
-##       Screen2Map(waypoints)
-##       wlen = len(waypoints)
-##       i = 0
-##       while True:
-##           if i >=wlen: break
-##           (x1,y1) = waypoints[i]
-##           i = i + 1
-##           if i<wlen:
-##               (x2,y2) = waypoints[i]
-##               cmd = str.format('AT+W,{:d},{:.2f},{:.2f},{:.2f},{:.2f}',j,x1,y1,x2,y2)
-##               i = i + 1
-##               j = j + 2
-##           else:
-##               cmd = str.format('AT+W,{:d},{:.2f},{:.2f}',j,x1,y1)
-##               j = j + 1
-##           if udp.ExecCmd(cmd)=="": return ERROR
-##       # AT+N, iWayPerimeter, iWayExclusion, iWayDock, iWayMow, iWayFree
-##       cmd = str.format('AT+N,{:d},0,0,{:d},0',plen,wlen)
-##       if udp.ExecCmd(cmd)=="": return ERROR
-##       sleep(1)
-##   return SUCCESS
-##
-##
-##def ComputeMapChecksum(m):
-##   checkSum = int(0)
-##   if len(perimeters[m]) >= 4:
-##       #process perimeter
-##       perimeter = perimeters[m].copy()
-##       Screen2Map(perimeter)
-##       plen = len(perimeter)
-##       i = 0
-##       j = 0
-##       while True:
-##           if i >=plen: break
-##           (x1,y1) = perimeter[i]
-##           checkSum += int(math.floor(x1*100+0.5)) + int(math.floor(y1*100+0.5))
-##           i = i + 1
-##   if len(wayPoints[m]) >= 2:
-##       # process waypoints
-##       waypoints = wayPoints[m].copy()
-##       Screen2Map(waypoints)
-##       wlen = len(waypoints)
-##       i = 0
-##       while True:
-##           if i >=wlen: break
-##           (x1,y1) = waypoints[i]
-##           checkSum += int(math.floor(x1*100+0.5)) + int(math.floor(y1*100+0.5))
-##           i = i + 1
-##   return checkSum
-
-
 def UploadMap(m):
    errorFlag = True
    #if len(perimeters[m]) >= 4:
@@ -507,12 +440,15 @@ def UploadMap(m):
    #allPoints.extend(wayPoints[m])
    plen = len(perimeters[MAP_INDEX_PERIMETER_WITH_EXCLUSION])
    xlen = 0
+   dlen = len(dockPoints)
    wlen = len(wayPoints[m])
    allPoints = perimeters[MAP_INDEX_PERIMETER_WITH_EXCLUSION].copy()
    #allPoints.extend(perimeters[MAP_INDEX_EXCLUSION_POINTS])
+   allPoints.extend(dockPoints)
    allPoints.extend(wayPoints[m])
    Screen2Map(allPoints)
    aLen = len(allPoints)
+   print("Total points in map:", aLen)
    i = 0
    j = 0
    while True:
@@ -530,7 +466,7 @@ def UploadMap(m):
            break
        if udp.ExecCmd(cmd)=="": return ERROR
    # AT+N, iWayPerimeter, iWayExclusion, iWayDock, iWayMow, iWayFree
-   cmd = str.format('AT+N,{:d},{:d},0,{:d},0',plen,xlen,wlen)
+   cmd = str.format('AT+N,{:d},{:d},{:d},{:d},0',plen,xlen,dlen,wlen)
    if udp.ExecCmd(cmd)=="": return ERROR
    sleep(1)
    # AT+X,0,iExclusionLength0 [,1,iExclusionLength0,...]
@@ -544,6 +480,7 @@ def ComputeMapChecksum(m):
    #allPoints = garten.copy()
    #
    allPoints = perimeters[MAP_INDEX_PERIMETER_WITH_EXCLUSION].copy()
+   allPoints.extend(dockPoints)
    allPoints.extend(wayPoints[m])
    Screen2Map(allPoints)
    for point in allPoints:
