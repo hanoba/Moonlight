@@ -137,6 +137,7 @@ double stateCRC = 0;
 float lastPosN = 0;
 float lastPosE = 0;
 
+bool undockFlag = false;
 unsigned long linearMotionStartTime = 0;
 unsigned long driveReverseStopTime = 0;
 unsigned long nextControlTime = 0;
@@ -1414,7 +1415,12 @@ void run()
                   CONSOLE.println("driveReverseStopTime");
                   motor.stopImmediately(false);
                   driveReverseStopTime = 0;
-                  if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
+                  if (undockFlag)
+                  {
+                     undockFlag = false;
+                     setOperation(stateOp, true);    // continue current operation
+                  }
+                  else if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
                   {
                      maps.addObstacle(stateX, stateY);
                      Point pt;
@@ -1537,18 +1543,23 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       CONSOLE.println(" OP_MOW");      
       if (initiatedbyOperator) maps.clearObstacles();
       motor.setLinearAngularSpeed(0,0);
-      if (maps.startMowing(stateX, stateY)){
-        if (maps.nextPoint(true)) {
-          resetGPSMotionMeasurement();
-          lastFixTime = millis();                
-          maps.setLastTargetPoint(stateX, stateY);        
-          stateSensor = SENS_NONE;
-          motor.setMowState(true);                
-        } else {
-          error = true;
-          CONSOLE.println("error: no waypoints!");
-          //op = stateOp;                
-        }
+      if (maps.startMowing(stateX, stateY))
+      {
+         if (maps.nextPoint(true)) 
+         {
+            resetGPSMotionMeasurement();
+            lastFixTime = millis();                
+            maps.setLastTargetPoint(stateX, stateY);        
+            stateSensor = SENS_NONE;
+            motor.setMowState(true);     
+            // drive 3 seconds backwards to undock from charging station
+            undockFlag = true;
+            driveReverseStopTime = millis()+3000;
+         } else {
+            error = true;
+            CONSOLE.println("error: no waypoints!");
+            //op = stateOp;                
+         }
       } else error = true;
       if (error){
         stateSensor = SENS_MAP_NO_ROUTE;

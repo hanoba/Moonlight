@@ -175,6 +175,19 @@ def StartMowing():
    cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
    udp.ExecCmd(cmd)
 
+def StartDocking():
+   # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
+   #bEnableMowMotor = 0           # off
+   #iOperationType = 4            # 4=OP_DOCK
+   fSpeed = 0.1                   # m/s
+   #iFixTimeout = 0               # 0 = no fix timeout
+   #bFinishAndRestart = 0         # disabled
+   #fMowingPointPercent = -1      # 
+   #bSkipNextMowingPoint = -1     # disabled
+   #bEnableSonar = 0              # disabled
+   cmd = str.format('AT+C,0,4,{:.2f},0,0,-1,-1,0', fSpeed)
+   udp.ExecCmd(cmd)
+
 def SwitchOffRobot():
    udp.ExecCmd(CMD_SwitchOffRobot)
 
@@ -243,6 +256,7 @@ def UploadMap(mapId):
    PrintGuiMessage("Uploading map started...");
    if maps.UploadMap(mapIndex)==maps.ERROR:
       print("[CmdUploadMap] ERROR during map upload")
+      PrintGuiMessage("ERROR during map upload")
    else:
       checksum = maps.ComputeMapChecksum(mapIndex)
       print("[maps.ComputeMapChecksum] Checksum = ", checksum)

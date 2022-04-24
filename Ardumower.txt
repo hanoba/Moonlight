@@ -52,4 +52,17 @@
             <File name="src\ublox\SparkFun_Ublox_Arduino_Library.cpp" />
         </Folder>
     </Project>
+    <Project name="amcp">
+        <File name="amcp\amcmd.py" />
+        <File name="amcp\amcp.py" />
+        <File name="amcp\date.py" />
+        <File name="amcp\maps.py" />
+        <File name="amcp\mower.py" />
+        <File name="amcp\msg.py" />
+        <File name="amcp\plan.py" />
+        <File name="amcp\send.py" />
+        <File name="amcp\udp.py" />
+        <File name="amcp\amcmd.bat" />
+        <File name="amcp\maps.json" />
+    </Project>
 </NotepadPlus>

@@ -116,35 +116,36 @@ def WriteTextBox(text, lineNum=-1):
 def PrintHelpText():
    numWayPoints = len(maps.wayPoints[currentMapIndex])
    MapId = currentMapIndex + 1
-   WriteTextBox(str.format("Current Map ID:      {:8d}             ", MapId), 0)
-   WriteTextBox(str.format("Checksum:            {:8d}             ", currentMapChecksum))
-   WriteTextBox(str.format("Number of waypoints: {:8d}             ", numWayPoints))
-   WriteTextBox("<v>   PrintVersionNumber                  ")
-   #WriteTextBox("<b>   ToggleBluetoothLogging              ")
-   WriteTextBox("<m>   Start mowing                        ")
-   WriteTextBox("<o>   SwitchOffRobot                      ")
-   #WriteTextBox("<p>   ToggleUseGPSfloatForPosEstimation   ")
-   #WriteTextBox("<d>   ToggleUseGPSfloatForDeltaEstimation ")
-   WriteTextBox("<s>   PrintStatistics                     ")
-   WriteTextBox("<u>   Upload current map                  ")
-   WriteTextBox("<i>   Stop mowing                         ")
-   #WriteTextBox("<DEL> ClearStatistics                     ")
-   WriteTextBox("<+>   Add point                           ")
-   WriteTextBox("<BS>  Remove point                        ")
-   WriteTextBox("<x>   Exclusion points                    ")
-   WriteTextBox("<#>   Select reference points             ")
-   WriteTextBox("<1> to <9> Select MAP1 to MAP9            ")
-   WriteTextBox("<0>   Select MAP10                        ")
-   #WriteTextBox("<F2>  Save maps to file maps.json         ")
-   WriteTextBox("<F4>  Toggle edit mode                    ")
-   WriteTextBox("<F5>  Show/hide waypoints                 ")
-   WriteTextBox("<F6>  Create waypoints                    ")
-   WriteTextBox("<F7>  Make parallel                       ")
-   WriteTextBox("<^y>  Redo                                ")
-   WriteTextBox("<^z>  Undo                                ")
-   WriteTextBox("<TAB> Select next perimeter point         ")
-   WriteTextBox("<SPC> Select previous perimeter point     ")
-   WriteTextBox("<ESC> Main Menu                           ")
+   WriteTextBox(str.format("Current Map ID:      {:8d}   ", MapId), 0)
+   WriteTextBox(str.format("Checksum:            {:8d}   ", currentMapChecksum))
+   WriteTextBox(str.format("Number of waypoints: {:8d}   ", numWayPoints))
+   WriteTextBox("<v>   Print version number      ")
+  #WriteTextBox("<b>   ToggleBluetoothLogging    ")
+   WriteTextBox("<m>   Start mowing              ")
+   WriteTextBox("<d>   Start docking             ")
+   WriteTextBox("<o>   SwitchOffRobot            ")
+  #WriteTextBox("<p>   ToggleUseGPSfloatForPosEst")
+  #WriteTextBox("<d>   ToggleUseGPSfloatForDeltaE")
+   WriteTextBox("<s>   PrintStatistics           ")
+   WriteTextBox("<u>   Upload current map        ")
+   WriteTextBox("<i>   Stop mowing               ")
+  #WriteTextBox("<DEL> ClearStatistics           ")
+   WriteTextBox("<+>   Add point                 ")
+   WriteTextBox("<BS>  Remove point              ")
+   WriteTextBox("<x>   Exclusion points          ")
+   WriteTextBox("<#>   Select reference points   ")
+   WriteTextBox("<1> to <9> Select MAP1 to MAP9  ")
+   WriteTextBox("<0>   Select MAP10              ")
+  #WriteTextBox("<F2>  Save maps to file maps.jso")
+   WriteTextBox("<F4>  Toggle edit mode          ")
+   WriteTextBox("<F5>  Show/hide waypoints       ")
+   WriteTextBox("<F6>  Create waypoints          ")
+   WriteTextBox("<F7>  Make parallel             ")
+   WriteTextBox("<^y>  Redo                      ")
+   WriteTextBox("<^z>  Undo                      ")
+   WriteTextBox("<TAB> Select next point         ")
+   WriteTextBox("<SPC> Select previous point     ")
+   WriteTextBox("<ESC> Main Menu                 ")
 
 
 def PrintLogMsg():
@@ -260,9 +261,9 @@ def ArdumowerControlProgram():
    theme_dark.title_font_size=30
    config_menu = pygame_menu.Menu('Configuration Menu', 600, 400, theme=theme_dark)
 
-   config_menu.add.button('Toggle Bluetooth Logging (b)', mower.ToggleBluetoothLogging)
-   config_menu.add.button('Toggle UseGPSfloatForPosEstimation (p)', mower.ToggleUseGPSfloatForPosEstimation)
-   config_menu.add.button('Toggle UseGPSfloatForDeltaEstimation (d)', mower.ToggleUseGPSfloatForDeltaEstimation)
+   config_menu.add.button('Toggle Bluetooth Logging', mower.ToggleBluetoothLogging)
+   config_menu.add.button('Toggle UseGPSfloatForPosEstimation', mower.ToggleUseGPSfloatForPosEstimation)
+   config_menu.add.button('Toggle UseGPSfloatForDeltaEstimation', mower.ToggleUseGPSfloatForDeltaEstimation)
    config_menu.add.button('Toggle SmoothCurves', mower.ToggleSmoothCurves)
    config_menu.add.button('Toggle EnablePathFinder', mower.ToggleEnablePathFinder)
    config_menu.add.button('Toggle GPS Logging', mower.ToggleGpsLogging)
@@ -283,6 +284,7 @@ def ArdumowerControlProgram():
    menu.add.button('Upload current map (u)', CmdUploadMap)
    menu.add.button('Start mowing (m)', mower.StartMowing)
    menu.add.button('Stop mowing (i)', mower.StopMowing)
+   menu.add.button('Statt docking (d)', mower.StartDocking)
    menu.add.button('Switch Off Robot (o)', mower.SwitchOffRobot)
    menu.add.button('Get Version Number (v)', mower.GetVersionNumber)
    menu.add.button('PrintStatistics (s)', mower.PrintStatistics)
@@ -359,6 +361,8 @@ def ArdumowerControlProgram():
                      mower.ClearStatistics()
                   #elif event.key == pygame.K_d:
                   #   mower.ToggleUseGPSfloatForDeltaEstimation()
+                  elif event.key == pygame.K_d:
+                     mower.StartDocking()
                   elif event.key == pygame.K_i:
                      mower.StopMowing()
                   elif event.key == pygame.K_m:
@@ -453,6 +457,9 @@ def ArdumowerControlProgram():
       # Nullpunkt
       # pygame.draw.circle(screen, WHITE, origin, 6)
       DrawCross(WHITE, origin)
+      
+      # DockPoints zeichnen
+      #pygame.draw.lines(screen, PURPLE,  True, maps.dockPoints, 3)
       
       # Messungen
       pygame.draw.circle(screen, RED, messungen[0], 2)
