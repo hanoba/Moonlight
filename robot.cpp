@@ -137,7 +137,6 @@ double stateCRC = 0;
 float lastPosN = 0;
 float lastPosE = 0;
 
-bool undockFlag = false;
 unsigned long linearMotionStartTime = 0;
 unsigned long driveReverseStopTime = 0;
 unsigned long nextControlTime = 0;
@@ -1401,7 +1400,25 @@ void run()
          }
          
          
-         if ((stateOp == OP_MOW) ||  (stateOp == OP_DOCK)) 
+         if (stateOp == OP_UNDOCK) 
+         {              
+            //------------------------------------------------------------------------------------------------- 
+            // Handle drive reverse to undock
+            //------------------------------------------------------------------------------------------------- 
+            if (driveReverseStopTime > 0)
+            {
+               // obstacle avoidance
+               motor.setLinearAngularSpeed(-0.2,0);
+               if (millis() > driveReverseStopTime)
+               {
+                  CONSOLE.println("undock complete");
+                  motor.stopImmediately(false);
+                  driveReverseStopTime = 0;
+                  setOperation(OP_IDLE);   
+               }
+            } 
+         }
+         else if ((stateOp == OP_MOW) ||  (stateOp == OP_DOCK)) 
          {              
             //------------------------------------------------------------------------------------------------- 
             // Handle drive reverse after obstacle detection
@@ -1415,12 +1432,7 @@ void run()
                   CONSOLE.println("driveReverseStopTime");
                   motor.stopImmediately(false);
                   driveReverseStopTime = 0;
-                  if (undockFlag)
-                  {
-                     undockFlag = false;
-                     setOperation(stateOp, true);    // continue current operation
-                  }
-                  else if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
+                  if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
                   {
                      maps.addObstacle(stateX, stateY);
                      Point pt;
@@ -1514,6 +1526,11 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       motor.setLinearAngularSpeed(0,0);
       motor.setMowState(false);
       break;
+    case OP_UNDOCK:
+      CONSOLE.println(" OP_UNDOCK");
+      // drive 3 seconds backwards to undock from charging station
+      driveReverseStopTime = millis()+6000;
+      break;
     case OP_DOCK:
       CONSOLE.println(" OP_DOCK");
       if (initiatedbyOperator) maps.clearObstacles();
@@ -1552,9 +1569,6 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
             maps.setLastTargetPoint(stateX, stateY);        
             stateSensor = SENS_NONE;
             motor.setMowState(true);     
-            // drive 3 seconds backwards to undock from charging station
-            undockFlag = true;
-            driveReverseStopTime = millis()+3000;
          } else {
             error = true;
             CONSOLE.println("error: no waypoints!");

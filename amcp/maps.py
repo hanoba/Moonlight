@@ -112,13 +112,13 @@ Map2Screen(haus)
 # DockPoints
 dx0 =  3.87
 dy0 = -2.23
+dx1 =  3.14
+dy1 = -1.19
 dx2 =  2.40
 dy2 = -0.14
-dx1 = (dx0+dx2)/2
-dy1 = (dy0+dy2)/2
 #dockPoints = [(3.87,-2.23),(2.58,-0.4),(2.4,-0.14)]
-#dockPoints = [(dx0,dy0),(dx1,dy1),(dx2,dy2)]
-dockPoints = []
+dockPoints = [(dx0,dy0),(dx1,dy1),(dx2,dy2)]
+#dockPoints = []
 Map2Screen(dockPoints)
 
 # Terrasse
@@ -463,7 +463,7 @@ def UploadMap(m):
        else:
            cmd = str.format('AT+W,{:d},{:.2f},{:.2f}',j,x1,y1)
            j = j + 1
-           break
+           #break
        if udp.ExecCmd(cmd)=="": return ERROR
    # AT+N, iWayPerimeter, iWayExclusion, iWayDock, iWayMow, iWayFree
    cmd = str.format('AT+N,{:d},{:d},{:d},{:d},0',plen,xlen,dlen,wlen)

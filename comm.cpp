@@ -1118,7 +1118,7 @@ void outputConsole()
 
   if (millis() > nextInfoTime){
     bool started = (nextInfoTime == 0);
-    nextInfoTime = millis() + (simulationFlag ? 1000: LOG_PERIOD_MS);
+    nextInfoTime = millis() + LOG_PERIOD_MS; //(simulationFlag ? 1000: LOG_PERIOD_MS);
 
     //unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
     //unsigned long totalmins = totalsecs/60;
@@ -1149,6 +1149,7 @@ void outputConsole()
     else if (stateOp == OP_CHARGE) CONSOLE.print(" CHARGE");
     else if (stateOp == OP_ERROR)  CONSOLE.print("  ERROR");
     else if (stateOp == OP_DOCK)   CONSOLE.print("  DOCK ");
+    else if (stateOp == OP_UNDOCK) CONSOLE.print(" UNDOCK");
     else                           CONSOLE.print("  ???  ");
 
 

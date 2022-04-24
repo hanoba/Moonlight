@@ -188,6 +188,19 @@ def StartDocking():
    cmd = str.format('AT+C,0,4,{:.2f},0,0,-1,-1,0', fSpeed)
    udp.ExecCmd(cmd)
 
+def StartUndocking():
+   # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
+   #bEnableMowMotor = 0           # off
+   #iOperationType = 5            # 5=OP_UNDOCK
+   fSpeed = 0.1                   # m/s
+   #iFixTimeout = 0               # 0 = no fix timeout
+   #bFinishAndRestart = 0         # disabled
+   #fMowingPointPercent = -1      # 
+   #bSkipNextMowingPoint = -1     # disabled
+   #bEnableSonar = 0              # disabled
+   cmd = str.format('AT+C,0,5,{:.2f},0,0,-1,-1,0', fSpeed)
+   udp.ExecCmd(cmd)
+
 def SwitchOffRobot():
    udp.ExecCmd(CMD_SwitchOffRobot)
 
