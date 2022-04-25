@@ -419,9 +419,11 @@ void UBLOX::dispatchMessage() {
               solution = (UBLOX::SolType)((this->unpack_int32(60) >> 3) & 3);              
 
               // GPS logging to file on SD card
-              // char buf[32];
-              // sprintf(buf,"x=%6.2f y=%6.2f SOL=%d\r\n", relPosE, relPosN, solution);
-              // sdSerial.writeGpsLogSD(buf);
+#ifdef MOONLIGHT_LOG_GPS_POSITION
+              char buf[32];
+              sprintf(buf,"x=%6.2f y=%6.2f SOL=%d\r\n", relPosE, relPosN, solution);
+              sdSerial.writeGpsLogSD(buf);
+#endif
 
 #if MOONLIGHT_GPS_JUMP
               if (solution==SOL_FIXED) dgpsAge = millis();

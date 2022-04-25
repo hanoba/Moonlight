@@ -1,8 +1,9 @@
 @echo off
 set BOSSAC=C:\Users\Harald\AppData\Local\Arduino15\packages\arduino\tools\bossac\1.6.1-arduino/bossac.exe
 set BIN=Moonlight.ino.bin
-echo Erzwinge Reset durch oeffnen/schliessen mit 1200 bps auf dem Port COM5
-mode com5:1200
+set PORT=COM5
+echo Erzwinge Reset durch oeffnen/schliessen mit 1200 bps auf dem Port %PORT%
+mode %PORT%:1200
 :: timeout /T 10 wartet 10 Sekunden, die Wartezeit kann mit einer beliebigen Taste übersprungen werden, um dies zu verhindern gibt es den Parameter: /nobreak
 timeout /T 1 >nul
 :: Usage: bossac.exe [OPTION...] [FILE]
@@ -41,6 +42,6 @@ timeout /T 1 >nul
 ::   -h, --help            display this help text
 ::   -U, --force_usb_port=true/false override USB port autodetection
 ::   -R, --reset           reset CPU (if supported)
-%BOSSAC% -i --port=COM5 -U false -e -w -b %BIN% -R 
-::C:\Users\Harald\AppData\Local\Arduino15\packages\arduino\tools\bossac\1.6.1-arduino/bossac.exe -i -d --port=COM5 -U false -e -w -b C:\Users\Harald\AppData\Local\Temp\arduino_build_616871/Moonlight.ino.bin -R 
+::%BOSSAC% -i --port=%PORT% -U false -e -w -b %BIN% -R 
+%BOSSAC% -i -e -w -b %BIN% -R 
 pause

@@ -57,9 +57,11 @@ bool Sim::ComputeRobotState()
       gps.dgpsAge = millis();
 
       // simulate GPS logging
+#ifdef MOONLIGHT_LOG_GPS_POSITION
       char buf[64];
       sprintf(buf,"x=%6.2f y=%6.2f SOL=%d\r\n", gps.relPosE, gps.relPosN, gps.solution);
       sdSerial.writeGpsLogSD(buf);
+#endif
    }
    return true;
 }
