@@ -41,9 +41,10 @@ CMD_KidnappingTest = "AT+K"
 CMD_StopMowing = "AT+C,-1,0,-1,-1,-1,-1,-1,-1"
 CMD_StressTest = "AT+Z"
 CMD_TriggerWatchdogTest = "AT+Y"
+CMD_GnssReboot = "AT+Y2"
 CMD_SwitchOffRobot = "AT+Y3"
 CMD_TriggerRaspiShutdown = "AT+Y4"
-CMD_ToggleBluetoothLogging = "AT+Y2"
+CMD_ToggleBluetoothLogging = "AT+Y5"
 CMD_ToggleUseGPSfloatForPosEstimation = "AT+YP"
 CMD_ToggleUseGPSfloatForDeltaEstimation = "AT+YD"
 CMD_ToggleSmoothCurves = "AT+YS"
@@ -133,6 +134,9 @@ def GetVersionNumber():
    if result != "": 
       PrintGuiMessage(result[2:len(result)-7])
 
+def GnssReboot():
+   udp.ExecCmd(CMD_GnssReboot)
+
 def ToggleBluetoothLogging():
    udp.ExecCmd(CMD_ToggleBluetoothLogging)
 
@@ -172,7 +176,8 @@ def StartMowing():
    #fMowingPointPercent = -1      # 
    #bSkipNextMowingPoint = -1     # disabled
    #bEnableSonar = 0              # disabled
-   cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
+   #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
+   cmd = str.format('AT+C,1,1,{:.2f},0,0,-1,-1,0', fSpeed)     #HB enable mow motor
    udp.ExecCmd(cmd)
 
 def StartDocking():

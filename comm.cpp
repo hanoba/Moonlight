@@ -846,10 +846,10 @@ void processCmd(bool checkCrc, String cmd)
       } 
       else 
       {
-         if (cmd[4] == '2') cmdToggleBluetoothLoggingFlag();  //  cmdGNSSReboot();   // for developers
+         if (cmd[4] == '2') cmdGNSSReboot();   // for developers
          if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
          if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
-         if (cmd[4] == '5') cmdGNSSReboot();   // for developers
+         if (cmd[4] == '5') cmdToggleBluetoothLoggingFlag();   // for developers
          if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
          if (cmd[4] == 'F') cmdToggleEnablePathFinder();
          if (cmd[4] == 'G') cmdToggleGpsLogging();

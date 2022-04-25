@@ -221,6 +221,9 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 //  - GPS JUMP refers to position state
 #define MOONLIGHT_GPS_JUMP 1
 
+// Log GPS position & solution to file on SD Card
+//#define MOONLIGHT_LOG_GPS_POSITION
+
 
 // ----- battery charging current measurement (INA169) --------------
 // the Marotronics charger outputs max 1.5A
@@ -293,8 +296,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
                                               // (increase if you get 'no map route' errors near perimeter)
 
 // is a docking station available?
-//#define DOCKING_STATION true   // use this if docking station available and mower should dock automatically
-#define DOCKING_STATION false    //HB mower will just stop after mowing instead of docking automatically
+#define DOCKING_STATION true   // use this if docking station available and mower should dock automatically
+//#define DOCKING_STATION false    // mower will just stop after mowing instead of docking automatically
 
 //#define DOCK_AUTO_START true     // robot will automatically continue mowing after docked automatically
 #define DOCK_AUTO_START false      // robot will not automatically continue mowing after docked automatically
