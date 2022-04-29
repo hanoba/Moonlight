@@ -1515,7 +1515,9 @@ void run()
 
 // set new robot operation
 void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){  
+  static bool SMOOTH_CURVES_saved = SMOOTH_CURVES_DEFAULT;
   if ((stateOp == op) && (!allowRepeat)) return;  
+  if (stateOp == OP_DOCK && op != OP_DOCK) SMOOTH_CURVES = SMOOTH_CURVES_saved;
   CONSOLE.print("setOperation op=");
   CONSOLE.print(op);
   bool error = false;
@@ -1528,10 +1530,13 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       break;
     case OP_UNDOCK:
       CONSOLE.println(" OP_UNDOCK");
-      // drive 3 seconds backwards to undock from charging station
+      // drive 6 seconds backwards to undock from charging station
       driveReverseStopTime = millis()+6000;
       break;
     case OP_DOCK:
+      // SMOOTH_CURVES==false during docking and it is restored after docking is complete
+      if (stateOp != OP_DOCK) SMOOTH_CURVES_saved = SMOOTH_CURVES;
+      SMOOTH_CURVES = false;
       CONSOLE.println(" OP_DOCK");
       if (initiatedbyOperator) maps.clearObstacles();
       dockingInitiatedByOperator = initiatedbyOperator;      

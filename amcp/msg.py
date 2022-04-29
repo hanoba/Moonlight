@@ -1,4 +1,4 @@
-guiMessage="Hallo"
+guiMessage="amcp - Version 1.0, 2022-04-26"
 
 def GetGuiMessage():
    return guiMessage
