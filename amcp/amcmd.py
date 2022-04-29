@@ -110,6 +110,7 @@ def main():
       elif argc == 2 and cmd == "stop":   mower.StopMowing()
       elif argc == 2 and cmd == "dock":   mower.StartDocking()
       elif argc == 2 and cmd == "undock": mower.StartUndocking()
+      elif argc == 2 and cmd == "grb":    mower.GnssReboot()
       elif argc == 2 and cmd == "off":    mower.SwitchOffRobot()
       elif argc == 2 and cmd == "ps":     mower.PrintStatistics()
       elif argc == 2 and cmd == "cs":     mower.ClearStatistics()
@@ -136,11 +137,12 @@ def main():
          print("       amcmd stop                     # StopMowing (IDLE mode)")
          print("       amcmd dock                     # Go to docking station")
          print("       amcmd undock                   # Undock from docking station")
+         print("       amcmd grb                      # GNSS Reboot")
          print("       amcmd off                      # SwitchOffRobot")
          print("       amcmd ps                       # PrintStatistics")
          print("       amcmd cs                       # ClearStatistics")
-         print("       amcmd umap <mapId>             # UploadMap(<mapId>)")
-         print("       amcmd rmap <mapId>             # ReadMapFromSdCard(<mapId>)")
+         print("       amcmd umap <mapId>             # UploadMap (<mapId>=1...10)")
+         print("       amcmd rmap <mapId>             # ReadMapFromSdCard (<mapId>=1..10)")
          print("<file_pattern> can include the wild card * at the end")
       return
    try:
