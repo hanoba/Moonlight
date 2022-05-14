@@ -289,7 +289,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // drive curves smoothly?
 //#define SMOOTH_CURVES  true
 //#define SMOOTH_CURVES  false
-#define SMOOTH_CURVES_DEFAULT  false   //true
+#define SMOOTH_CURVES_DEFAULT  true
 
 //#define ENABLE_PATH_FINDER  true     // path finder is experimental (can be slow - you may have to wait until robot actually starts)
 //#define ENABLE_PATH_FINDER  false
