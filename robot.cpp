@@ -878,8 +878,8 @@ void computeRobotState()
     resetLastPos = true;
   }
   
-  //HB if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
-  if ((gps.solutionAvail) && gps.solution == UBLOX::SOL_FIXED)
+  //HB_OLD if ((gps.solutionAvail) && gps.solution == UBLOX::SOL_FIXED)
+  if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
   {
       gps.solutionAvail = false;        
       stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * gps.groundSpeed;    
@@ -1369,55 +1369,57 @@ void run()
       
       computeRobotState();
       
-      if (gpsJump)
-      {
-         // gps jump: restart current operation from new position
-         CONSOLE.println("restarting due to gps jump");
-         gpsJump = false;
-         motor.stopImmediately(true);
-         setOperation(stateOp, true);    // restart current operation
-      }  
+      //if (gpsJump)
+      //{
+      //   // gps jump: restart current operation from new position
+      //   CONSOLE.println("restarting due to gps jump");
+      //   gpsJump = false;
+      //   motor.stopImmediately(true);
+      //   setOperation(stateOp, true);    // restart current operation
+      //}
 
       // MOONLIGHT extension: Stop docking immediately in case there is no FIX
-      if (stateOp == OP_DOCK && gps.solution != UBLOX::SOL_FIXED)
-      {
-         CONSOLE.println("Stop docking due to missing FIX");
-         motor.stopImmediately(true);
-         setOperation(OP_ERROR);    // restart current operation
-      }
+      //if (stateOp == OP_DOCK && gps.solution != UBLOX::SOL_FIXED)
+      //{
+      //   CONSOLE.println("Stop docking due to missing FIX");
+      //   motor.stopImmediately(true);
+      //   setOperation(OP_ERROR);    // restart current operation
+      //}
       
+      //-------------------------------------------------------------------------------------------------
+      // Handle charging / docking station
+      //------------------------------------------------------------------------------------------------- 
+      if (battery.chargerConnected() != stateChargerConnected) 
+      {    
+         stateChargerConnected = battery.chargerConnected(); 
+         if (stateChargerConnected)
+         {      
+           stateChargerConnected = true;
+           setOperation(OP_CHARGE);                
+         }           
+      }     
+      if (battery.chargerConnected())
+      {
+         if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE))
+         {
+            maps.setIsDocked(true);               
+            // get robot position and yaw from map
+            // sensing charging contacts means we are in docking station - we use docking point coordinates to get rid of false fix positions in
+            // docking station
+            maps.setRobotStatePosToDockingPos(stateX, stateY, stateDelta);                       
+         }
+         battery.resetIdle();        
+      } 
+      else 
+      {
+         if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE))
+         {
+            maps.setIsDocked(false);
+         }
+      }
+            
       if (!imuIsCalibrating)
       {       
-         //-------------------------------------------------------------------------------------------------
-         // Handle charging / docking station
-         //------------------------------------------------------------------------------------------------- 
-         if (battery.chargerConnected() != stateChargerConnected) 
-         {    
-            stateChargerConnected = battery.chargerConnected(); 
-            if (stateChargerConnected)
-            {      
-              stateChargerConnected = true;
-              setOperation(OP_CHARGE);                
-            }           
-         }     
-         if (battery.chargerConnected())
-         {
-            if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE))
-            {
-              maps.setIsDocked(true);               
-              maps.setRobotStatePosToDockingPos(stateX, stateY, stateDelta);                       
-            }
-            battery.resetIdle();        
-         } 
-         else 
-         {
-            if ((stateOp == OP_IDLE) || (stateOp == OP_CHARGE))
-            {
-               maps.setIsDocked(false);
-            }
-         }
-         
-         
          //------------------------------------------------------------------------------------------------- 
          // Handle drive reverse to undock
          //------------------------------------------------------------------------------------------------- 
