@@ -113,6 +113,21 @@
     <ClInclude Include="rtc.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="fix_display.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\due\DueTimer.h">
+      <Filter>ArduinoLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ublox\ublox.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ublox\SparkFun_Ublox_Arduino_Library.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h">
+      <Filter>ArduinoLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="battery.cpp">
@@ -188,6 +203,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\ublox\SparkFun_Ublox_Arduino_Library.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="fix_display.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

@@ -167,14 +167,14 @@ def ReadMapFromSdCard(mapId):
    #udp.ExecCmd(str.format('AT+R,{:d}', mapId))
 
 def StartMowing():
-   # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
-   #bEnableMowMotor = -1          # off
+   # AT+C,1,1,0.39,0,0,-1,-1,0,0x8  # -1 means no change, keep current value
+   #bEnableMowMotor = 1           # on
    #iOperationType = 1            # 1=OP_MOW
-   fSpeed = 0.25                 # m/s
+   fSpeed = 0.25                  # m/s
    #iFixTimeout = 0               # 0 = no fix timeout
    #bFinishAndRestart = 0         # disabled
    #fMowingPointPercent = -1      # 
-   #bSkipNextMowingPoint = -1     # disabled
+   #bSkipNextMowingPoint = -1     #
    #bEnableSonar = 0              # disabled
    #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
    cmd = str.format('AT+C,1,1,{:.2f},0,0,-1,-1,0', fSpeed)     #HB enable mow motor

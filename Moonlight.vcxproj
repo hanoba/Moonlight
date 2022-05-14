@@ -119,6 +119,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\SD.h" />
     <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\utility\SdFat.h" />
+    <ClInclude Include="..\..\..\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h" />
     <ClInclude Include="battery.h" />
     <ClInclude Include="ble.h" />
     <ClInclude Include="buzzer.h" />
@@ -128,6 +129,7 @@
     <ClInclude Include="console.h" />
     <ClInclude Include="cpu.h" />
     <ClInclude Include="file_cmds.h" />
+    <ClInclude Include="fix_display.h" />
     <ClInclude Include="helper.h" />
     <ClInclude Include="helper_3dmath.h" />
     <ClInclude Include="i2c.h" />
@@ -146,6 +148,9 @@
     <ClInclude Include="sonar.h" />
     <ClInclude Include="SparkFunHTU21D.h" />
     <ClInclude Include="src\driver\AmRobotDriver.h" />
+    <ClInclude Include="src\due\DueTimer.h" />
+    <ClInclude Include="src\ublox\SparkFun_Ublox_Arduino_Library.h" />
+    <ClInclude Include="src\ublox\ublox.h" />
     <ClInclude Include="udpserial.h" />
     <ClInclude Include="VL53L0X.h" />
   </ItemGroup>
@@ -156,6 +161,7 @@
     <ClCompile Include="comm.cpp" />
     <ClCompile Include="cpu.cpp" />
     <ClCompile Include="file_cmds.cpp" />
+    <ClCompile Include="fix_display.cpp" />
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="i2c.cpp" />
     <ClCompile Include="map.cpp" />

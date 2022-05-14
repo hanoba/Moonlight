@@ -6,6 +6,7 @@
   Modified by Philipp Klaus, June 2013.
   Released into the public domain.
 */
+#define USING_SERVO_LIB
 
 #ifdef __arm__
 

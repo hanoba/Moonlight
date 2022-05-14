@@ -30,6 +30,7 @@
 #include "i2c.h"
 #include "sim.h"
 #include "rtc.h"
+#include "fix_display.h"
 
 
 // #define I2C_SPEED  10000
@@ -71,6 +72,8 @@ HTU21D myHumidity;
 RCModel rcmodel;
 PID pidLine(0.2, 0.01, 0); // not used
 PID pidAngle(2, 0.1, 0);  // not used
+
+FixDisplay fixDisplay;
 
 OperationType stateOp = OP_IDLE; // operation-mode
 Sensor stateSensor = SENS_NONE; // last triggered sensor
@@ -770,6 +773,10 @@ void start()
   motor.begin();
   sonar.begin();
   bumper.begin();
+
+#ifdef MOONLIGHT_ENABLE_FIX_DISPLAY
+  fixDisplay.begin();
+#endif
   
   if (TOF_ENABLE){
     tof.setTimeout(500);
@@ -1278,6 +1285,9 @@ void run()
    sonar.run();
    maps.run();  
    rcmodel.run();
+#ifdef MOONLIGHT_ENABLE_FIX_DISPLAY
+   fixDisplay.run();
+#endif
  
    //------------------------------------------------------------------------------------------------- 
    // state saving every 5 sec
@@ -1367,6 +1377,14 @@ void run()
          motor.stopImmediately(true);
          setOperation(stateOp, true);    // restart current operation
       }  
+
+      // MOONLIGHT extension: Stop docking immediately in case there is no FIX
+      if (stateOp == OP_DOCK && gps.solution != UBLOX::SOL_FIXED)
+      {
+         CONSOLE.println("Stop docking due to missing FIX");
+         motor.stopImmediately(true);
+         setOperation(OP_ERROR);    // restart current operation
+      }
       
       if (!imuIsCalibrating)
       {       
