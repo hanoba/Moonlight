@@ -878,8 +878,8 @@ void computeRobotState()
     resetLastPos = true;
   }
   
-  //HB_OLD if ((gps.solutionAvail) && gps.solution == UBLOX::SOL_FIXED)
-  if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
+  if ((gps.solutionAvail) && gps.solution == UBLOX::SOL_FIXED)
+  //HB if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
   {
       gps.solutionAvail = false;        
       stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * gps.groundSpeed;    
@@ -893,7 +893,7 @@ void computeRobotState()
       {
              //gpsJump = true;
              //statGPSJumps++;
-             CONSOLE.print(F("GPS jump: "));
+             CONSOLE.print(F("ML GPS jump: "));
              CONSOLE.println(distGpsState);
       } 
 #endif
