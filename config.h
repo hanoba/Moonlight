@@ -224,6 +224,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // Log GPS position & solution to file on SD Card
 //#define MOONLIGHT_LOG_GPS_POSITION
 
+// enable display of GPS-FIX with servo motor
+//#define MOONLIGHT_ENABLE_FIX_DISPLAY
 
 // ----- battery charging current measurement (INA169) --------------
 // the Marotronics charger outputs max 1.5A
@@ -287,7 +289,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // drive curves smoothly?
 //#define SMOOTH_CURVES  true
 //#define SMOOTH_CURVES  false
-#define SMOOTH_CURVES_DEFAULT  true
+#define SMOOTH_CURVES_DEFAULT  false   //true
 
 //#define ENABLE_PATH_FINDER  true     // path finder is experimental (can be slow - you may have to wait until robot actually starts)
 //#define ENABLE_PATH_FINDER  false
@@ -296,8 +298,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
                                               // (increase if you get 'no map route' errors near perimeter)
 
 // is a docking station available?
-#define DOCKING_STATION true   // use this if docking station available and mower should dock automatically
-//#define DOCKING_STATION false    // mower will just stop after mowing instead of docking automatically
+//#define DOCKING_STATION true   // use this if docking station available and mower should dock automatically
+#define DOCKING_STATION false    // mower will just stop after mowing instead of docking automatically
 
 //#define DOCK_AUTO_START true     // robot will automatically continue mowing after docked automatically
 #define DOCK_AUTO_START false      // robot will not automatically continue mowing after docked automatically
@@ -363,6 +365,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 // ------ hardware pins---------------------------------------
 // no configuration needed here
+#define pinFixServo 6              // Servo for raising FIX flag
+
 #define pinMotorEnable  37         // EN motors enable
 #define pinMotorLeftPWM 5          // M1_IN1 left motor PWM pin
 #define pinMotorLeftDir 31         // M1_IN2 left motor Dir pin
