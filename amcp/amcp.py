@@ -260,7 +260,7 @@ def ArdumowerControlProgram():
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
    theme_dark.widget_font_size=20
    theme_dark.title_font_size=30
-   config_menu = pygame_menu.Menu('Configuration Menu', 600, 400, theme=theme_dark)
+   config_menu = pygame_menu.Menu('Configuration Menu', 600, 500, theme=theme_dark)
 
    config_menu.add.button('Toggle Bluetooth Logging (b=off,B=on)', mower.ToggleBluetoothLogging)
    config_menu.add.button('Toggle UseGPSfloatForPosEstimation (p=off,P=on)', mower.ToggleUseGPSfloatForPosEstimation)
