@@ -269,6 +269,7 @@ def ArdumowerControlProgram():
    config_menu.add.button('Toggle SmoothCurves (s=off,S=on)', mower.ToggleSmoothCurves)
    config_menu.add.button('Toggle EnablePathFinder (f=off,F=on)', mower.ToggleEnablePathFinder)
    config_menu.add.button('GNSS Reboot', mower.GnssReboot)
+   config_menu.add.button('GNSS Hardware Reset', mower.GnssHardwareReset)
    config_menu.add.button('Sync RTC with current time', mower.SyncRtc)
    config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
    config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
