@@ -42,6 +42,7 @@ CMD_StopMowing = "AT+C,-1,0,-1,-1,-1,-1,-1,-1"
 CMD_StressTest = "AT+Z"
 CMD_TriggerWatchdogTest = "AT+Y"
 CMD_GnssReboot = "AT+Y2"
+CMD_GnssHardwareReset = "AT+YR"
 CMD_SwitchOffRobot = "AT+Y3"
 CMD_TriggerRaspiShutdown = "AT+Y4"
 CMD_ToggleBluetoothLogging = "AT+Y5"
@@ -137,6 +138,9 @@ def GetVersionNumber():
 def GnssReboot():
    udp.ExecCmd(CMD_GnssReboot)
 
+def GnssHardwareReset():
+   udp.ExecCmd(CMD_GnssHardwareReset)
+
 def ToggleBluetoothLogging():
    udp.ExecCmd(CMD_ToggleBluetoothLogging)
 
@@ -184,7 +188,7 @@ def StartDocking():
    # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
    #bEnableMowMotor = 0           # off
    #iOperationType = 4            # 4=OP_DOCK
-   fSpeed = 0.1                   # m/s
+   fSpeed = 0.3                   # m/s
    #iFixTimeout = 0               # 0 = no fix timeout
    #bFinishAndRestart = 0         # disabled
    #fMowingPointPercent = -1      # 

@@ -69,6 +69,7 @@ class UBLOX{
     void run();
     bool configure();  
     void reboot();
+    void HardReset();
   private:
     uint32_t _baud;  	
     HardwareSerial* _bus;
