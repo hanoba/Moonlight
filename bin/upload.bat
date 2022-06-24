@@ -43,5 +43,6 @@ timeout /T 1 >nul
 ::   -U, --force_usb_port=true/false override USB port autodetection
 ::   -R, --reset           reset CPU (if supported)
 ::%BOSSAC% -i --port=%PORT% -U false -e -w -b %BIN% -R 
+echo Uploading %BIN%
 %BOSSAC% -i -e -w -b %BIN% -R 
 pause
