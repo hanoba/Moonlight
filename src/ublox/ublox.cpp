@@ -173,6 +173,7 @@ void UBLOX::reboot(){
 void UBLOX::HardReset(){
   CONSOLE.println("Hard reset of GPS receiver...");
   configGPS.hardReset();
+  configure();
 }
 
 void UBLOX::parse(int b)
