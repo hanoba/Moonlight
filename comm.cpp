@@ -499,8 +499,17 @@ void cmdTriggerWatchdog(){
 void cmdGNSSReboot(){
   String s = F("Y2");
   cmdAnswer(s);
-  CONSOLE.println("GNNS reboot");
+  CONSOLE.println("GNSS reboot");
   gps.reboot();
+}
+
+// perform hang test (watchdog should trigger)
+void cmdGNSSHardReset()
+{
+  String s = F("YR");
+  cmdAnswer(s);
+  CONSOLE.println("GNSS Hardware Reset");
+  gps.HardReset();
 }
 
 // switch-off robot
@@ -850,6 +859,7 @@ void processCmd(bool checkCrc, String cmd)
          if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
          if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
          if (cmd[4] == '5') cmdToggleBluetoothLoggingFlag();   // for developers
+         if (cmd[4] == 'R') cmdGNSSHardReset();   
          if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
          if (cmd[4] == 'F') cmdToggleEnablePathFinder();
          if (cmd[4] == 'G') cmdToggleGpsLogging();

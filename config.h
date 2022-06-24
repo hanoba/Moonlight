@@ -304,6 +304,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 //#define DOCK_AUTO_START true     // robot will automatically continue mowing after docked automatically
 #define DOCK_AUTO_START false      // robot will not automatically continue mowing after docked automatically
 
+#define MOONLIGHT_DOCKING_SPEED  0.1        // speed during docking in m/s (note: speed until first docking point is set by amcp) 
 
 // stanley control for path tracking - determines gain how fast to correct for lateral path errors
 #define STANLEY_CONTROL_K_NORMAL  0.5   // 0.5 for path tracking control when in normal or fast motion

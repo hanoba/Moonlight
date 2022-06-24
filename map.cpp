@@ -1130,7 +1130,8 @@ bool Map::nextDockPoint(bool sim){
       if (!sim) trackSlow = true;
       if (!sim) useGPSfloatForPosEstimation = false;    
       if (!sim) useGPSfloatForDeltaEstimation = false;    
-      if (!sim) useIMU = USE_IMU;       //HB true;     // false      
+      if (!sim) useIMU = USE_IMU;       //HB true;     // false 
+      setSpeed = MOONLIGHT_DOCKING_SPEED;
       return true;
     } else {
       // finished docking
