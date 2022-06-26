@@ -1,4 +1,6 @@
-guiMessage="amcp - Version 1.0, 2022-04-26"
+import version
+
+guiMessage = version.versionString
 
 def GetGuiMessage():
    return guiMessage

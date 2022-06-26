@@ -15,8 +15,8 @@ SUCCESS = False
 
 # indices for special perimeters
 #MAP_INDEX_EXCLUSION_POINTS = 10
-MAP_INDEX_PERIMETER_WITH_EXCLUSION = 10
-MAP_INDEX_REFERENCE_POINTS = 11
+MAP_INDEX_PERIMETER_WITH_EXCLUSION = 14
+MAP_INDEX_REFERENCE_POINTS = 15
 
 # GPS-RTK Nullpunkt
 x0 = 44.7 - 10.3 - 0.67 + 0.3
@@ -348,7 +348,7 @@ def LoadMaps():
 
 def StoreMaps(fileName):
     #for m in range(1,10):
-    for m in range(0,12):
+    for m in range(0,MAP_INDEX_REFERENCE_POINTS+1):
         if len(perimeters[m]) > 2:
             #process perimeter
             perimeter = perimeters[m].copy()

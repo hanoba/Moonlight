@@ -336,13 +336,17 @@ def ArdumowerControlProgram():
                      maps.perimeters[currentMapIndex][r] = (x,y+1)
                      PrintDistance()
                   elif event.key == pygame.K_1:
-                     SetCurrentMapIndex(0)
+                     if event.mod & pygame.KMOD_ALT:  SetCurrentMapIndex(10)
+                     else: SetCurrentMapIndex(0)
                   elif event.key == pygame.K_2:
-                     SetCurrentMapIndex(1)
+                     if event.mod & pygame.KMOD_ALT:  SetCurrentMapIndex(11)
+                     else: SetCurrentMapIndex(1)
                   elif event.key == pygame.K_3:
-                     SetCurrentMapIndex(2)
+                     if event.mod & pygame.KMOD_ALT:  SetCurrentMapIndex(12)
+                     else: SetCurrentMapIndex(2)
                   elif event.key == pygame.K_4:
-                     SetCurrentMapIndex(3)
+                     if event.mod & pygame.KMOD_ALT:  SetCurrentMapIndex(13)
+                     else: SetCurrentMapIndex(3)
                   elif event.key == pygame.K_5:
                      SetCurrentMapIndex(4)
                   elif event.key == pygame.K_6:
@@ -356,9 +360,9 @@ def ArdumowerControlProgram():
                   elif event.key == pygame.K_0:
                      SetCurrentMapIndex(9)
                   elif event.key == pygame.K_x:       # exclusion points
-                     SetCurrentMapIndex(10)
+                     SetCurrentMapIndex(maps.MAP_INDEX_PERIMETER_WITH_EXCLUSION)
                   elif event.key == pygame.K_HASH:    # references points
-                     SetCurrentMapIndex(11)
+                     SetCurrentMapIndex(maps.MAP_INDEX_REFERENCE_POINTS)
                   elif event.key == pygame.K_b:
                      mower.ToggleBluetoothLogging()
                   elif event.key == pygame.K_c:
@@ -465,7 +469,7 @@ def ArdumowerControlProgram():
       DrawCross(WHITE, origin)
       
       # DockPoints zeichnen
-      if len(maps.dockPoints) > 1: pygame.draw.lines(screen, PURPLE,  True, maps.dockPoints, 3)
+      if len(maps.dockPoints) > 1: pygame.draw.lines(screen, WHITE,  True, maps.dockPoints, 3)
       
       # Messungen
       pygame.draw.circle(screen, RED, messungen[0], 2)
