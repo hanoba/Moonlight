@@ -6,7 +6,25 @@
 
 import socket
 from time import sleep
+from datetime import date;
+from datetime import datetime
 import os
+
+# Logging to screen and to file
+def WriteLog(text, end="\n"):
+   now = datetime.now()
+   time = now.strftime("%H:%M:%S ")
+   if end!='':
+      i=len(text)
+      while i>0:
+         if ord(text[i-1])==10 or ord(text[i-1])==13: i-=1
+         else: break
+      text = text[0:i] + "\n"
+   #print(time+text, end=str(end), flush=True)
+   print(time+text, end='', flush=True)
+   with open(LogFileName, 'a') as f:
+      f.write(time+text)
+      f.close
 
 host = ""
 port = 4210
@@ -24,7 +42,11 @@ UDPSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDPSock.bind(addr)
 UDPSock.setblocking(0)
 
-print("waiting for messages (port: " + str(port) + ") ...")
+today = date.today()
+LogFileName = today.strftime("log/%Y-%m-%d-amcp-log.txt")
+print(LogFileName)
+
+WriteLog("[udp] waiting for messages (port: " + str(port) + ") ...")
 
 #if os.environ['COMPUTERNAME']=="HBA004":
 #   clientAddr = ('192.168.178.71', 4211)
@@ -99,61 +121,27 @@ def close():
   
 def ExecCmd(cmd):
    sleep(0.1)
-   print("[udp.ExecCmd] " + cmd)
+   WriteLog("[udp.ExecCmd] " + cmd)
    for transmission in range(3):
       send(cmd)
       
-      print("[udp.ExecCmd] Wait for answer: " + cmd[3])
+      WriteLog("[udp.ExecCmd] Wait for answer: " + cmd[3])
       timeOutCounter = 5
       # longer timeout for N, C and S commands
       if cmd[3]=="N" or cmd[3]=="C" or cmd[3]=="S" or cmd[3]=="R" or cmd[3]=="X" or cmd[3]=="W" or cmd[3]=="R": timeOutCounter = 20
       while True:
          answer = receive()
          if answer != "":
-            print(answer, end='')
-            if answer[0] == cmd[3]: return answer
+            WriteLog("[am] " + answer)
+            if answer[0] == cmd[3]: 
+               WriteLog("[udp.ExecCmd] Received answer: " + answer)
+               return answer
          sleep(0.1)
          timeOutCounter = timeOutCounter - 1
          if timeOutCounter == 0: break;
-      print("[udp.ExecCmd] Retransmission #", transmission+1)
-   print("[udp.ExecCmd] ERROR: Transmission failed")
+      WriteLog("[udp.ExecCmd] Retransmission #" + str(transmission+1))
+   WriteLog("[udp.ExecCmd] ERROR: Transmission failed")
    return ""
-
-
-#def GetSummary():     # moved to mower.py
-#   answer = ExecCmd("AT+S")
-#   if answer=="": return
-#   fields = answer.split(",")
-#   checkSum = int(fields[16])
-#   print("BatteryVoltage =", float(fields[1]))
-#   print("MowPoint.Index =", int(fields[7]))
-#   print("MapCRC =", checkSum)
-#   return checkSum
-
-#def close():   # duplicated
-#   UDPSock.close()
-
-#def OldSendCmd(cmd):
-#   sleep(0.1)
-#   for transmission in range(3):
-#      print("[maps.SendCmd] " + cmd)
-#      udp.send(cmd)
-#      
-#      print("[maps.SendCmd] Wait for answer: " + cmd[3])
-#      timeOutCounter = 5
-#      # longer timeout for N and C commands
-#      if cmd[3]=="N" or cmd[3]=="C": timeOutCounter = 20
-#      while True:
-#         answer = udp.receive()
-#         if answer != "":
-#            print(answer, end='')
-#            if answer[0] == cmd[3]: return answer
-#         sleep(0.1)
-#         timeOutCounter = timeOutCounter - 1
-#         if timeOutCounter == 0: break;
-#      print("[maps.SendCmd] TIMEOUT ERROR - Transmission #", transmission);
-#   return ""
-
 
 def main():
     #send("AT+$L")

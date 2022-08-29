@@ -853,7 +853,7 @@ void calcStats(){
 // without IMU: heading (stateDelta) is computed by odometry (deltaOdometry)
 void computeRobotState()
 {
-   if (sim.ComputeRobotState()) return;
+  if (sim.ComputeRobotState()) return;
 
   long leftDelta = motor.motorLeftTicks-stateLeftTicks;
   long rightDelta = motor.motorRightTicks-stateRightTicks;  
@@ -878,8 +878,12 @@ void computeRobotState()
     resetLastPos = true;
   }
   
+#define USE_SUNRAY_FIX_OR_FLOAT 1
+#if USE_SUNRAY_FIX_OR_FLOAT
+  if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
+#else
   if ((gps.solutionAvail) && gps.solution == UBLOX::SOL_FIXED)
-  //HB if ((gps.solutionAvail) && ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT))  )
+#endif
   {
       gps.solutionAvail = false;        
       stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * gps.groundSpeed;    

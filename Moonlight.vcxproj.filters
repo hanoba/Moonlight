@@ -18,6 +18,9 @@
     <Filter Include="ArduinoLib">
       <UniqueIdentifier>{0210163f-5a98-49fe-b6fb-bfb80b7c2523}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Maps">
+      <UniqueIdentifier>{847221e3-f6fc-4c15-bdd5-42a4e190d2e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battery.h">
@@ -212,6 +215,9 @@
   <ItemGroup>
     <None Include="Moonlight.ino">
       <Filter>Quelldateien</Filter>
+    </None>
+    <None Include="amcp\maps.json">
+      <Filter>Maps</Filter>
     </None>
   </ItemGroup>
 </Project>

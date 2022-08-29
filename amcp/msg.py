@@ -1,4 +1,5 @@
 import version
+from udp import WriteLog
 
 guiMessage = version.versionString
 
@@ -8,4 +9,4 @@ def GetGuiMessage():
 def PrintGuiMessage(msg):
    global guiMessage
    guiMessage = msg
-   if msg != "": print("[GuiMessage] " + guiMessage)
+   if msg != "": WriteLog("[GuiMessage] " + guiMessage)

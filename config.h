@@ -81,7 +81,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#SD_card_module
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#SD_card_logging
 #define ENABLE_SD      1                 // enable SD card services (resuming, logging)? (uncomment to activate)
-#define ENABLE_SD_LOG  1                 // enable SD card logging? (uncomment to activate)
+//#define ENABLE_SD_LOG  1               // enable SD card logging? (uncomment to activate)
 #define ENABLE_SD_RESUME  1              // enable SD card map load/resume on reset? (uncomment to activate)
 
 
@@ -219,7 +219,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // Behaviour for MOONLIGHT_GPS_JUMP==1:
 //  - dgpsAge refers to last FIX
 //  - GPS JUMP refers to position state
-#define MOONLIGHT_GPS_JUMP 1
+#define MOONLIGHT_GPS_JUMP 0
 
 // Log GPS position & solution to file on SD Card
 //#define MOONLIGHT_LOG_GPS_POSITION
@@ -272,8 +272,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #define GPS_CONFIG   true     // configure GPS receiver (recommended )
 //#define GPS_CONFIG   false  // do not configure GPS receiver    HB 2021-03-01
 
-//#define GPS_CONFIG_FILTER   true     // use signal strength filter? (recommended)
-#define GPS_CONFIG_FILTER   false     // use this if you have difficulties to get a FIX solution
+#define GPS_CONFIG_FILTER   true     // use signal strength filter? (recommended)
+//#define GPS_CONFIG_FILTER   false     // use this if you have difficulties to get a FIX solution
 
 
 // ------ experimental options -------------------------

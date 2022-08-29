@@ -139,6 +139,34 @@ bool UBLOX::configure(){
   }    
 }
 
+//HB Function to update GPS Config Filter
+bool UBLOX::SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0)
+{
+    char text[80];
+    snprintf(text, 80, "Set GPS Filter: minElev=%d, #SV=%d, minCN0=%d dBHz ... ", minElev, nSV, minCN0);
+    CONSOLE.print(text);
+
+    // ----  gps nav5 input filter ----------------------------------
+    // minimum condition when the receiver should try a navigation solution
+    // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#RTK_float-to-fix_recovery_and_false-fix_issues
+    
+    bool setValueSuccess = true;
+    setValueSuccess &= configGPS.newCfgValset8(0x201100a4, minElev);    // CFG-NAVSPG-INFIL_MINELEV  (10 Min SV elevation degree)
+    setValueSuccess &= configGPS.addCfgValset8(0x201100aa, nSV);   // CFG-NAVSPG-INFIL_NCNOTHRS (10 C/N0 Threshold #SVs)
+    setValueSuccess &= configGPS.sendCfgValset8(0x201100ab, minCN0);    // CFG-NAVSPG-INFIL_CNOTHRS  (30 dbHz)
+
+    if (setValueSuccess == true)
+    {
+        CONSOLE.println("OK");
+        return true;
+    }
+    else 
+    {
+        CONSOLE.println("ERROR");
+        return false;
+    }
+}
+
 /* starts the serial communication */
 void UBLOX::begin()
 {	
@@ -162,12 +190,19 @@ void UBLOX::begin()
   if (GPS_CONFIG){
     configure();
   }
+  ttffFlag = false;
+  ttffValue = 0;
+  ttffStart = millis();
 }
 
 void UBLOX::reboot(){
   CONSOLE.println("rebooting GPS receiver...");
   //configGPS.hardReset();
   configGPS.GNSSRestart();
+
+  ttffFlag = false;
+  ttffValue = 0;
+  ttffStart = millis();
 }
 
 void UBLOX::HardReset(){
@@ -527,6 +562,11 @@ void UBLOX::run()
     CONSOLE.print(data, HEX);
     CONSOLE.print(",");    
 #endif
+  }
+  if (!ttffFlag && solution == SOL_FIXED)
+  {
+      ttffFlag = true;
+      ttffValue = millis() - ttffStart;
   }
 }
 

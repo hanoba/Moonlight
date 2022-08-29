@@ -183,6 +183,7 @@
     <ClCompile Include="VL53L0X.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="amcp\maps.json" />
     <None Include="Moonlight.ino" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

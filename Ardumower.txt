@@ -62,6 +62,7 @@
         <File name="amcp\plan.py" />
         <File name="amcp\send.py" />
         <File name="amcp\udp.py" />
+        <File name="amcp\version.py" />
         <File name="amcp\amcmd.bat" />
         <File name="amcp\maps.json" />
     </Project>

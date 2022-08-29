@@ -1,22 +1,23 @@
 # FILE:  mower.py
 # DESCRIPTION: This file conatins the following functions
-#  - GetSummary
-#  - SyncRtc
-#  - GetRtcDateTime
+#  - ClearStatistics
 #  - ComputeMapChecksum
+#  - GetRtcDateTime
+#  - GetSummary
 #  - GetVersionNumber
-#  - ToggleBluetoothLogging
-#  - ToggleUseGPSfloatForDeltaEstimation
-#  - ToggleUseGPSfloatForPosEstimation
-#  - ToggleSmoothCurves
-#  - ToggleGpsLogging
+#  - Ping
+#  - PrintStatistics
 #  - ReadMapFromSdCard
 #  - StartMowing
-#  - SwitchOffRobot
-#  - PrintStatistics
-#  - ClearStatistics
-#  - UploadMap
 #  - StopMowing
+#  - SwitchOffRobot
+#  - SyncRtc
+#  - ToggleBluetoothLogging
+#  - ToggleGpsLogging
+#  - ToggleSmoothCurves
+#  - ToggleUseGPSfloatForDeltaEstimation
+#  - ToggleUseGPSfloatForPosEstimation
+#  - UploadMap
 # 
 import math
 import maps
@@ -30,6 +31,8 @@ currentMapChecksum = 0
 showCurrentWayPoints = False
 numMaps = 0
 
+CMD_Ping = "AT+Y6"
+CMD_UploadGpsConfigFilter = "AT+A"
 CMD_PrintVersionNumber = "AT+V"
 CMD_PrintStatistics = "AT+T"
 CMD_ClearStatistics = "AT+L"
@@ -158,6 +161,9 @@ def ToggleEnablePathFinder():
 
 def ToggleGpsLogging():
    udp.ExecCmd(CMD_ToggleGpsLogging)
+
+def Ping():
+   udp.ExecCmd(CMD_Ping)
    
 def ReadMapFromSdCard(mapId):
    udp.send(str.format('AT+R,{:d}', mapId))
@@ -290,4 +296,10 @@ def UploadMap(mapId):
 
 def StopMowing():
    udp.ExecCmd(CMD_StopMowing)
-   
+
+def UploadGpsConfigFilter(gpsConfigFilter):
+   if udp.ExecCmd(CMD_UploadGpsConfigFilter + "," + gpsConfigFilter)=="": 
+      PrintGuiMessage("GPS Config Filter upload failed")
+   else:
+      PrintGuiMessage("GPS Config Filter (" + gpsConfigFilter + ") uploaded successfully")
+

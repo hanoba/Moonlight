@@ -63,11 +63,17 @@ class UBLOX{
     unsigned long dgpsChecksumErrorCounter;
     unsigned long dgpsPacketCounter;    
     bool verbose;   //HB
+    //HB Added for TTFF measurement
+    bool ttffFlag;
+    unsigned long ttffValue;
+    unsigned long ttffStart;
+
     
     UBLOX(HardwareSerial& bus,uint32_t baud);
     void begin();
     void run();
-    bool configure();  
+    bool configure();
+    bool SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0);
     void reboot();
     void HardReset();
   private:

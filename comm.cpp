@@ -262,6 +262,32 @@ void cmdControl(String cmd)
   cmdAnswer(s);
 }
 
+void cmdSetGpsConfigFilter(String cmd)
+{
+    uint8_t minElev=10, nSV=10, minCN0=30;
+    if (cmd.length() < 6) return;
+    int counter = 0;
+    int lastCommaIdx = 0;
+    for (int idx = 0; idx < cmd.length(); idx++) {
+        char ch = cmd[idx];
+        if ((ch == ',') || (idx == cmd.length() - 1)) 
+        {
+            int intValue = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
+            if (intValue >= 0 && intValue < 256)
+            {
+                if (counter == 1) minElev = intValue;
+                else if (counter == 2) nSV = intValue;
+                else if (counter == 3) minCN0 = intValue;
+            }
+            counter++;
+            lastCommaIdx = idx;
+        }
+    }
+    String s = F("A");
+    cmdAnswer(s);
+    gps.SetGpsConfigFilter(minElev, nSV, minCN0);
+}
+
 // request motor
 void cmdMotor(String cmd)
 {
@@ -647,6 +673,13 @@ void cmdToggleGPSSolution(){
 }
 
 
+void cmdPing()
+{
+    String s = F("Y6");
+    cmdAnswer(s);
+}
+
+
 // request summary
 void cmdSummary(){
   String s = F("S,");
@@ -741,6 +774,8 @@ void cmdStats(){
   s += ",";
   s += statMowGPSMotionTimeoutCounter;
   cmdAnswer(s);
+  CONSOLE.print("time to first fix in sec: ");
+  CONSOLE.println(gps.ttffValue);
 }
 
 // clear statistics
@@ -826,27 +861,28 @@ void processCmd(bool checkCrc, String cmd)
   if (cmd[0] != 'A') return;
   if (cmd[1] != 'T') return;
   if (cmd[2] != '+') return;
-  else if (cmd[3] == 'S') cmdSummary();
-  else if (cmd[3] == 'M') cmdMotor(cmd);
+  else if (cmd[3] == 'A') cmdSetGpsConfigFilter(cmd);
   else if (cmd[3] == 'C') cmdControl(cmd);
-  else if (cmd[3] == 'W') cmdWaypoint(cmd);
-  else if (cmd[3] == 'N') cmdWayCount(cmd);
-  else if (cmd[3] == 'X') cmdExclusionCount(cmd);
-  else if (cmd[3] == 'V') cmdVersion();
-  else if (cmd[3] == 'P') cmdPosMode(cmd);
-  else if (cmd[3] == 'T') cmdStats();
-  else if (cmd[3] == 'L') cmdClearStats();
+  else if (cmd[3] == 'D') cmdRtc(cmd);
   else if (cmd[3] == 'E') cmdMotorTest();
-  else if (cmd[3] == 'O') cmdObstacle();
   else if (cmd[3] == 'F') cmdSensorTest();
   else if (cmd[3] == 'G') cmdToggleGPSSolution();   // for developers
   else if (cmd[3] == 'K') cmdKidnap();   // for developers
-  else if (cmd[3] == 'Z') cmdStressTest();   // for developers
+  else if (cmd[3] == 'L') cmdClearStats();
+  else if (cmd[3] == 'M') cmdMotor(cmd);
+  else if (cmd[3] == 'N') cmdWayCount(cmd);
+  else if (cmd[3] == 'O') cmdObstacle();
+  else if (cmd[3] == 'P') cmdPosMode(cmd);
   else if (cmd[3] == 'Q') cmdSwitchOffRobot();
   else if (cmd[3] == 'R') cmdReadMapFile(cmd);
+  else if (cmd[3] == 'S') cmdSummary();
+  else if (cmd[3] == 'T') cmdStats();
   else if (cmd[3] == 'U') cmdStartUploadMap(cmd);
+  else if (cmd[3] == 'V') cmdVersion();
+  else if (cmd[3] == 'W') cmdWaypoint(cmd);
+  else if (cmd[3] == 'X') cmdExclusionCount(cmd);
+  else if (cmd[3] == 'Z') cmdStressTest();   // for developers
   else if (cmd[3] == '$') FileSystemCmd(cmd);
-  else if (cmd[3] == 'D') cmdRtc(cmd);
   else if (cmd[3] == 'Y') 
   {
       if (cmd.length() <= 4)
@@ -859,12 +895,14 @@ void processCmd(bool checkCrc, String cmd)
          if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
          if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
          if (cmd[4] == '5') cmdToggleBluetoothLoggingFlag();   // for developers
-         if (cmd[4] == 'R') cmdGNSSHardReset();   
+         if (cmd[4] == '6') cmdPing();
+         if (cmd[4] == 'R') cmdGNSSHardReset();
          if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
          if (cmd[4] == 'F') cmdToggleEnablePathFinder();
          if (cmd[4] == 'G') cmdToggleGpsLogging();
          if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
          if (cmd[4] == 'S') cmdToggleSmoothCurves();
+         if (cmd[4] == '6') cmdPing();
       }
   }
   else
@@ -999,8 +1037,8 @@ void processUdp()
       int len = udpSerial.readPacket(packetBuf, SIZE);
       if (len > 0)
       {
-         CONSOLE.print("Packet received: ");
-         CONSOLE.println(packetBuf);
+         //CONSOLE.print("Packet received: ");
+         //CONSOLE.println(packetBuf);
          const bool USE_CHECKSUM = true;
          processCmd(USE_CHECKSUM, packetBuf);
          CONSOLE.print(cmdResponse);

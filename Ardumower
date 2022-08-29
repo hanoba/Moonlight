@@ -59,6 +59,7 @@
         <File name="amcp\plan.py" />
         <File name="amcp\udp.py" />
         <File name="amcp\mower.py" />
+        <File name="amcp\heatmap.py" />
     </Project>
     <Project name="amcmd">
         <File name="amcp\amcmd.py" />

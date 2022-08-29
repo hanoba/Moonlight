@@ -138,10 +138,10 @@ void Battery::run()
             {
                 buzzer.sound(SND_OVERCURRENT, false);
                 batteryDriver.keepPowerOn(false);
-                while (true)
-                {
-                   watchdogReset();
-                }
+                //while (true)
+                //{
+                //   watchdogReset();
+                //}
             }
             else
             {
