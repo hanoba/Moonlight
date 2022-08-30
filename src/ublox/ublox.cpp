@@ -142,9 +142,6 @@ bool UBLOX::configure(){
 //HB Function to update GPS Config Filter
 bool UBLOX::SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0)
 {
-    char text[80];
-    snprintf(text, 80, "Set GPS Filter: minElev=%d, #SV=%d, minCN0=%d dBHz ... ", minElev, nSV, minCN0);
-    CONSOLE.print(text);
 
     // ----  gps nav5 input filter ----------------------------------
     // minimum condition when the receiver should try a navigation solution
@@ -157,12 +154,14 @@ bool UBLOX::SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0)
 
     if (setValueSuccess == true)
     {
-        CONSOLE.println("OK");
+        char text[80];
+        snprintf(text, 80, "=Set GPS Filter to minElev=%d, #SV=%d, minCN0=%d dBHz  ... OK", minElev, nSV, minCN0);
+        CONSOLE.println(text);
         return true;
     }
     else 
     {
-        CONSOLE.println("ERROR");
+        CONSOLE.println("=Set GPS Filter ... ERROR");
         return false;
     }
 }
@@ -466,7 +465,8 @@ void UBLOX::dispatchMessage() {
               sdSerial.writeGpsLogSD(buf);
 #endif
 
-#if MOONLIGHT_GPS_JUMP
+#define MOONLIGHT_GPS_AGE
+#ifdef MOONLIGHT_GPS_AGE
               if (solution==SOL_FIXED) dgpsAge = millis();
 #else
               dgpsAge = millis();
@@ -509,7 +509,7 @@ void UBLOX::dispatchMessage() {
               byte flags = (byte)this->unpack_int8(1);
               if ((flags & 1) != 0) dgpsChecksumErrorCounter++;
               dgpsPacketCounter++;
-#if MOONLIGHT_GPS_JUMP==0
+#ifndef MOONLIGHT_GPS_AGE
               dgpsAge = millis();
 #endif
             }
@@ -567,6 +567,10 @@ void UBLOX::run()
   {
       ttffFlag = true;
       ttffValue = millis() - ttffStart;
+
+      char text[64];
+      sprintf(text, "=TTFF: %d sec", ttffValue/1000);
+      CONSOLE.println(text);
   }
 }
 

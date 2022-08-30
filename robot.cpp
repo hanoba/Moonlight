@@ -1435,8 +1435,9 @@ void run()
                motor.setLinearAngularSpeed(-0.2,0);
                if (millis() > driveReverseStopTime)
                {
-                  CONSOLE.println("undock complete");
-                  motor.stopImmediately(false);
+                  CONSOLE.println("=undock complete");
+                  //motor.stopImmediately(false);
+                  motor.setLinearAngularSpeed(0.,0.);
                   driveReverseStopTime = 0;
                   setOperation(OP_IDLE);   
                }

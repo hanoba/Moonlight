@@ -76,7 +76,7 @@ void WriteMap(String cmd)
          return;
       }
    }
-   CONSOLE.println("ERROR opening map file for writing");
+   CONSOLE.println("=ERROR opening map file for writing");
 }
 
 
@@ -159,7 +159,7 @@ static void cmdReadMapFile(String cmd)
    {
       char fileName[16];
       sprintf(fileName, "MAP%d.TXT", mapId);
-      CONSOLE.print("Loading map from file ");
+      CONSOLE.print("=Loading map from file ");
       CONSOLE.println(fileName);
 
       udpSerial.DisableLogging();
@@ -201,7 +201,7 @@ static void cmdReadMapFile(String cmd)
       }
       else 
       {
-         CONSOLE.print("error opening file ");
+         CONSOLE.print("=error opening file ");
          CONSOLE.println(fileName);
       }
       dataFile.close();
@@ -525,7 +525,7 @@ void cmdTriggerWatchdog(){
 void cmdGNSSReboot(){
   String s = F("Y2");
   cmdAnswer(s);
-  CONSOLE.println("GNSS reboot");
+  CONSOLE.println("=GNSS reboot");
   gps.reboot();
 }
 
@@ -534,7 +534,7 @@ void cmdGNSSHardReset()
 {
   String s = F("YR");
   cmdAnswer(s);
-  CONSOLE.println("GNSS Hardware Reset");
+  CONSOLE.println("=GNSS Hardware Reset");
   gps.HardReset();
 }
 
@@ -550,7 +550,7 @@ void cmdSwitchOffRobot(){
 void cmdKidnap(){
   String s = F("K");
   cmdAnswer(s);
-  CONSOLE.println("kidnapping robot - kidnap detection should trigger");
+  CONSOLE.println("=kidnapping robot - kidnap detection should trigger");
   stateX = 0;
   stateY = 0;
 }
@@ -559,7 +559,7 @@ void cmdTriggerRaspiShutdown()
 {
     String s = F("Y4");
     cmdAnswer(s);
-    CONSOLE.println("Trigger raspi shutdown");
+    CONSOLE.println("=Trigger raspi shutdown");
     batteryDriver.raspiShutdown();
 }
 
@@ -591,7 +591,7 @@ void cmdToggleUseIMU()
     String s = F("YI");
     cmdAnswer(s);
     USE_IMU = !USE_IMU;
-    CONSOLE.print("USE_IMU = ");
+    CONSOLE.print("=USE_IMU = ");
     CONSOLE.println(USE_IMU);
 }
 
@@ -601,7 +601,7 @@ void cmdToggleSmoothCurves()
     String s = F("YS");
     cmdAnswer(s);
     SMOOTH_CURVES = !SMOOTH_CURVES;
-    CONSOLE.print("SMOOTH_CURVES = ");
+    CONSOLE.print("=SMOOTH_CURVES = ");
     CONSOLE.println(SMOOTH_CURVES);
 }
 
@@ -611,7 +611,7 @@ void cmdToggleEnablePathFinder()
     String s = F("YF");
     cmdAnswer(s);
     ENABLE_PATH_FINDER = !ENABLE_PATH_FINDER;
-    CONSOLE.print("ENABLE_PATH_FINDER = ");
+    CONSOLE.print("=ENABLE_PATH_FINDER = ");
     CONSOLE.println(ENABLE_PATH_FINDER);
 }
 
@@ -621,7 +621,7 @@ void cmdToggleUseGPSfloatForPosEstimation()
     cmdAnswer(s);
     USE_GPS_FLOAT_FOR_POS_ESTIMATION = !USE_GPS_FLOAT_FOR_POS_ESTIMATION;
     maps.useGPSfloatForPosEstimation = USE_GPS_FLOAT_FOR_POS_ESTIMATION;    
-    CONSOLE.print("USE_GPS_FLOAT_FOR_POS_ESTIMATION = ");
+    CONSOLE.print("=USE_GPS_FLOAT_FOR_POS_ESTIMATION = ");
     CONSOLE.println(USE_GPS_FLOAT_FOR_POS_ESTIMATION);
 }
 
@@ -631,7 +631,7 @@ void cmdToggleUseGPSfloatForDeltaEstimationEstimation()
     cmdAnswer(s);
     USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = !USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
     maps.useGPSfloatForDeltaEstimation = USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
-    CONSOLE.print("USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = ");
+    CONSOLE.print("=USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = ");
     CONSOLE.println(USE_GPS_FLOAT_FOR_DELTA_ESTIMATION);
 }
 
@@ -774,8 +774,9 @@ void cmdStats(){
   s += ",";
   s += statMowGPSMotionTimeoutCounter;
   cmdAnswer(s);
-  CONSOLE.print("time to first fix in sec: ");
-  CONSOLE.println(gps.ttffValue);
+  char text[64];
+  sprintf(text, "=TTFF: %d sec", gps.ttffValue/1000);
+  CONSOLE.println(text);
 }
 
 // clear statistics
@@ -813,7 +814,7 @@ static void cmdToggleBluetoothLoggingFlag()
    String s = F("Y2");
    cmdAnswer(s);
    bluetoothLoggingFlag = !bluetoothLoggingFlag;
-   CONSOLE.print("Bluetooth logging is ");
+   CONSOLE.print("=Bluetooth logging is ");
    CONSOLE.println(bluetoothLoggingFlag ? "enabled" : "disabled");
 }
 
@@ -1054,7 +1055,7 @@ void processComm(){
   processUdp();
 #endif
   if (triggerWatchdog) {
-    CONSOLE.println("hang test - watchdog should trigger and perform a reset");
+    CONSOLE.println("=hang test - watchdog should trigger and perform a reset");
     while (true){
       // do nothing, just hang
     }

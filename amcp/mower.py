@@ -22,7 +22,7 @@
 import math
 import maps
 import udp
-from msg import PrintGuiMessage
+from udp import PrintGuiMessage
 from datetime import datetime
 from time import sleep
 
@@ -97,22 +97,39 @@ def GetSummary():
    stateSensor = int(fields[9])
    if stateSensor < 0 or stateSensor >= len(textSensor): stateSensor = len(textSensor) - 1
 
-   print("Battery Voltage:        ", fields[ 1], "V")
-   print("StateX:                 ", fields[ 2], "m")
-   print("StateY:                 ", fields[ 3], "m")
-   print("StateDelta:             ", stateDelta, "°")
-   print("GPS solution:           ", textGpsSolution[gpsSolution])
-   print("Operating State:        ", textStateOp[stateOp])
-   print("Mow Point Index:        ", fields[ 7])
-   print("GPS Age:                ", fields[ 8], "sec")
-   print("Last triggered sensor:  ", textSensor[stateSensor])
-   print("TargetPointX:           ", fields[10], "m")
-   print("TargetPointY:           ", fields[11], "m")
-   print("GPS Accuracy;           ", fields[12], "m")
-   print("Num Satellites          ", fields[13])
-   print("Charge/motor current:   ", fields[14], "A")
-   print("Num DGPS Satellites:    ", fields[15])
-   print("Map Checksum:           ", checkSum)
+#   print("Battery Voltage:        ", fields[ 1], "V")
+#   print("StateX:                 ", fields[ 2], "m")
+#   print("StateY:                 ", fields[ 3], "m")
+#   print("StateDelta:             ", stateDelta, "°")
+#   print("GPS solution:           ", textGpsSolution[gpsSolution])
+#   print("Operating State:        ", textStateOp[stateOp])
+#   print("Mow Point Index:        ", fields[ 7])
+#   print("GPS Age:                ", fields[ 8], "sec")
+#   print("Last triggered sensor:  ", textSensor[stateSensor])
+#   print("TargetPointX:           ", fields[10], "m")
+#   print("TargetPointY:           ", fields[11], "m")
+#   print("GPS Accuracy;           ", fields[12], "m")
+#   print("Num Satellites          ", fields[13])
+#   print("Charge/motor current:   ", fields[14], "A")
+#   print("Num DGPS Satellites:    ", fields[15])
+#   print("Map Checksum:           ", checkSum)
+
+   udp.WriteLog("[mower.GetSummary] Battery Voltage:        " + fields[ 1] + "V")
+   udp.WriteLog("[mower.GetSummary] StateX:                 " + fields[ 2] + "m")
+   udp.WriteLog("[mower.GetSummary] StateY:                 " + fields[ 3] + "m")
+   udp.WriteLog("[mower.GetSummary] StateDelta:             " + str(stateDelta) + "°")
+   udp.WriteLog("[mower.GetSummary] GPS solution:           " + textGpsSolution[gpsSolution])
+   udp.WriteLog("[mower.GetSummary] Operating State:        " + textStateOp[stateOp])
+   udp.WriteLog("[mower.GetSummary] Mow Point Index:        " + fields[ 7])
+   udp.WriteLog("[mower.GetSummary] GPS Age:                " + fields[ 8] + "sec")
+   udp.WriteLog("[mower.GetSummary] Last triggered sensor:  " + textSensor[stateSensor])
+   udp.WriteLog("[mower.GetSummary] TargetPointX:           " + fields[10] + "m")
+   udp.WriteLog("[mower.GetSummary] TargetPointY:           " + fields[11] + "m")
+   udp.WriteLog("[mower.GetSummary] GPS Accuracy;           " + fields[12] + "m")
+   udp.WriteLog("[mower.GetSummary] Num Satellites          " + fields[13])
+   udp.WriteLog("[mower.GetSummary] Charge/motor current:   " + fields[14] + "A")
+   udp.WriteLog("[mower.GetSummary] Num DGPS Satellites:    " + fields[15])
+   udp.WriteLog("[mower.GetSummary] Map Checksum:           " + str(checkSum))
    return checkSum
 
 def SyncRtc():
@@ -176,18 +193,18 @@ def ReadMapFromSdCard(mapId):
    else: PrintGuiMessage("Maps not synchronized")
    #udp.ExecCmd(str.format('AT+R,{:d}', mapId))
 
-def StartMowing():
+def StartMowing(fSpeed=0.25, iFixTimeout=0):
    # AT+C,1,1,0.39,0,0,-1,-1,0,0x8  # -1 means no change, keep current value
    #bEnableMowMotor = 1           # on
    #iOperationType = 1            # 1=OP_MOW
-   fSpeed = 0.25                  # m/s
+   #fSpeed = 0.25                  # m/s
    #iFixTimeout = 0               # 0 = no fix timeout
    #bFinishAndRestart = 0         # disabled
    #fMowingPointPercent = -1      # 
    #bSkipNextMowingPoint = -1     #
    #bEnableSonar = 0              # disabled
    #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-   cmd = str.format('AT+C,1,1,{:.2f},0,0,-1,-1,0', fSpeed)     #HB enable mow motor
+   cmd = str.format('AT+C,1,1,{:.2f},{:d},0,-1,-1,0', fSpeed, iFixTimeout)     #HB enable mow motor + add iFixTimeout
    udp.ExecCmd(cmd)
 
 def StartDocking():
@@ -248,30 +265,30 @@ def PrintStatistics():
    if answer=="": return
    fields = answer.split(",")
    i=1
-   print("statIdleDuration               :", fields[i+0])
-   print("statChargeDuration             :", fields[i+1])
-   print("statMowDuration                :", fields[i+2])
-   print("statMowDurationFloat           :", fields[i+3])
-   print("statMowDurationFix             :", fields[i+4])
-   print("statMowFloatToFixRecoveries    :", fields[i+5])
-   print("statMowDistanceTraveled        :", fields[i+6])
-   print("statMowMaxDgpsAge              :", fields[i+7])
-   print("statImuRecoveries              :", fields[i+8])
-   print("statTempMin                    :", fields[i+9])
-   print("statTempMax                    :", fields[i+10])
-   print("gps.chksumErrorCounter         :", fields[i+11])
-   print("gps.dgpsChecksumErrorCounter   :", fields[i+12]) 
-   print("statMaxControlCycleTime        :", fields[i+13])
-   print("SERIAL_BUFFER_SIZE             :", fields[i+14])
-   print("statMowDurationInvalid         :", fields[i+15])
-   print("statMowInvalidRecoveries       :", fields[i+16])
-   print("statMowObstacles               :", fields[i+17])
-   print("freeMemory()                   :", fields[i+18])
-   print("getResetCause()                :", fields[i+19])
-   print("statGPSJumps                   :", fields[i+20])
-   print("statMowSonarCounter            :", fields[i+21])
-   print("statMowBumperCounter           :", fields[i+22])
-   print("statMowGPSMotionTimeoutCounter :", fields[i+23])
+   udp.WriteLog("[mower.PrintStatistics] statIdleDuration               :" + fields[i+0])
+   udp.WriteLog("[mower.PrintStatistics] statChargeDuration             :" + fields[i+1])
+   udp.WriteLog("[mower.PrintStatistics] statMowDuration                :" + fields[i+2])
+   udp.WriteLog("[mower.PrintStatistics] statMowDurationFloat           :" + fields[i+3])
+   udp.WriteLog("[mower.PrintStatistics] statMowDurationFix             :" + fields[i+4])
+   udp.WriteLog("[mower.PrintStatistics] statMowFloatToFixRecoveries    :" + fields[i+5])
+   udp.WriteLog("[mower.PrintStatistics] statMowDistanceTraveled        :" + fields[i+6])
+   udp.WriteLog("[mower.PrintStatistics] statMowMaxDgpsAge              :" + fields[i+7])
+   udp.WriteLog("[mower.PrintStatistics] statImuRecoveries              :" + fields[i+8])
+   udp.WriteLog("[mower.PrintStatistics] statTempMin                    :" + fields[i+9])
+   udp.WriteLog("[mower.PrintStatistics] statTempMax                    :" + fields[i+10])
+   udp.WriteLog("[mower.PrintStatistics] gps.chksumErrorCounter         :" + fields[i+11])
+   udp.WriteLog("[mower.PrintStatistics] gps.dgpsChecksumErrorCounter   :" + fields[i+12]) 
+   udp.WriteLog("[mower.PrintStatistics] statMaxControlCycleTime        :" + fields[i+13])
+   udp.WriteLog("[mower.PrintStatistics] SERIAL_BUFFER_SIZE             :" + fields[i+14])
+   udp.WriteLog("[mower.PrintStatistics] statMowDurationInvalid         :" + fields[i+15])
+   udp.WriteLog("[mower.PrintStatistics] statMowInvalidRecoveries       :" + fields[i+16])
+   udp.WriteLog("[mower.PrintStatistics] statMowObstacles               :" + fields[i+17])
+   udp.WriteLog("[mower.PrintStatistics] freeMemory()                   :" + fields[i+18])
+   udp.WriteLog("[mower.PrintStatistics] getResetCause()                :" + fields[i+19])
+   udp.WriteLog("[mower.PrintStatistics] statGPSJumps                   :" + fields[i+20])
+   udp.WriteLog("[mower.PrintStatistics] statMowSonarCounter            :" + fields[i+21])
+   udp.WriteLog("[mower.PrintStatistics] statMowBumperCounter           :" + fields[i+22])
+   udp.WriteLog("[mower.PrintStatistics] statMowGPSMotionTimeoutCounter :" + fields[i+23])
 
 def ClearStatistics():
    udp.ExecCmd(CMD_ClearStatistics)
@@ -298,8 +315,5 @@ def StopMowing():
    udp.ExecCmd(CMD_StopMowing)
 
 def UploadGpsConfigFilter(gpsConfigFilter):
-   if udp.ExecCmd(CMD_UploadGpsConfigFilter + "," + gpsConfigFilter)=="": 
-      PrintGuiMessage("GPS Config Filter upload failed")
-   else:
-      PrintGuiMessage("GPS Config Filter (" + gpsConfigFilter + ") uploaded successfully")
+   udp.ExecCmd(CMD_UploadGpsConfigFilter + "," + gpsConfigFilter)
 

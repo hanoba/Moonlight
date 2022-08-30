@@ -10,7 +10,7 @@ from datetime import datetime
 from version import versionString
 import pygame_menu
 #from msg import guiMessage
-from msg import PrintGuiMessage, GetGuiMessage
+from udp import PrintGuiMessage, GetGuiMessage
 
 #guiMessage=""
 
@@ -32,6 +32,15 @@ numMaps = 0
 FONT_SIZE = 14
 LINE_SPACING = FONT_SIZE + 1
 FRAME_RATE = 20
+
+aliveCounter=0
+
+def KeepMowerAlive(aliveCounterThreshold):
+   global aliveCounter
+   aliveCounter += 1
+   if aliveCounter >= aliveCounterThreshold:
+      aliveCounter = 0
+      mower.Ping()
 
 def SetCurrentMapIndex(index):
     global currentMapIndex, currentMapChecksum
@@ -100,10 +109,13 @@ def PrintCurrentPointPosition():
    screen.blit(text, textRect)
 
 def ShowGuiMessage():
+   msg = udp.ReceiveMowerMessage()
+   if msg != "":
+      if msg[0] == ':': KeepMowerAlive(24)   # Mower sends a periodic log message every 5 sec --> ping every 2 minutes
    if GetGuiMessage() != "":
       text = bigFont.render(GetGuiMessage(), True, WHITE, BLACK)
       textRect = text.get_rect()
-      textRect.topright = ((maps.screenX-20, maps.screenY-30))
+      textRect.topright = ((maps.screenX-20, maps.screenY-40))
       screen.blit(text, textRect)
 
 
@@ -150,32 +162,23 @@ def PrintHelpText():
    WriteTextBox("^z/^y  Undo / Redo           ")
 
 
-aliveCounter=0
-
-def KeepMowerAlive(aliveCounterThreshold):
-   global aliveCounter
-   aliveCounter += 1
-   if aliveCounter >= aliveCounterThreshold:
-      aliveCounter = 0
-      mower.Ping()
-
 def PrintLogMsg():
-   if not hasattr(PrintLogMsg, "headline"):
-       PrintLogMsg.headline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map Info    "
-       PrintLogMsg.oldMsg = " "
-   msg = udp.receive()
-   if msg != "":
-      if msg[0] == ':':    PrintLogMsg.oldMsg = msg[1:len(msg)-2]
-      elif msg[0] == '#':  PrintLogMsg.headline = msg[1:len(msg)-2]
-      udp.WriteLog("[am] "+msg)
-      KeepMowerAlive(24)   # Mower sends log message every 5 sec --> ping every 2 minutes
+   #if not hasattr(PrintLogMsg, "headline"):
+   #    PrintLogMsg.headline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map Info    "
+   #    PrintLogMsg.oldMsg = " "
+   #msg = udp.receive()
+   #if msg != "":
+   #   if msg[0] == ':':    PrintLogMsg.oldMsg = msg[1:len(msg)-2]
+   #   elif msg[0] == '#':  PrintLogMsg.headline = msg[1:len(msg)-2]
+   #   udp.WriteLog("[am] "+msg)
+   #   KeepMowerAlive(24)   # Mower sends log message every 5 sec --> ping every 2 minutes
    # print headline
-   text = bigFont.render(PrintLogMsg.headline, True, WHITE, BLACK)
+   text = bigFont.render(udp.logHeadline, True, WHITE, BLACK)
    textRect = text.get_rect()
    textRect.topleft = ((10, 15-(LINE_SPACING-1)))
    screen.blit(text, textRect)
    # print logging text
-   text = bigFont.render(PrintLogMsg.oldMsg, True, WHITE, BLACK)
+   text = bigFont.render(udp.logMessage, True, WHITE, BLACK)
    textRect = text.get_rect()
    textRect.topleft = ((10, 15))
    screen.blit(text, textRect)
@@ -272,7 +275,7 @@ def ArdumowerControlProgram():
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
    theme_dark.widget_font_size=20
    theme_dark.title_font_size=30
-   config_menu = pygame_menu.Menu('Configuration Menu', 600, 600, theme=theme_dark)
+   config_menu = pygame_menu.Menu('Configuration Menu', 600, 700, theme=theme_dark)
 
    config_menu.add.button('Toggle Bluetooth Logging (b=off,B=on)', mower.ToggleBluetoothLogging)
    config_menu.add.button('Toggle UseGPSfloatForPosEstimation (p=off,P=on)', mower.ToggleUseGPSfloatForPosEstimation)
@@ -283,8 +286,11 @@ def ArdumowerControlProgram():
    config_menu.add.button('GNSS Reboot', mower.GnssReboot)
    config_menu.add.button('GNSS Hardware Reset', mower.GnssHardwareReset)
    config_menu.add.button('Sync RTC with current time', mower.SyncRtc)
+   config_menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
    config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
    config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
+   config_menu.add.text_input('Mower speed in m/s: ', textinput_id='ID_MOWER_SPEED', default='0.25')
+   config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='0')
    config_menu.add.text_input('GPS Config Filter: ', textinput_id='ID_GPS_CONFIG_FILTER', default='10,10,30')
    config_menu.add.button('Upload GPS Config Filter', CmdUploadGpsConfigFilter)
    config_menu.add.button('Return to Main Menu', pygame_menu.events.BACK)
@@ -295,17 +301,17 @@ def ArdumowerControlProgram():
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
    theme_dark.widget_font_size=20
    theme_dark.title_font_size=30
-   menu = pygame_menu.Menu('Main Menu', 600, 800, theme=theme_dark)
+   menu = pygame_menu.Menu('Main Menu', 600, 780, theme=theme_dark)
 
    menu.add.button('Show/Hide MainMenu (ESC)', CmdShowHideMainMenu)
-   menu.add.button('Start mowing (m)', mower.StartMowing)
+   menu.add.button('Start mowing (m)', CmdStartMowing)
    menu.add.button('Stop mowing (i)', mower.StopMowing)
    menu.add.button('Start docking (d)', mower.StartDocking)
    menu.add.button('Start undocking (a)', mower.StartUndocking)
    menu.add.button('Switch Off Robot (o)', mower.SwitchOffRobot)
    menu.add.button('Get Version Number (v)', mower.GetVersionNumber)
    menu.add.button('PrintStatistics (s)', mower.PrintStatistics)
-   menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
+   #menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
    menu.add.button('Upload current map (u)', CmdUploadMap)
    menu.add.button('Read Map From SD Card (r)', CmdReadMapFromSdCard)
    menu.add.button('Save Maps', CmdStoreMaps)
@@ -333,7 +339,7 @@ def ArdumowerControlProgram():
          if event.type == pygame.QUIT:
                programActive = False
          elif event.type == pygame.KEYDOWN:
-               PrintGuiMessage("")
+               #PrintGuiMessage("")
                if event.key == pygame.K_ESCAPE:
                   CmdShowHideMainMenu()
                elif not menu.is_enabled():
@@ -578,13 +584,12 @@ def ArdumowerControlProgram():
       # Refresh-Zeiten festlegen
       clock.tick(FRAME_RATE)
 
-
 def CmdShowHideMainMenu():
    global editMode
    editMode = False
    menu.toggle()
    data = menu.get_input_data()
-   if menu.is_enabled(): PrintGuiMessage("")
+   #if menu.is_enabled(): PrintGuiMessage("")
    #mapsFileName = data.get('ID_MAPS_FILE_NAME')
    #print("Maps File Name: " + mapsFileName)
 
@@ -616,6 +621,14 @@ def CmdUploadGpsConfigFilter():
    data = config_menu.get_input_data()
    gpsConfigFilter = data.get('ID_GPS_CONFIG_FILTER')
    mower.UploadGpsConfigFilter(gpsConfigFilter)
+
+
+def CmdStartMowing():
+   global config_menu
+   data = config_menu.get_input_data()
+   fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
+   mowerSpeed = float(data.get('ID_MOWER_SPEED'))
+   mower.StartMowing(mowerSpeed, fixTimeout)
 
 
 def CmdUploadMap():

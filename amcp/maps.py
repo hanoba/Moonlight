@@ -343,7 +343,7 @@ def LoadMaps():
                 wpoly.append((point["X"], point["Y"]))
             Map2Screen(wpoly)
         wayPoints.append(wpoly)
-    print(numMaps, "maps loaded")
+    udp.WriteLog("[maps.LoadMaps] " + str(numMaps) + " maps loaded")
 
 def StoreMaps(fileName):
     #for m in range(1,10):

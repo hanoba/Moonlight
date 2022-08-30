@@ -9,6 +9,22 @@ from time import sleep
 from datetime import date;
 from datetime import datetime
 import os
+#from msg import PrintGuiMessage
+import version
+#from mower import Ping
+
+logHeadline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map Info    "
+logMessage = " "
+
+guiMessage = version.versionString
+
+def GetGuiMessage():
+   return guiMessage
+
+def PrintGuiMessage(msg):
+   global guiMessage
+   guiMessage = msg
+   if msg != "": WriteLog("[GuiMessage] " + guiMessage)
 
 # Logging to screen and to file
 def WriteLog(text, end="\n"):
@@ -73,24 +89,17 @@ def ReceiveRaw():
    return msg
 
 
-# Receive message if available
-def receive():
+# Receive message from ArduMower - if available
+def ReceiveMowerMessage():
    global stateX, stateY
    global targetX, targetY
    global gpsX, gpsY
-   global clientAddr
-   msg = ""
-   try: 
-      (data, clientAddr) = UDPSock.recvfrom(bufsize)
-   except socket.error:
-      pass
-   else:   
-      #print (data.decode('utf-8'), end='', flush=True)      
-      msg = data.decode(encoding='UTF-8',errors='ignore')
-      #print (msg, end='', flush=True)
-      #print(clientAddr)
-      #if msg[0] == '0':
-      #   msg = ':' + msg
+   global logMessage
+   global logHeadline
+   
+   msg = ReceiveRaw()
+   if msg != "":
+      WriteLog("[am] " + msg)
       if msg[0] == ':':
          fields = msg.split()
          n=5
@@ -100,6 +109,11 @@ def receive():
          stateY = float(fields[n+3])
          gpsX = float(fields[n+5])
          gpsY = float(fields[n+6])
+         logMessage = msg[1:len(msg)-2]
+      elif msg[0] == '#':
+         logHeadline = msg[1:len(msg)-2]
+      elif msg[0] == '=':
+         PrintGuiMessage(msg[1:len(msg)-2])
    return msg
 
 def CheckSum(send_data):
@@ -130,9 +144,9 @@ def ExecCmd(cmd):
       # longer timeout for N, C and S commands
       if cmd[3]=="N" or cmd[3]=="C" or cmd[3]=="S" or cmd[3]=="R" or cmd[3]=="X" or cmd[3]=="W" or cmd[3]=="R": timeOutCounter = 20
       while True:
-         answer = receive()
+         answer = ReceiveMowerMessage()
          if answer != "":
-            WriteLog("[am] " + answer)
+            #WriteLog("[am] " + answer)
             if answer[0] == cmd[3]: 
                WriteLog("[udp.ExecCmd] Received answer: " + answer)
                return answer

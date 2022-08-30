@@ -116,6 +116,7 @@ def main():
       elif argc == 2 and cmd == "ps":     mower.PrintStatistics()
       elif argc == 2 and cmd == "cs":     mower.ClearStatistics()
       elif argc == 2 and cmd == "gs":     mower.GetSummary()
+      elif argc == 3 and cmd == "ugf":    mower.UploadGpsConfigFilter(sys.argv[2])
       else:
          print("Ardumower Command Line Tool")
          print("")
@@ -143,6 +144,7 @@ def main():
          print("       amcmd off                      # SwitchOffRobot")
          print("       amcmd ps                       # PrintStatistics")
          print("       amcmd cs                       # ClearStatistics")
+         print("       amcmd ugf \"10,10,30\"           # Upload GNSS Filter")
          print("       amcmd umap <mapId>             # UploadMap (<mapId>=1...10)")
          print("       amcmd rmap <mapId>             # ReadMapFromSdCard (<mapId>=1..10)")
          print("<file_pattern> can include the wild card * at the end")
