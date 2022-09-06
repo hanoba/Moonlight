@@ -243,7 +243,7 @@ bool loadState(){
   uint32_t marker = 0;
   stateFile.read((uint8_t*)&marker, sizeof(marker));
   maps.mapID = marker & 15;
-  if (maps.mapID==0 || maps.mapID > 10) maps.mapID==3;
+  if (maps.mapID==0 || maps.mapID > MAX_MAP_ID) maps.mapID==3;
   if ((marker & 0xFFFFfff0) != 0x10001000)
   {
     CONSOLE.print("ERROR: invalid marker: ");
@@ -307,7 +307,7 @@ bool saveState(){
     CONSOLE.println("ERROR opening file for writing");
     return false;
   }
-  if (maps.mapID==0 || maps.mapID > 10) maps.mapID==3;
+  if (maps.mapID==0 || maps.mapID > MAX_MAP_ID) maps.mapID==3;
   uint32_t marker = 0x10001000 | maps.mapID;
   res &= (stateFile.write((uint8_t*)&marker, sizeof(marker)) != 0); 
   res &= (stateFile.write((uint8_t*)&maps.mapCRC, sizeof(maps.mapCRC)) != 0); 
@@ -1058,14 +1058,14 @@ void detectObstacle()
    {
       if ( (millis() > linearMotionStartTime + 5000) && (bumper.obstacle()) )
       {  
-         CONSOLE.println("bumper obstacle!");    
+         CONSOLE.println("=bumper obstacle!");    
          statMowBumperCounter++;
          triggerObstacle();    
          return;
       }
    }
    if (sonar.obstacle() && (maps.wayMode != WAY_DOCK)){
-     CONSOLE.println("sonar obstacle!");    
+     CONSOLE.println("=sonar obstacle!");    
      statMowSonarCounter++;
      if (SONAR_TRIGGER_OBSTACLES){
        triggerObstacle();
@@ -1080,7 +1080,7 @@ void detectObstacle()
      float delta = sqrt( sq(dX) + sq(dY) );    
      if (delta < 0.05){
        if (GPS_MOTION_DETECTION){
-         CONSOLE.println("gps no motion => obstacle!");
+         CONSOLE.println("=gps no motion => obstacle!");
          statMowGPSMotionTimeoutCounter++;
          triggerObstacle();
          return;

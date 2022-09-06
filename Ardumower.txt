@@ -58,7 +58,6 @@
         <File name="amcp\date.py" />
         <File name="amcp\maps.py" />
         <File name="amcp\mower.py" />
-        <File name="amcp\msg.py" />
         <File name="amcp\plan.py" />
         <File name="amcp\send.py" />
         <File name="amcp\udp.py" />

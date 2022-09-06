@@ -15,6 +15,7 @@
 enum WayType {WAY_PERIMETER, WAY_EXCLUSION, WAY_DOCK, WAY_MOW, WAY_FREE};
 typedef enum WayType WayType;
 
+#define MAX_MAP_ID 15
 
 class Point
 {

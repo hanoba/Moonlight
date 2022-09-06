@@ -150,7 +150,7 @@ static void cmdReadMapFile(String cmd)
 {
    long mapCheckSum = 0;
    int mapId = cmd.substring(5).toInt();
-   if (mapId<1 || mapId>10)
+   if (mapId<1 || mapId>MAX_MAP_ID)
    {
       CONSOLE.print("Illegal MapId: ");
       CONSOLE.println(mapId);

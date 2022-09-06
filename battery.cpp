@@ -83,7 +83,7 @@ void Battery::resetIdle(){
 }
 
 void Battery::switchOff(){
-  CONSOLE.println("switching-off battery by operator...");
+  CONSOLE.println("=switching-off battery by operator...");
   switchOffByOperator = true;
 }
 
@@ -108,7 +108,7 @@ void Battery::run()
     if (!chargerConnectedState){
         if (chargingVoltage > 5){
         chargerConnectedState = true;
-            DEBUGLN(F("CHARGER CONNECTED"));
+            DEBUGLN(F("=CHARGER CONNECTED"));
         buzzer.sound(SND_OVERCURRENT, true);
         }
     }
@@ -120,19 +120,19 @@ void Battery::run()
             if (chargingVoltage <= 5){
                 chargerConnectedState = false;
                 nextEnableTime = millis() + 5000;    // reset charging enable time
-                DEBUGLN(F("CHARGER DISCONNECTED"));
+                DEBUGLN(F("=CHARGER DISCONNECTED"));
             }
         }
         timeMinutes = (millis()-chargingStartTime) / 1000 /60;
         if (underVoltage())
         {
-            DEBUGLN(F("SWITCHING OFF (undervoltage)"));
+            DEBUGLN(F("=SWITCHING OFF (undervoltage)"));
             buzzer.sound(SND_OVERCURRENT, true);
             if (switchOffAllowedUndervoltage)  batteryDriver.keepPowerOn(false);
         }
         else if ((millis() >= switchOffTime) || (switchOffByOperator)) 
         {
-            DEBUGLN(F("SWITCHING OFF (idle timeout)"));
+            DEBUGLN(F("=SWITCHING OFF (idle timeout)"));
             //HB buzzer.sound(SND_OVERCURRENT, true);
             if ((switchOffAllowedIdle) || (switchOffByOperator))
             {
