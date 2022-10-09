@@ -137,6 +137,9 @@
     <ClInclude Include="src\mpu\SparkFunMPU9250-DMP.h">
       <Filter>src\mpu</Filter>
     </ClInclude>
+    <ClInclude Include="LineTracker.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="battery.cpp">
@@ -219,6 +222,9 @@
     </ClCompile>
     <ClCompile Include="src\mpu\SparkFunMPU9250-DMP.cpp">
       <Filter>src\mpu</Filter>
+    </ClCompile>
+    <ClCompile Include="LineTracker.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include <SD.h>
 
 #include "robot.h"
+#include "LineTracker.h"
 #include "comm.h"
 #include "src/esp/WiFiEsp.h"
 #include "src/mpu/SparkFunMPU9250-DMP.h"
@@ -88,7 +89,7 @@ float stateDeltaIMU = 0;
 float stateGroundSpeed = 0; // m/s
 float stateTemp = 0; // degreeC
 float stateHumidity = 0; // percent
-float setSpeed = 0.1; // linear speed (m/s)
+
 unsigned long stateLeftTicks = 0;
 unsigned long stateRightTicks = 0;
 unsigned long lastFixTime = 0;
@@ -98,10 +99,6 @@ double absolutePosSourceLon = 0;
 double absolutePosSourceLat = 0;
 bool finishAndRestart = false;
 bool resetLastPos = true;
-bool rotateLeft = false;
-bool rotateRight = false;
-bool angleToTargetFits = false;
-bool targetReached = false;
 bool stateChargerConnected = false;
 bool imuIsCalibrating = false;
 int imuCalibrationSeconds = 0;
@@ -634,7 +631,7 @@ void readIMU(){
       {
          CONSOLE.print("Steigung: ");
          CONSOLE.print(pitchSum/maxPitchCnt);
-         CONSOLE.println("°");
+         CONSOLE.println("Â°");
          pitchCnt = 0;
          pitchSum = 0;
       }
@@ -1103,190 +1100,6 @@ void detectObstacle()
      lastGPSMotionY = stateY;      
    }    
 }
-
-
-// control robot velocity (linear,angular) to track line to next waypoint (target)
-// uses a stanley controller for line tracking
-// https://medium.com/@dingyan7361/three-methods-of-vehicle-lateral-control-pure-pursuit-stanley-and-mpc-db8cc1d32081
-void trackLine(){  
-  Point target = maps.targetPoint;
-  Point lastTarget = maps.lastTargetPoint;
-  float linear = 1.0;  
-  bool mow = true;
-  if (stateOp == OP_DOCK) mow = false;
-  float angular = 0;      
-  float targetDelta = pointsAngle(stateX, stateY, target.x(), target.y());      
-  if (maps.trackReverse) targetDelta = scalePI(targetDelta + PI);
-  targetDelta = scalePIangles(targetDelta, stateDelta);
-  float diffDelta = distancePI(stateDelta, targetDelta);                         
-  float lateralError = distanceLineInfinite(stateX, stateY, lastTarget.x(), lastTarget.y(), target.x(), target.y());        
-  float distToPath = distanceLine(stateX, stateY, lastTarget.x(), lastTarget.y(), target.x(), target.y());        
-  float targetDist = maps.distanceToTargetPoint(stateX, stateY);
-  
-  float lastTargetDist = maps.distanceToLastTargetPoint(stateX, stateY);  
-  if (SMOOTH_CURVES)
-    targetReached = (targetDist < 0.2);    
-  else 
-    targetReached = (targetDist < 0.05);    
-  
-  
-  if ( (motor.motorLeftOverload) || (motor.motorRightOverload) || (motor.motorMowOverload) ){
-    linear = 0.1;  
-  }   
-  
-  if (KIDNAP_DETECT){
-    if (fabs(distToPath) > 1.0){ // actually, this should not happen (except something strange is going on...)
-      CONSOLE.println("kidnapped!");
-      stateSensor = SENS_KIDNAPPED;
-      setOperation(OP_ERROR);
-      buzzer.sound(SND_ERROR, true);        
-      return;
-   }
-  }
-          
-  // allow rotations only near last or next waypoint or if too far away from path
-  if ( (targetDist < 0.5) || (lastTargetDist < 0.5) ||  (fabs(distToPath) > 0.5) ) {
-    if (SMOOTH_CURVES)
-      angleToTargetFits = (fabs(diffDelta)/PI*180.0 < 120);          
-    else     
-      angleToTargetFits = (fabs(diffDelta)/PI*180.0 < 20);   
-  } else angleToTargetFits = true;
-
-               
-  if (!angleToTargetFits){
-    // angular control (if angle to far away, rotate to next waypoint)
-    linear = 0;
-    angular = 0.5;               
-    if ((!rotateLeft) && (!rotateRight)){ // decide for one rotation direction (and keep it)
-      if (diffDelta < 0) rotateLeft = true;
-        else rotateRight = true;
-    }        
-    if (rotateLeft) angular *= -1;            
-    if (fabs(diffDelta)/PI*180.0 < 90){
-      rotateLeft = false;  // reset rotate direction
-      rotateRight = false;
-    }
-  } 
-  else {
-    // line control (stanley)
-    bool straight = maps.nextPointIsStraight();
-    if (maps.trackSlow) {
-      // planner forces slow tracking (e.g. docking etc)
-      linear = 0.1;           
-    } else if (     ((setSpeed > 0.2) && (maps.distanceToTargetPoint(stateX, stateY) < 0.5) && (!straight))   // approaching
-          || ((linearMotionStartTime != 0) && (millis() < linearMotionStartTime + 3000))                      // leaving  
-       ) 
-    {
-      linear = 0.1; // reduce speed when approaching/leaving waypoints          
-    } 
-    else {
-      if (gps.solution == UBLOX::SOL_FLOAT)        
-         //HB linear = min(setSpeed, 0.1); // reduce speed for float solution
-         linear = max(setSpeed/2, 0.2); // reduce speed for float solution
-      else
-        linear = setSpeed;         // desired speed
-      if (sonar.nearObstacle()) linear = 0.1; // slow down near obstacles
-    }      
-    //angular = 3.0 * diffDelta + 3.0 * lateralError;       // correct for path errors 
-    float k = STANLEY_CONTROL_K_NORMAL;
-    if (maps.trackSlow) k = STANLEY_CONTROL_K_SLOW;   
-    angular = diffDelta + atan2(k * lateralError, (0.001 + fabs(motor.linearSpeedSet)));       // correct for path errors           
-    /*pidLine.w = 0;              
-    pidLine.x = lateralError;
-    pidLine.max_output = PI;
-    pidLine.y_min = -PI;
-    pidLine.y_max = PI;
-    pidLine.compute();
-    angular = -pidLine.y;   */
-    //CONSOLE.print(lateralError);        
-    //CONSOLE.print(",");        
-    //CONSOLE.println(angular/PI*180.0);            
-    if (maps.trackReverse) linear *= -1;   // reverse line tracking needs negative speed
-    if (!SMOOTH_CURVES) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
-    //if (SMOOTH_CURVES) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
-    //else  angular = max(-PI/16, min(PI/16, angular));
-  }
-  if (fixTimeout != 0){
-    if (millis() > lastFixTime + fixTimeout * 1000.0){
-      // stop on fix solution timeout (fixme: optionally: turn on place if fix-timeout)
-      linear = 0;
-      angular = 0;
-      mow = false; 
-      stateSensor = SENS_GPS_FIX_TIMEOUT;
-      //angular = 0.2;
-    } else {
-      if (stateSensor == SENS_GPS_FIX_TIMEOUT) stateSensor = SENS_NONE; // clear fix timeout
-    }       
-  }     
-  
-  if ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT)){        
-    if (linear > 0.06) {
-      if ((millis() > linearMotionStartTime + 5000) && (stateGroundSpeed < 0.03)){
-        // if in linear motion and not enough ground speed => obstacle
-        if (GPS_SPEED_DETECTION){
-          CONSOLE.println("gps no speed => obstacle!");
-          triggerObstacle();
-          return;
-        }
-      }
-    }  
-  } else {
-    // no gps solution
-    if (REQUIRE_VALID_GPS){
-      if (!maps.isUndocking()) { 
-        //CONSOLE.println("no gps solution!");
-        stateSensor = SENS_GPS_INVALID;
-        //setOperation(OP_ERROR);
-        //buzzer.sound(SND_STUCK, true);          
-        linear = 0;
-        angular = 0;      
-        mow = false;
-      } 
-    }
-  }
-   
-  if (mow)  {  // wait until mowing motor is running
-    if (millis() < motor.motorMowSpinUpTime + 5000){
-      if (!buzzer.isPlaying()) buzzer.sound(SND_WARNING, true);
-      linear = 0;
-      angular = 0;   
-    }
-  }
-
-  if (abs(linear) < 0.01){
-    resetLinearMotionMeasurement();
-  }
-
-  motor.setLinearAngularSpeed(linear, angular);      
-  motor.setMowState(mow);
-   
-  if (targetReached){
-    if (maps.wayMode == WAY_MOW){
-      maps.clearObstacles(); // clear obstacles if target reached
-    }
-    bool straight = maps.nextPointIsStraight();
-    if (!maps.nextPoint(false)){
-      // finish        
-      if (stateOp == OP_DOCK){
-        CONSOLE.println("docking finished!");
-        setOperation(OP_IDLE); 
-      } else {
-        CONSOLE.println("mowing finished!");
-        if (!finishAndRestart){             
-          if (DOCKING_STATION){
-            setOperation(OP_DOCK);               
-          } else {
-            setOperation(OP_IDLE); 
-          }
-        }                   
-      }
-    } else {      
-      // next waypoint          
-      //if (!straight) angleToTargetFits = false;      
-    }
-  }  
-}
-
 
 
 // robot main loop

@@ -167,6 +167,7 @@ class Map
     bool setWayCount(WayType type, int count);
     // set number points for exclusion 
     bool setExclusionLength(int idx, int len);
+    bool checkpoint(float x, float y);
     // choose progress (0..100%) in mowing point list
     void setMowingPointPercent(float perc);
     // skip next mowing point

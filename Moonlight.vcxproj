@@ -133,6 +133,7 @@
     <ClInclude Include="helper.h" />
     <ClInclude Include="helper_3dmath.h" />
     <ClInclude Include="i2c.h" />
+    <ClInclude Include="LineTracker.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="motor.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="fix_display.cpp" />
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="i2c.cpp" />
+    <ClCompile Include="LineTracker.cpp" />
     <ClCompile Include="map.cpp" />
     <ClCompile Include="motor.cpp" />
     <ClCompile Include="pid.cpp" />

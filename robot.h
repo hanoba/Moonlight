@@ -78,6 +78,8 @@ extern bool absolutePosSource;
 extern double absolutePosSourceLon;
 extern double absolutePosSourceLat;
 
+extern unsigned long linearMotionStartTime;
+
 extern unsigned long statIdleDuration; // seconds
 extern unsigned long statChargeDuration; // seconds
 extern unsigned long statMowDuration ; // seconds
@@ -143,6 +145,7 @@ void run();
 void setOperation(OperationType op, bool allowRepeat = false, bool initiatedbyOperator = false);
 void triggerObstacle();
 void sensorTest();
+void resetLinearMotionMeasurement();
 
 
 #endif
