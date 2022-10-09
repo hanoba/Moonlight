@@ -148,8 +148,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #define MOW_OVERLOAD_CURRENT 2.0    // mowing motor overload current (amps)
 
 // should the direction of mowing motor toggle each start? (yes: true, no: false)
-#define MOW_TOGGLE_DIR       true
-//#define MOW_TOGGLE_DIR       false
+//#define MOW_TOGGLE_DIR       true
+#define MOW_TOGGLE_DIR       false
 
 // should the motor overload detection be enabled?
 //#define ENABLE_OVERLOAD_DETECTION  true

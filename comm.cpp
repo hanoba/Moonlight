@@ -631,13 +631,22 @@ void cmdToggleUseGPSfloatForDeltaEstimationEstimation()
     CONSOLE.println(USE_GPS_FLOAT_FOR_DELTA_ESTIMATION);
 }
 
-void cmdToggleGpsLogging()
+void cmdToggleGpsLogging()    //HB disabled
 {
     String s = F("YG");
     cmdAnswer(s);
     gps.verbose = !gps.verbose;
     CONSOLE.print("gps.verbose = ");
     CONSOLE.println(gps.verbose);
+}
+
+void cmdToggleUpHillDetectionFlag()
+{
+    String s = F("YG");
+    cmdAnswer(s);
+    upHillDetectionFlag = !upHillDetectionFlag;
+    CONSOLE.print("=upHillDetectionFlag = ");
+    CONSOLE.println(upHillDetectionFlag);
 }
 
 // toggle GPS solution (invalid,float,fix) for testing
@@ -894,7 +903,8 @@ void processCmd(bool checkCrc, String cmd)
          if (cmd[4] == 'R') cmdGNSSHardReset();
          if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
          if (cmd[4] == 'F') cmdToggleEnablePathFinder();
-         if (cmd[4] == 'G') cmdToggleGpsLogging();
+         //HB if (cmd[4] == 'G') cmdToggleGpsLogging();
+         if (cmd[4] == 'G') cmdToggleUpHillDetectionFlag();
          if (cmd[4] == 'P') cmdToggleUseGPSfloatForPosEstimation();
          if (cmd[4] == 'S') cmdToggleSmoothCurves();
          if (cmd[4] == '6') cmdPing();
@@ -1170,7 +1180,7 @@ void outputConsole()
     //unsigned long min = totalmins % 60;
     //unsigned long sec = totalsecs % 60;
     static int headLineCnt = 0;
-    if (headLineCnt == 0) CONSOLE.println(F("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags  Map  WayPts "));
+    if (headLineCnt == 0) CONSOLE.println(F("#Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy   Pitch    Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags  Map  WayPts "));
     headLineCnt = headLineCnt + 1 & 7;
     //PRINT(":%02d:", hour);
     //PRINT("%02d:", min);
@@ -1249,7 +1259,9 @@ void outputConsole()
        PRINT(" %6.2f", gps.relPosE);
        PRINT(" %6.2f", gps.relPosN);
     }
-    PRINT(" %5.0f°", gps.relPosD*DEGREE);
+    //PRINT(" %5.0f°", gps.relPosD*DEGREE);
+    PRINT(" %5.0f°", maxPitch*180.0/PI);
+    maxPitch = -PI;  // reset for next logging output
 
 	 float gps_height = gps.height - 412;		// 412m ist ungefähr die minimale Höhe des Gartens
 	 gps_height = min(gps_height, 99.99);

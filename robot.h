@@ -26,7 +26,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.46 HB 2022-10-08"
+#define VER "Ardumower Moonlight, V168.47 HB 2022-10-09"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 5000
@@ -101,6 +101,10 @@ extern float statTempMin;
 extern float statTempMax;
 extern float stateTemp;     //HB degreeC
 extern float stateHumidity; //HB percent
+
+extern float maxPitch;     //HB Used for patch display only
+extern bool upHillFlag;  //HB vermeiden, dass Mower kippt bei grossen Steigungen
+extern bool upHillDetectionFlag;
 
 extern unsigned long lastFixTime;
 extern float stateGroundSpeed; // m/s

@@ -109,6 +109,10 @@ float lastGPSMotionX = 0;
 float lastGPSMotionY = 0;
 unsigned long nextGPSMotionCheckTime = 0;
 
+float maxPitch = -PI;      //HB Used for pitch display only
+bool upHillFlag = false;   //HB vermeiden, dass Mower kippt bei grossen Steigungen
+bool upHillDetectionFlag = false;
+
 UBLOX::SolType lastSolution = UBLOX::SOL_INVALID;    
 unsigned long nextStatTime = 0;
 unsigned long nextToFTime = 0;
@@ -614,9 +618,6 @@ void readIMU(){
     // Use dmpUpdateFifo to update the ax, gx, mx, etc. values
     if ( imu.dmpUpdateFifo() == INV_SUCCESS)
     {      
-      static const int maxPitchCnt = 4;
-      static int pitchCnt = 0;
-      static int pitchSum;
       // computeEulerAngles can be used -- after updating the
       // quaternion values -- to estimate roll, pitch, and yaw
       //  toEulerianAngle(imu.calcQuat(imu.qw), imu.calcQuat(imu.qx), imu.calcQuat(imu.qy), imu.calcQuat(imu.qz), imu.roll, imu.pitch, imu.yaw);
@@ -626,6 +627,10 @@ void readIMU(){
       //CONSOLE.print(imu.ay);
       //CONSOLE.print(",");
       //CONSOLE.println(imu.az);
+#if 0
+      static const int maxPitchCnt = 4;
+      static int pitchCnt = 0;
+      static int pitchSum;
       pitchSum += (int) (scalePI(imu.pitch)*180.0/PI);
       if (++pitchCnt == maxPitchCnt)
       {
@@ -635,6 +640,7 @@ void readIMU(){
          pitchCnt = 0;
          pitchSum = 0;
       }
+#endif
       #ifdef ENABLE_TILT_DETECTION
         rollChange += (imu.roll-stateRoll);
         pitchChange += (imu.pitch-statePitch);               
@@ -663,6 +669,20 @@ void readIMU(){
         }           
       #endif
       motor.robotPitch = scalePI(imu.pitch);
+      maxPitch = max(maxPitch, motor.robotPitch);
+      if (upHillDetectionFlag)
+      {
+         static const float pitchHiThreshold = 10.0 / 180.0 *PI;
+         static const float pitchLoThreshold =  5.0 / 180.0 *PI;
+         bool lastupHillFlag = upHillFlag;
+         upHillFlag = motor.robotPitch > (upHillFlag ? pitchLoThreshold : pitchHiThreshold);    //HB Hysterese
+         if (lastupHillFlag != upHillFlag) 
+         {
+            CONSOLE.print("=Steigung=");
+            CONSOLE.println(upHillFlag);
+         }
+      }
+      else upHillFlag = false;
       imu.yaw = scalePI(imu.yaw);
       //CONSOLE.println(imu.yaw / PI * 180.0);
       lastIMUYaw = scalePI(lastIMUYaw);
