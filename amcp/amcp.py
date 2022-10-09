@@ -60,6 +60,7 @@ def SetCurrentMapIndex(index):
     showCurrentWayPoints = False
     currentMapChecksum = maps.ComputeMapChecksum(currentMapIndex)
     r = 0
+    PrintGuiMessage("MAP" + str(currentMapIndex+1) + " selected")
 
 def PrintMouseDistance():
    pos = pygame.mouse.get_pos()
@@ -409,7 +410,7 @@ def ArdumowerControlProgram():
                   elif event.key == pygame.K_i:
                      mower.StopMowing()
                   elif event.key == pygame.K_m:
-                     mower.StartMowing()
+                     CmdStartMowing()
                   elif event.key == pygame.K_o:
                      mower.SwitchOffRobot()
                   #elif event.key == pygame.K_p:
@@ -596,6 +597,7 @@ def CmdShowHideMainMenu():
 def CmdToggleShowWaypoints():
    global showCurrentWayPoints
    showCurrentWayPoints = not showCurrentWayPoints
+   PrintGuiMessage("Show waypoints = " + str(showCurrentWayPoints))
 
 def CmdReadMapFromSdCard():
    mapId = currentMapIndex + 1

@@ -21,6 +21,9 @@
     <Filter Include="Maps">
       <UniqueIdentifier>{847221e3-f6fc-4c15-bdd5-42a4e190d2e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\mpu">
+      <UniqueIdentifier>{fdf59694-8f8d-48cd-a8d6-d91bfa97bf02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battery.h">
@@ -131,6 +134,9 @@
     <ClInclude Include="..\..\..\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h">
       <Filter>ArduinoLib</Filter>
     </ClInclude>
+    <ClInclude Include="src\mpu\SparkFunMPU9250-DMP.h">
+      <Filter>src\mpu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="battery.cpp">
@@ -210,6 +216,9 @@
     </ClCompile>
     <ClCompile Include="fix_display.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpu\SparkFunMPU9250-DMP.cpp">
+      <Filter>src\mpu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -202,6 +202,7 @@ void UBLOX::reboot(){
   ttffFlag = false;
   ttffValue = 0;
   ttffStart = millis();
+  dgpsAge = ttffStart;
 }
 
 void UBLOX::HardReset(){

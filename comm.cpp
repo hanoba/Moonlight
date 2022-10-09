@@ -525,7 +525,7 @@ void cmdTriggerWatchdog(){
 void cmdGNSSReboot(){
   String s = F("Y2");
   cmdAnswer(s);
-  CONSOLE.println("=GNSS reboot");
+  CONSOLE.println("=GNSS Warm Start");
   gps.reboot();
 }
 
@@ -534,7 +534,7 @@ void cmdGNSSHardReset()
 {
   String s = F("YR");
   cmdAnswer(s);
-  CONSOLE.println("=GNSS Hardware Reset");
+  CONSOLE.println("=GNSS Cold Start");
   gps.HardReset();
 }
 
@@ -563,7 +563,6 @@ void cmdTriggerRaspiShutdown()
     batteryDriver.raspiShutdown();
 }
 
-
 void cmdStartUploadMap(String cmd)
 {
    if (cmd.length()<6) return;
@@ -585,7 +584,6 @@ void cmdStartUploadMap(String cmd)
    cmdAnswer(s);
 }
 
-
 void cmdToggleUseIMU()
 {
     String s = F("YI");
@@ -595,7 +593,6 @@ void cmdToggleUseIMU()
     CONSOLE.println(USE_IMU);
 }
 
-
 void cmdToggleSmoothCurves()
 {
     String s = F("YS");
@@ -604,7 +601,6 @@ void cmdToggleSmoothCurves()
     CONSOLE.print("=SMOOTH_CURVES = ");
     CONSOLE.println(SMOOTH_CURVES);
 }
-
 
 void cmdToggleEnablePathFinder()
 {
@@ -672,13 +668,11 @@ void cmdToggleGPSSolution(){
   }
 }
 
-
 void cmdPing()
 {
     String s = F("Y6");
     cmdAnswer(s);
 }
-
 
 // request summary
 void cmdSummary(){

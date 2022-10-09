@@ -208,7 +208,8 @@ void SFE_UBLOX_GPS::hardReset()
   packetCfg.startingSpot = 0;
   payloadCfg[0] = 0xff;       // cold start
   payloadCfg[1] = 0xff;       // cold start
-  payloadCfg[2] = 0;          // 0=HW reset
+  //HB payloadCfg[2] = 0;          // 0=HW reset
+  payloadCfg[2] = 0x02;       // 0x02=software reset (GNSS only)
   payloadCfg[3] = 0;          // reserved
   sendCommand(&packetCfg, 0); // don't expect ACK
 }

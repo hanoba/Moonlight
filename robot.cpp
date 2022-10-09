@@ -596,10 +596,11 @@ void readIMU(){
   //CONSOLE.print("duration:");
   //CONSOLE.println(duration);  
   if ((duration > 10) || (millis() > imuDataTimeout)) {
+    setOperation(OP_ERROR);
     if (millis() > imuDataTimeout){
-      CONSOLE.println("ERROR IMU data timeout");  
+      CONSOLE.println("=ERROR IMU data timeout");  
     } else {
-      CONSOLE.print("ERROR IMU timeout: ");
+      CONSOLE.print("=ERROR IMU timeout: ");
       CONSOLE.println(duration);          
     }
     stateSensor = SENS_IMU_TIMEOUT;
@@ -616,6 +617,9 @@ void readIMU(){
     // Use dmpUpdateFifo to update the ax, gx, mx, etc. values
     if ( imu.dmpUpdateFifo() == INV_SUCCESS)
     {      
+      static const int maxPitchCnt = 4;
+      static int pitchCnt = 0;
+      static int pitchSum;
       // computeEulerAngles can be used -- after updating the
       // quaternion values -- to estimate roll, pitch, and yaw
       //  toEulerianAngle(imu.calcQuat(imu.qw), imu.calcQuat(imu.qx), imu.calcQuat(imu.qy), imu.calcQuat(imu.qz), imu.roll, imu.pitch, imu.yaw);
@@ -625,6 +629,15 @@ void readIMU(){
       //CONSOLE.print(imu.ay);
       //CONSOLE.print(",");
       //CONSOLE.println(imu.az);
+      pitchSum += (int) (scalePI(imu.pitch)*180.0/PI);
+      if (++pitchCnt == maxPitchCnt)
+      {
+         CONSOLE.print("Steigung: ");
+         CONSOLE.print(pitchSum/maxPitchCnt);
+         CONSOLE.println("°");
+         pitchCnt = 0;
+         pitchSum = 0;
+      }
       #ifdef ENABLE_TILT_DETECTION
         rollChange += (imu.roll-stateRoll);
         pitchChange += (imu.pitch-statePitch);               
