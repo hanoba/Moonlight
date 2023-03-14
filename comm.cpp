@@ -522,20 +522,20 @@ void cmdTriggerWatchdog(){
 }
 
 // perform hang test (watchdog should trigger)
-void cmdGNSSReboot(){
+void cmdGnssWarmRestart(){
   String s = F("Y2");
   cmdAnswer(s);
-  CONSOLE.println("=GNSS Warm Start");
-  gps.reboot();
+  CONSOLE.println("=GNSS Warm Restart");
+  gps.WarmRestart();
 }
 
 // perform hang test (watchdog should trigger)
-void cmdGNSSHardReset()
+void cmdGnssColdRestart()
 {
   String s = F("YR");
   cmdAnswer(s);
-  CONSOLE.println("=GNSS Cold Start");
-  gps.HardReset();
+  CONSOLE.println("=GNSS Cold Restart");
+  gps.ColdRestart();
 }
 
 // switch-off robot
@@ -895,12 +895,12 @@ void processCmd(bool checkCrc, String cmd)
       } 
       else 
       {
-         if (cmd[4] == '2') cmdGNSSReboot();   // for developers
+         if (cmd[4] == '2') cmdGnssWarmRestart();   // for developers
          if (cmd[4] == '3') cmdSwitchOffRobot();   // for developers
          if (cmd[4] == '4') cmdTriggerRaspiShutdown();   // for developers
          if (cmd[4] == '5') cmdToggleBluetoothLoggingFlag();   // for developers
          if (cmd[4] == '6') cmdPing();
-         if (cmd[4] == 'R') cmdGNSSHardReset();
+         if (cmd[4] == 'R') cmdGnssColdRestart();
          if (cmd[4] == 'D') cmdToggleUseGPSfloatForDeltaEstimationEstimation();
          if (cmd[4] == 'F') cmdToggleEnablePathFinder();
          //HB if (cmd[4] == 'G') cmdToggleGpsLogging();

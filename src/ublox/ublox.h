@@ -74,8 +74,8 @@ class UBLOX{
     void run();
     bool configure();
     bool SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0);
-    void reboot();
-    void HardReset();
+    void WarmRestart();
+    void ColdRestart();
   private:
     uint32_t _baud;  	
     HardwareSerial* _bus;

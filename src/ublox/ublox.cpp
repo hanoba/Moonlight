@@ -194,10 +194,10 @@ void UBLOX::begin()
   ttffStart = millis();
 }
 
-void UBLOX::reboot(){
-  CONSOLE.println("rebooting GPS receiver...");
+void UBLOX::WarmRestart(){
+  //CONSOLE.println("rebooting GPS receiver...");
   //configGPS.hardReset();
-  configGPS.GNSSRestart();
+  configGPS.GnssWarmRestart();
 
   ttffFlag = false;
   ttffValue = 0;
@@ -205,10 +205,14 @@ void UBLOX::reboot(){
   dgpsAge = ttffStart;
 }
 
-void UBLOX::HardReset(){
-  CONSOLE.println("Hard reset of GPS receiver...");
-  configGPS.hardReset();
-  configure();
+void UBLOX::ColdRestart(){
+  //CONSOLE.println("Hard reset of GPS receiver...");
+  configGPS.GnssColdRestart();
+
+  ttffFlag = false;
+  ttffValue = 0;
+  ttffStart = millis();
+  dgpsAge = ttffStart;
 }
 
 void UBLOX::parse(int b)

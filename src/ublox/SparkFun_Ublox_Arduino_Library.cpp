@@ -208,13 +208,12 @@ void SFE_UBLOX_GPS::hardReset()
   packetCfg.startingSpot = 0;
   payloadCfg[0] = 0xff;       // cold start
   payloadCfg[1] = 0xff;       // cold start
-  //HB payloadCfg[2] = 0;          // 0=HW reset
-  payloadCfg[2] = 0x02;       // 0x02=software reset (GNSS only)
+  payloadCfg[2] = 0;          // 0=HW reset
   payloadCfg[3] = 0;          // reserved
   sendCommand(&packetCfg, 0); // don't expect ACK
 }
 
-void SFE_UBLOX_GPS::GNSSRestart()
+void SFE_UBLOX_GPS::GnssWarmRestart()
 {
   // Issue hard reset
   packetCfg.cls = UBX_CLASS_CFG;
@@ -223,6 +222,20 @@ void SFE_UBLOX_GPS::GNSSRestart()
   packetCfg.startingSpot = 0;
   payloadCfg[0] = 0x00;       // warm start
   payloadCfg[1] = 0x00;       // warm start
+  payloadCfg[2] = 0x02;       // 0x02=software reset (GNSS only)
+  payloadCfg[3] = 0;          // reserved
+  sendCommand(&packetCfg, 0); // don't expect ACK
+}
+
+void SFE_UBLOX_GPS::GnssColdRestart()
+{
+  // Issue hard reset
+  packetCfg.cls = UBX_CLASS_CFG;
+  packetCfg.id = UBX_CFG_RST;
+  packetCfg.len = 4;
+  packetCfg.startingSpot = 0;
+  payloadCfg[0] = 0xff;       // cold start
+  payloadCfg[1] = 0xff;       // cold start
   payloadCfg[2] = 0x02;       // 0x02=software reset (GNSS only)
   payloadCfg[3] = 0;          // reserved
   sendCommand(&packetCfg, 0); // don't expect ACK

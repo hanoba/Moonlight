@@ -14,3 +14,7 @@ amcp/maps_save.json
 amcp/tmp.json
 src/driver/AmRobotDriver.cpp.bak
 src/driver/AmRobotDriver.h.bak
+*.bak
+mist/
+amcp/Messreihe/
+amcp/maps - Kopie.json

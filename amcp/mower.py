@@ -44,8 +44,8 @@ CMD_KidnappingTest = "AT+K"
 CMD_StopMowing = "AT+C,-1,0,-1,-1,-1,-1,-1,-1"
 CMD_StressTest = "AT+Z"
 CMD_TriggerWatchdogTest = "AT+Y"
-CMD_GnssReboot = "AT+Y2"
-CMD_GnssHardwareReset = "AT+YR"
+CMD_GnssWarmReboot = "AT+Y2"
+CMD_GnssColdReboot = "AT+YR"
 CMD_SwitchOffRobot = "AT+Y3"
 CMD_TriggerRaspiShutdown = "AT+Y4"
 CMD_ToggleBluetoothLogging = "AT+Y5"
@@ -155,11 +155,11 @@ def GetVersionNumber():
    if result != "": 
       PrintGuiMessage(result[2:len(result)-7])
 
-def GnssReboot():
-   udp.ExecCmd(CMD_GnssReboot)
+def GnssWarmReboot():
+   udp.ExecCmd(CMD_GnssWarmReboot)
 
-def GnssHardwareReset():
-   udp.ExecCmd(CMD_GnssHardwareReset)
+def GnssColdReboot():
+   udp.ExecCmd(CMD_GnssColdReboot)
 
 def ToggleBluetoothLogging():
    udp.ExecCmd(CMD_ToggleBluetoothLogging)

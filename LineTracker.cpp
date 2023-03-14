@@ -1,3 +1,9 @@
+// Ardumower Sunray 
+// Copyright (c) 2013-2020 by Alexander Grau, Grau GmbH
+// Licensed GPLv3 for open source use
+// or Grau GmbH Commercial License for commercial use (http://grauonline.de/cms2/?page_id=153)
+
+
 #include "LineTracker.h"
 #include "robot.h"
 //#include "StateEstimator.h"
@@ -9,16 +15,24 @@
 //PID pidAngle(2, 0.1, 0);  // not used
 Polygon circle(8);
 
+float stanleyTrackingNormalK = STANLEY_CONTROL_K_NORMAL;
+float stanleyTrackingNormalP = STANLEY_CONTROL_P_NORMAL;    
+float stanleyTrackingSlowK = STANLEY_CONTROL_K_SLOW;
+float stanleyTrackingSlowP = STANLEY_CONTROL_P_SLOW;    
 
 float setSpeed = 0.1; // linear speed (m/s)
+Point last_rotation_target;
 bool rotateLeft = false;
 bool rotateRight = false;
 bool angleToTargetFits = false;
+bool langleToTargetFits = false;
 bool targetReached = false;
 float trackerDiffDelta = 0;
 bool stateKidnapped = false;
 bool printmotoroverload = false;
 bool trackerDiffDelta_positive = false;
+
+float lateralError = 0; // lateral error
 
 int get_turn_direction_preference() {
   Point target = maps.targetPoint;
@@ -108,8 +122,8 @@ void trackLine(){
   float targetDelta = pointsAngle(stateX, stateY, target.x(), target.y());      
   if (maps.trackReverse) targetDelta = scalePI(targetDelta + PI);
   targetDelta = scalePIangles(targetDelta, stateDelta);
-  float diffDelta = distancePI(stateDelta, targetDelta);                         
-  float lateralError = distanceLineInfinite(stateX, stateY, lastTarget.x(), lastTarget.y(), target.x(), target.y());        
+  trackerDiffDelta = distancePI(stateDelta, targetDelta);                         
+  lateralError = distanceLineInfinite(stateX, stateY, lastTarget.x(), lastTarget.y(), target.x(), target.y());        
   float distToPath = distanceLine(stateX, stateY, lastTarget.x(), lastTarget.y(), target.x(), target.y());        
   float targetDist = maps.distanceToTargetPoint(stateX, stateY);
   
@@ -119,48 +133,74 @@ void trackLine(){
   else 
     targetReached = (targetDist < 0.05);    
   
-  
-  if ( (motor.motorLeftOverload) || (motor.motorRightOverload) || (motor.motorMowOverload) ){
-    linear = 0.1;  
-  }   
-  
-  if (KIDNAP_DETECT){
-    if (fabs(distToPath) > 1.0){ // actually, this should not happen (except something strange is going on...)
-      CONSOLE.println("kidnapped!");
-      stateSensor = SENS_KIDNAPPED;
-      setOperation(OP_ERROR);
-      buzzer.sound(SND_ERROR, true);        
-      return;
-   }
+  if ( (last_rotation_target.x() != target.x() || last_rotation_target.y() != target.y()) &&
+        (rotateLeft || rotateRight ) ) {
+    // CONSOLE.println("reset left / right rot (target point changed)");
+    rotateLeft = false;
+    rotateRight = false;
   }
           
   // allow rotations only near last or next waypoint or if too far away from path
-  if ( (targetDist < 0.5) || (lastTargetDist < 0.5) ||  (fabs(distToPath) > 0.5) ) {
+  // it might race between rotating mower and targetDist check below
+  // if we race we still have rotateLeft or rotateRight true
+  if ( (targetDist < 0.5) || (lastTargetDist < 0.5) || (fabs(distToPath) > 0.5) ||
+       rotateLeft || rotateRight ) {
     if (SMOOTH_CURVES)
-      angleToTargetFits = (fabs(diffDelta)/PI*180.0 < 120);          
+      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 120);
     else     
-      angleToTargetFits = (fabs(diffDelta)/PI*180.0 < 20);   
-  } else angleToTargetFits = true;
-
+      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 20);
+  } else {
+     angleToTargetFits = true;
+  }
                
   if (!angleToTargetFits){
     // angular control (if angle to far away, rotate to next waypoint)
     linear = 0;
     angular = 0.5;               
     if ((!rotateLeft) && (!rotateRight)){ // decide for one rotation direction (and keep it)
-      if (diffDelta < 0) rotateLeft = true;
-        else rotateRight = true;
+      int r = 0;
+      // no idea but don't work in reverse mode...
+      if (!maps.trackReverse) {
+        r = get_turn_direction_preference();
     }        
-    if (rotateLeft) angular *= -1;            
-    if (fabs(diffDelta)/PI*180.0 < 90){
-      rotateLeft = false;  // reset rotate direction
+      // store last_rotation_target point
+      last_rotation_target.setXY(target.x(), target.y());
+      
+      if (r == 1) {
+        //CONSOLE.println("force turn right");
+        rotateLeft = false;
+        rotateRight = true;
+      }
+      else if (r == -1) {
+        //CONSOLE.println("force turn left");
+        rotateLeft = true;
       rotateRight = false;
     }
+      else if (trackerDiffDelta < 0) {
+        rotateRight = true;
+      } else {
+        rotateLeft = true;
+      }
+
+      trackerDiffDelta_positive = (trackerDiffDelta >= 0);
+    }        
+    if (trackerDiffDelta_positive != (trackerDiffDelta >= 0)) {
+      CONSOLE.println("reset left / right rotation - DiffDelta overflow");
+      rotateLeft = false;
+      rotateRight = false;
+      // reverse rotation (*-1) - slowly rotate back
+      angular = 10.0 / 180.0 * PI * -1; //  10 degree/s (0.19 rad/s);               
+    }
+    if (rotateRight) angular *= -1;
   } 
   else {
     // line control (stanley)
     bool straight = maps.nextPointIsStraight();
-    if (maps.trackSlow) {
+    bool trackslow_allowed = true;
+
+    rotateLeft = false;
+    rotateRight = false;
+    if (maps.trackSlow && trackslow_allowed) {
       // planner forces slow tracking (e.g. docking etc)
       linear = 0.1;           
     } else if (     ((setSpeed > 0.2) && (maps.distanceToTargetPoint(stateX, stateY) < 0.5) && (!straight))   // approaching
@@ -171,17 +211,31 @@ void trackLine(){
     } 
     else {
       if (gps.solution == UBLOX::SOL_FLOAT)        
-         //HB linear = min(setSpeed, 0.1); // reduce speed for float solution
-         linear = max(setSpeed/2, 0.2); // reduce speed for float solution
+        linear = max(setSpeed/2, 0.2); // reduce speed for float solution
       else
         linear = setSpeed;         // desired speed
       if (sonar.nearObstacle()) linear = 0.1; // slow down near obstacles
       if (upHillFlag) linear = 0.1;   //HB vermeiden, dass Mower kippt bei grossen Steigungen
     }      
-    //angular = 3.0 * diffDelta + 3.0 * lateralError;       // correct for path errors 
-    float k = STANLEY_CONTROL_K_NORMAL;
-    if (maps.trackSlow) k = STANLEY_CONTROL_K_SLOW;   
-    angular = diffDelta + atan2(k * lateralError, (0.001 + fabs(motor.linearSpeedSet)));       // correct for path errors           
+    // slow down speed in case of overload and overwrite all prior speed 
+    if ( (motor.motorLeftOverload) || (motor.motorRightOverload) || (motor.motorMowOverload) ){
+      if (!printmotoroverload) {
+          CONSOLE.println("motor overload detected: reduce linear speed to 0.1");
+      }
+      printmotoroverload = true;
+      linear = 0.1;  
+    } else {
+      printmotoroverload = false;
+    }   
+          
+    //angula                                    r = 3.0 * trackerDiffDelta + 3.0 * lateralError;       // correct for path errors 
+    float k = stanleyTrackingNormalK; // STANLEY_CONTROL_K_NORMAL;
+    float p = stanleyTrackingNormalP; // STANLEY_CONTROL_P_NORMAL;    
+    if (maps.trackSlow && trackslow_allowed) {
+      k = stanleyTrackingSlowK; //STANLEY_CONTROL_K_SLOW;   
+      p = stanleyTrackingSlowP; //STANLEY_CONTROL_P_SLOW;          
+    }
+    angular =  p * trackerDiffDelta + atan2(k * lateralError, (0.001 + fabs(motor.linearSpeedSet)));       // correct for path errors           
     /*pidLine.w = 0;              
     pidLine.x = lateralError;
     pidLine.max_output = PI;
@@ -197,6 +251,7 @@ void trackLine(){
     //if (SMOOTH_CURVES) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
     //else  angular = max(-PI/16, min(PI/16, angular));
   }
+  // check some pre-conditions that can make linear+angular speed zero
   if (fixTimeout != 0){
     if (millis() > lastFixTime + fixTimeout * 1000.0){
       // stop on fix solution timeout (fixme: optionally: turn on place if fix-timeout)
@@ -211,7 +266,7 @@ void trackLine(){
   }     
   
   if ((gps.solution == UBLOX::SOL_FIXED) || (gps.solution == UBLOX::SOL_FLOAT)){        
-    if (linear > 0.06) {
+    if (abs(linear) > 0.06) {
       if ((millis() > linearMotionStartTime + 5000) && (stateGroundSpeed < 0.03)){
         // if in linear motion and not enough ground speed => obstacle
         if (GPS_SPEED_DETECTION){
@@ -247,11 +302,21 @@ void trackLine(){
   if (abs(linear) < 0.01){
     resetLinearMotionMeasurement();
   }
+  if (angleToTargetFits != langleToTargetFits) {
+      //CONSOLE.print("angleToTargetFits: ");
+      //CONSOLE.print(angleToTargetFits);
+      //CONSOLE.print(" trackerDiffDelta: ");
+      //CONSOLE.println(trackerDiffDelta);
+      langleToTargetFits = angleToTargetFits;
+  }
 
   motor.setLinearAngularSpeed(linear, angular);      
+  // if (detectLift()) mow = false; // in any case, turn off mower motor if lifted 
   motor.setMowState(mow);
    
   if (targetReached){
+    rotateLeft = false;
+    rotateRight = false;
     if (maps.wayMode == WAY_MOW){
       maps.clearObstacles(); // clear obstacles if target reached
     }

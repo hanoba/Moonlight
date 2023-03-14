@@ -26,7 +26,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.47 HB 2022-10-09"
+#define VER "Ardumower Moonlight, V168.49 HB 2022-10-12"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 5000
