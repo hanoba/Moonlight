@@ -288,6 +288,36 @@ void cmdSetGpsConfigFilter(String cmd)
     gps.SetGpsConfigFilter(minElev, nSV, minCN0);
 }
 
+void cmdRemoteControl(String cmd)
+{
+    int iLinear, iAngular;
+    if (cmd.length() < 6) return;
+    int counter = 0;
+    int lastCommaIdx = 0;
+    for (int idx = 0; idx < cmd.length(); idx++) 
+    {
+        char ch = cmd[idx];
+        if ((ch == ',') || (idx == cmd.length() - 1)) 
+        {
+            int intValue = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
+
+            // ignore command if wrong values are received
+            if (intValue < -2048 || intValue > 2048) return;
+
+            if (counter == 1) iLinear = intValue;
+            else if (counter == 2) iAngular = intValue;
+            counter++;
+            lastCommaIdx = idx;
+        }
+    }
+    // mowerSpeed = 0.5 * iLinear / 2048       # m/s
+    // mowerRotation = 1 * iAngular / 2048     # rad/s
+    static const float cLinear = 0.5 / 2048.;
+    static const float cAngular = 1.0 / 2048.;
+
+    motor.setLinearAngularSpeed(iLinear*cLinear, iAngular*cAngular, false); 
+}
+
 // request motor
 void cmdMotor(String cmd)
 {
@@ -886,6 +916,7 @@ void processCmd(bool checkCrc, String cmd)
   else if (cmd[3] == 'W') cmdWaypoint(cmd);
   else if (cmd[3] == 'X') cmdExclusionCount(cmd);
   else if (cmd[3] == 'Z') cmdStressTest();   // for developers
+  else if (cmd[3] == '#') cmdRemoteControl(cmd);  
   else if (cmd[3] == '$') FileSystemCmd(cmd);
   else if (cmd[3] == 'Y') 
   {
