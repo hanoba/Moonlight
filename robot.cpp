@@ -421,19 +421,19 @@ void startWIFI()
    }
    if (res.indexOf("OK") == -1)
    {
-      CONSOLE.println("WIFI (ESP8266) not found! If the problem persist, you may need to flash your ESP to firmware 2.2.1"); 
+      CONSOLE.println(F("WIFI (ESP8266) not found! If the problem persist, you may need to flash your ESP to firmware 2.2.1")); 
       return;
    }    
-   CONSOLE.println("Wifi Found!");
+   CONSOLE.println(F("Wifi Found!"));
    WiFi.init(&WIFI);  
    if (WiFi.status() == WL_NO_SHIELD) 
    {
-      CONSOLE.println("ERROR: WiFi not present");       
+      CONSOLE.println(F("ERROR: WiFi not present"));       
    } 
    else 
    {
       wifiFound = true;
-      CONSOLE.println("WiFi found!");       
+      CONSOLE.println(F("WiFi found!"));       
       if (START_AP)
       {
          CONSOLE.print("Attempting to start AP ");  
@@ -457,7 +457,7 @@ void startWIFI()
                WiFi.disconnect();
                delay(500);
                watchdogReset();
-               CONSOLE.print("Attempting to connect to WPA SSID: ");
+               CONSOLE.print(F("Attempting to connect to WPA SSID: "));
                CONSOLE.println(WIFI_SSID_HOME);      
                status = WiFi.begin(WIFI_SSID_HOME, WIFI_PASS_HOME);
                if (status == WL_CONNECTED)
@@ -471,7 +471,7 @@ void startWIFI()
             WiFi.disconnect();
             delay(500);
             watchdogReset();
-            CONSOLE.print("Attempting to connect to WPA SSID: ");
+            CONSOLE.print(F("Attempting to connect to WPA SSID: "));
             CONSOLE.println(WIFI_SSID);      
             status = WiFi.begin(WIFI_SSID, WIFI_PASS);
             if (status == WL_CONNECTED)
@@ -489,9 +489,9 @@ void startWIFI()
 #if defined(ENABLE_UDP)
       udpSerial.beginUDP();  
 #endif    
-      CONSOLE.print("You're connected with SSID=");    
+      CONSOLE.print(F("You're connected with SSID="));    
       CONSOLE.print(WiFi.SSID());
-      CONSOLE.print(" and IP=");        
+      CONSOLE.print(F(" and IP="));        
       IPAddress ip = WiFi.localIP();    
       CONSOLE.println(ip);   
       if (ENABLE_SERVER)
@@ -799,7 +799,6 @@ void start()
   bleConfig.run();   
   BLE.println(VER);  
     
-  rcmodel.begin();  
   motor.begin();
   sonar.begin();
   bumper.begin();
@@ -837,6 +836,8 @@ void start()
 
   // initialize ESP module
   startWIFI();  
+
+  rcmodel.begin();  
   
   watchdogEnable(10000L);   // 10 seconds  
   
@@ -1134,7 +1135,6 @@ void run()
    motor.run();
    sonar.run();
    maps.run();  
-   rcmodel.run();
 #ifdef MOONLIGHT_ENABLE_FIX_DISPLAY
    fixDisplay.run();
 #endif
@@ -1371,6 +1371,7 @@ void run()
          setOperation(OP_IDLE);
          battery.switchOff();
       }
+      rcmodel.run();
    } // robot control every 20 ms
      
    //------------------------------------------------------------------------------------------------- 

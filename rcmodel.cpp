@@ -1,101 +1,88 @@
-// Ardumower Sunray 
+// Ardumower Moonlight 
 
+
+#include "src/esp/WiFiEsp.h"
+#include "src/esp/WiFiEspUdp.h"
 
 #include "config.h"
 #include "rcmodel.h"
 #include "robot.h"
 
+//static WiFiEspUDP rcUdp;
 
-volatile unsigned long PPM_start_lin = 0;
-volatile unsigned long PPM_end_lin = 0;                
-volatile unsigned long PPM_start_ang = 0;
-volatile unsigned long PPM_end_ang = 0 ;        
-      
+//static unsigned int rcLocalPort = 4213;  // local port 
 
-void get_lin_PPM()                                                        // Interrupt Service Routine
-{
-  if (digitalRead(pinRemoteMow)==HIGH) PPM_start_lin = micros();  
-  else                                   PPM_end_lin = micros();    
-}
-
-void get_ang_PPM()                                                        // Interrupt Service Routine
-{
-  if (digitalRead(pinRemoteSteer)==HIGH) PPM_start_ang = micros();  
-  else                                   PPM_end_ang = micros();  
-}
-
-void RCModel::begin(){  
-  lin_PPM = 0;                                            
-  linearPPM = 0;                                         
-  ang_PPM = 0;                                            
-  angularPPM = 0;                                         
-  buttontimer = 0;                                          
-  RC_Mode = false; 
-  nextControlTime = 0;
-  // R/C
-  pinMode(pinRemoteSteer, INPUT);
-  pinMode(pinRemoteMow, INPUT); 
-#ifdef RC_DEBUG
-  nextOutputTime = millis() + 1000;
-#endif
-  if (RCMODEL_ENABLE){
-    //attachInterrupt(digitalPinToInterrupt(pinRemoteMow), get_lin_PPM, CHANGE);// Interrupt aktivieren
-    //attachInterrupt(digitalPinToInterrupt(pinRemoteSteer), get_ang_PPM, CHANGE);// Interrupt aktivieren 
-  }
+void RCModel::begin()
+{ 
+   //rcUdp.begin(rcLocalPort);  
 } 
 
-void RCModel::run(){
-  unsigned long t = millis();
-  if (!RCMODEL_ENABLE) return;
-  if (t < nextControlTime) return;
-  nextControlTime = t + 100;                                       // save CPU resources by running at 10 Hz
-  
-  if ((digitalRead(pinButton)== LOW) && (buttontimer <= 30)) {               // Taster abfragen
-    buttontimer ++;                                                       // Timer 3sec.
-    if (buttontimer == 30)    {                                        // 3sec. erreicht
-      RC_Mode = !RC_Mode;                                                   // R/C-Mode toggle
-      if (RC_Mode)  {                                                       // R/C-Mode ist aktiv
-        buzzer.sound(SND_ERROR, true);                                      // 3x Piep für R/C aktiv        
-        attachInterrupt(digitalPinToInterrupt(pinRemoteMow), get_lin_PPM, CHANGE);// Interrupt aktivieren
-        attachInterrupt(digitalPinToInterrupt(pinRemoteSteer), get_ang_PPM, CHANGE);// Interrupt aktivieren 
+
+void RCModel::DoRemoteControl(String cmd)
+{
+   if (cmd.length() < 6) return;
+   int counter = 0;
+   int lastCommaIdx = 0;
+   for (int idx = 0; idx < cmd.length(); idx++) 
+   {
+       char ch = cmd[idx];
+       if ((ch == ',') || (idx == cmd.length() - 1)) 
+       {
+           int intValue = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
+
+           if (intValue < -2500) intValue = -2500;
+           if (intValue > 2500) intValue = 2500;
+
+           if (counter == 1) iLinear = intValue;
+           else if (counter == 2) iAngular = intValue;
+           counter++;
+           lastCommaIdx = idx;
+       }
+   }
+   // mowerSpeed = 0.5 * iLinear / 2048       # m/s
+   // mowerRotation = 1 * iAngular / 2048     # rad/s
+   if (counter > 2)
+   {
+      static const float cLinear = 0.5 / 2048.;
+      static const float cAngular = 1.0 / 2048.;
+ 
+      if (stateOp == OP_IDLE) motor.setLinearAngularSpeed(iLinear*cLinear, iAngular*cAngular, false);    
+      dataFlag = true;
+   }
+}
+
+
+void RCModel::run()
+{
+   //int len = 0;
+   //const int SIZE = 32;
+   //static char packetBuf[SIZE];
+   //int packetSize = rcUdp.parsePacket();
+   //if (packetSize)
+   //{
+   //   len = rcUdp.read(packetBuf, SIZE);
+   //   if (len > 0) 
+   //   {
+   //      packetBuf[len] = 0;
+   //      DoRemoteControl(packetBuf);
+   //   }
+   //}
+   if (millis() > nextRcOutputTime)
+   {
+      nextRcOutputTime += 1000;
+      if (dataFlag != lastDataFlag)
+      {
+         if (dataFlag) CONSOLE.println(stateOp == OP_IDLE ? F("=RC connected") : F("=RC ERROR: Switch to IDLE mode"));
+         else CONSOLE.println(F("=RC disconnected"));
       }
-      if (!RC_Mode) {                                                       // R/C-Mode inaktiv
-        buzzer.sound(SND_WARNING, true);                          // 2x Piiiiiiiep für R/C aus
-        motor.setLinearAngularSpeed(0, 0);                                 
-        detachInterrupt(digitalPinToInterrupt(pinRemoteMow));             // Interrupt deaktivieren
-        detachInterrupt(digitalPinToInterrupt(pinRemoteSteer));             // Interrupt deaktivieren
+      lastDataFlag = dataFlag;
+      if (dataFlag)
+      {
+         CONSOLE.print("[RC] ");
+         CONSOLE.print(iLinear);
+         CONSOLE.print(",");
+         CONSOLE.println(iAngular);
       }
-    }
-  }
-  if (digitalRead(pinButton)== HIGH) buttontimer = 0;                        // Taste los gelasseb = freigeben
-  
-  if (RC_Mode)    {       
-    lin_PPM = 0;
-    if (PPM_start_lin < PPM_end_lin) lin_PPM = PPM_end_lin - PPM_start_lin; 
-    if (lin_PPM < 2000 && lin_PPM > 1000)   {                               // Wert innerhalb 1100 bis 1900µsec
-      float value_l = (lin_PPM - 1500) / 1500;                                // PPM auf Bereich +0.30 bis -0.30
-      if ((value_l < 0.05) && (value_l > -0.05)) value_l = 0;                 // NullLage vergrössern         
-      linearPPM = value_l;                                                    // Weitergabe an Debug
-    }
-
-    ang_PPM = 0;
-    if (PPM_start_ang < PPM_end_ang) ang_PPM = PPM_end_ang - PPM_start_ang; 
-    if (ang_PPM < 2000 && ang_PPM > 1000)   {                               // Wert innerhalb 1100 bis 1900µsec
-      float value_a = (ang_PPM - 1500) / 950;                                 // PPM auf Bereich +0.50 bis -0.50
-      if ((value_a < 0.05) && (value_a > -0.05)) value_a = 0;                 // NullLage vergrössern         
-      angularPPM = value_a;                                                   // Weitergabe an Debug
-    }
-
-#ifdef RC_DEBUG
-    if (t >= nextOutputTime) {
-      nextOutputTime = t + 1000;
-
-      CONSOLE.print("RC: linearPPM= ");
-      CONSOLE.print(linearPPM);
-      CONSOLE.print("  angularPPM= ");
-      CONSOLE.println(angularPPM);
-    }
-#endif
-    motor.setLinearAngularSpeed(linearPPM, angularPPM, false);                     // R/C Signale an Motor leiten
-  }
+      dataFlag = false;
+   }
 }

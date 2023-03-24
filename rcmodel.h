@@ -12,22 +12,18 @@
 
 
 
-class RCModel {
+class RCModel 
+{
     public:
       void begin();      
       void run();      
-    protected:
-      float lin_PPM ;                                            
-      float linearPPM ;                                         
-      float ang_PPM ;                                            
-      float angularPPM ;                                         
-      int buttontimer ;                                          
-      bool RC_Mode ; 
-      unsigned long nextControlTime ;
+      void DoRemoteControl(String cmd);
     private:
-#ifdef RC_DEBUG
-        unsigned long nextOutputTime;
-#endif
+      bool dataFlag = false;
+      bool lastDataFlag = false;
+      unsigned nextRcOutputTime = 0;
+      int iLinear;
+      int iAngular;
 };
 
 

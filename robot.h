@@ -23,10 +23,11 @@
 #include "src/ublox/ublox.h"
 #include "src/esp/WiFiEsp.h"
 #include "sim.h"
+#include "rcmodel.h"
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.50 HB 2023-03-19"
+#define VER "Ardumower Moonlight, V168.50 HB 2023-03-23"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 5000
@@ -142,6 +143,7 @@ extern PinManager pinMan;
 extern Map maps;
 extern UBLOX gps;
 extern Sim sim;
+extern RCModel rcmodel;
 
 int freeMemory();
 void start();

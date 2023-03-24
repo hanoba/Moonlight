@@ -33,18 +33,16 @@ bool ENABLE_PATH_FINDER = ENABLE_PATH_FINDER_DEFAULT;
 // answer Bluetooth with CRC
 void cmdAnswer(String s)
 {
-   if (s.length() > 0)
-   {
-      byte crc = 0;
-      for (int i=0; i < s.length(); i++) crc += s[i];
-      s += F(",0x");
-      if (crc <= 0xF) s += F("0");
-      s += String(crc, HEX);
-      s += F("\r\n");
-      //CONSOLE.print(s);      
-   }
-   cmdResponse = s;
+  byte crc = 0;
+  for (int i=0; i < s.length(); i++) crc += s[i];
+  s += F(",0x");
+  if (crc <= 0xF) s += F("0");
+  s += String(crc, HEX);
+  s += F("\r\n");
+  //CONSOLE.print(s);
+  cmdResponse = s;
 }
+
 
 void WriteMap(String cmd)
 {
@@ -82,6 +80,7 @@ void WriteMap(String cmd)
    }
    CONSOLE.println("=ERROR opening map file for writing");
 }
+
 
 // Get/set data/time of the RTC
 void cmdRtc(String cmd)
@@ -148,6 +147,7 @@ void cmdRtc(String cmd)
    cmdAnswer(s);
 }
 
+
 static void cmdReadMapFile(String cmd)
 {
    long mapCheckSum = 0;
@@ -213,6 +213,7 @@ static void cmdReadMapFile(String cmd)
    s += mapCheckSum;
    cmdAnswer(s);
 }
+
 
 // request operation
 void cmdControl(String cmd)
@@ -364,6 +365,7 @@ void cmdSensorTest(){
   sensorTest();
 }
 
+
 // request waypoint
 void cmdWaypoint(String cmd)
 {
@@ -418,6 +420,7 @@ void cmdWaypoint(String cmd)
   }
 }
 
+
 // request waypoints count
 void cmdWayCount(String cmd)
 {
@@ -453,6 +456,7 @@ void cmdWayCount(String cmd)
   //maps.dump();
 }
 
+
 // request exclusion count
 void cmdExclusionCount(String cmd)
 {
@@ -484,6 +488,7 @@ void cmdExclusionCount(String cmd)
   s += widx;
   cmdAnswer(s);
 }
+
 
 // request position mode
 void cmdPosMode(String cmd)
@@ -955,7 +960,7 @@ void processConsole(){
       if ((ch == '\r') || (ch == '\n')) {
         CONSOLE.println(cmd);
         processCmd(false, cmd);
-        if (cmdResponse.length() > 0) CONSOLE.print(cmdResponse);
+        CONSOLE.print(cmdResponse);
         cmd = "";
       } else if (cmd.length() < 500){
         cmd += ch;
@@ -982,12 +987,9 @@ void processBLE()
            {
                if (bluetoothLoggingFlag) CONSOLE.println(cmd);
                processCmd(true, cmd);
-               if (cmdResponse.length() > 0) 
-               {
-                  if (bluetoothLoggingFlag) CONSOLE.print("BLE:"); // HB
-                  if (bluetoothLoggingFlag) CONSOLE.print(cmdResponse); // HB
-                  BLE.print(cmdResponse);
-               }
+               if (bluetoothLoggingFlag) CONSOLE.print("BLE:"); // HB
+               if (bluetoothLoggingFlag) CONSOLE.print(cmdResponse); // HB
+               BLE.print(cmdResponse);
                cmd = "";
                //skip=false;
                //timeOut=0;
@@ -1041,20 +1043,17 @@ void processWifi()
           CONSOLE.println(cmd);
           if (client.connected()) {
             processCmd(true, cmd);
-            if (cmdResponse.length() > 0) 
-            {
-               client.print(
-                 "HTTP/1.1 200 OK\r\n"
-                 "Access-Control-Allow-Origin: *\r\n"
-                 "Content-Type: text/html\r\n"
-                 "Connection: close\r\n"  // the connection will be closed after completion of the response
-                 // "Refresh: 1\r\n"        // refresh the page automatically every 20 sec
-                 );
-               client.print("Content-length: ");
-               client.print(cmdResponse.length());
-               client.print("\r\n\r\n");
-               client.print(cmdResponse);
-            }
+            client.print(
+              "HTTP/1.1 200 OK\r\n"
+              "Access-Control-Allow-Origin: *\r\n"
+              "Content-Type: text/html\r\n"
+              "Connection: close\r\n"  // the connection will be closed after completion of the response
+              // "Refresh: 1\r\n"        // refresh the page automatically every 20 sec
+              );
+            client.print("Content-length: ");
+            client.print(cmdResponse.length());
+            client.print("\r\n\r\n");
+            client.print(cmdResponse);
           }
           break;
         }
@@ -1081,7 +1080,7 @@ void processUdp()
          //CONSOLE.println(packetBuf);
          const bool USE_CHECKSUM = true;
          processCmd(USE_CHECKSUM, packetBuf);
-         if (cmdResponse.length() > 0) CONSOLE.print(cmdResponse);
+         CONSOLE.print(cmdResponse);
          battery.resetIdle();
       }
 }
