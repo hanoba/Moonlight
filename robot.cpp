@@ -621,7 +621,13 @@ void readIMU(){
       // computeEulerAngles can be used -- after updating the
       // quaternion values -- to estimate roll, pitch, and yaw
       //  toEulerianAngle(imu.calcQuat(imu.qw), imu.calcQuat(imu.qx), imu.calcQuat(imu.qy), imu.calcQuat(imu.qz), imu.roll, imu.pitch, imu.yaw);
-      imu.computeEulerAngles(false);      
+      imu.computeEulerAngles(false);   
+      if (motorDriver.frontWheelDrive)
+      {
+         imu.yaw = imu.yaw>0 ? imu.yaw-PI : imu.yaw+PI;
+         imu.pitch = -imu.pitch;
+         imu.roll = -imu.roll;
+      }
       //CONSOLE.print(imu.ax);
       //CONSOLE.print(",");
       //CONSOLE.print(imu.ay);

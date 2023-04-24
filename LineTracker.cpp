@@ -145,9 +145,11 @@ void trackLine(){
   // if we race we still have rotateLeft or rotateRight true
   if ( (targetDist < 0.5) || (lastTargetDist < 0.5) || (fabs(distToPath) > 0.5) ||
        rotateLeft || rotateRight ) {
+#if MOONLIGHT_LINE_TRACKING == 0
     if (SMOOTH_CURVES)
       angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 120);
     else     
+#endif
       angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 20);
   } else {
      angleToTargetFits = true;
@@ -158,6 +160,10 @@ void trackLine(){
     linear = 0;
     angular = 0.5;               
     if ((!rotateLeft) && (!rotateRight)){ // decide for one rotation direction (and keep it)
+#if MOONLIGHT_LINE_TRACKING
+       rotateRight = trackerDiffDelta < 0;
+       rotateLeft = !rotateRight;
+#else
       int r = 0;
       // no idea but don't work in reverse mode...
       if (!maps.trackReverse) {
@@ -181,7 +187,7 @@ void trackLine(){
       } else {
         rotateLeft = true;
       }
-
+#endif
       trackerDiffDelta_positive = (trackerDiffDelta >= 0);
     }        
     if (trackerDiffDelta_positive != (trackerDiffDelta >= 0)) {
@@ -228,7 +234,7 @@ void trackLine(){
       printmotoroverload = false;
     }   
           
-    //angula                                    r = 3.0 * trackerDiffDelta + 3.0 * lateralError;       // correct for path errors 
+    //angular                                   r = 3.0 * trackerDiffDelta + 3.0 * lateralError;       // correct for path errors 
     float k = stanleyTrackingNormalK; // STANLEY_CONTROL_K_NORMAL;
     float p = stanleyTrackingNormalP; // STANLEY_CONTROL_P_NORMAL;    
     if (maps.trackSlow && trackslow_allowed) {

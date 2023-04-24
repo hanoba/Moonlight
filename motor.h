@@ -30,7 +30,7 @@ class Motor {
     bool motorRightOverload; 
     bool motorMowOverload; 
     bool enableMowMotor;
-    bool odometryError;    
+    bool odometryError; 
     unsigned long motorOverloadDuration; // accumulated duration (ms)
     int  pwmMax;
     int  pwmMaxMow;    

@@ -30,7 +30,8 @@ class AmMotorDriver: public MotorDriver {
     void resetMotorFaults()  override;
     void getMotorCurrent(float &leftCurrent, float &rightCurrent, float &mowCurrent) override;
     void getMotorEncoderTicks(int &leftTicks, int &rightTicks, int &mowTicks) override;
-  protected:
+    bool frontWheelDrive = false;
+protected:
     void setMC33926(int pinDir, int pinPWM, int speed);
 
 };

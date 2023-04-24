@@ -35,6 +35,11 @@ void RCModel::DoRemoteControl(String cmd)
 
            if (counter == 1) iLinear = intValue;
            else if (counter == 2) iAngular = intValue;
+           else if (counter == 3) 
+           {   
+               motor.enableMowMotor = intValue>>3 & 1;
+               motor.setMowState(intValue>>3 & 1);
+           }
            counter++;
            lastCommaIdx = idx;
        }
