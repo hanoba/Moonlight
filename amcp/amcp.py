@@ -154,7 +154,7 @@ def PrintHelpText():
    WriteTextBox("^p  Make parallel            ")
    WriteTextBox("TAB Select next point        ")
    WriteTextBox("SPC Select previous point    ")
-   WriteTextBox("ESC Main Menu                ")
+   WriteTextBox("ESC Show/hide menu           ")
    WriteTextBox("x   Select exclusion points  ")
    WriteTextBox("#   Select reference points  ")
    WriteTextBox("1..9   Select MAP1 to MAP9   ")
@@ -274,8 +274,8 @@ def ArdumowerControlProgram():
    # Create Config Menu
    #------------------------------------------------------------------------------------------------- 
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
-   theme_dark.widget_font_size=20
-   theme_dark.title_font_size=30
+   theme_dark.widget_font_size=18
+   theme_dark.title_font_size=24
    config_menu = pygame_menu.Menu('Configuration Menu', 600, 700, theme=theme_dark)
 
    config_menu.add.button('Toggle Bluetooth Logging (b=off,B=on)', mower.ToggleBluetoothLogging)
@@ -290,8 +290,11 @@ def ArdumowerControlProgram():
    config_menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
    config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
    config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
-   config_menu.add.text_input('Mower speed in m/s: ', textinput_id='ID_MOWER_SPEED', default='0.25')
+   config_menu.add.text_input('Mower speed in m/s: ', textinput_id='ID_MOWER_SPEED', default='0.35')
    config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='0')
+   config_menu.add.text_input('Enable Bumper: ', textinput_id='ID_BUMPER_ENABLE', default='1')
+   config_menu.add.text_input('Front Wheel Drive: ', textinput_id='ID_FRONT_WHEEL_DRIVE', default='0')
+   config_menu.add.text_input('Moonlight Line Tracking: ', textinput_id='ID_ML_LINE_TRACKING', default='0')
    config_menu.add.text_input('GPS Config Filter: ', textinput_id='ID_GPS_CONFIG_FILTER', default='10,10,30')
    config_menu.add.button('Upload GPS Config Filter', CmdUploadGpsConfigFilter)
    config_menu.add.button('Return to Main Menu', pygame_menu.events.BACK)
@@ -630,7 +633,11 @@ def CmdStartMowing():
    data = config_menu.get_input_data()
    fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
    mowerSpeed = float(data.get('ID_MOWER_SPEED'))
-   mower.StartMowing(mowerSpeed, fixTimeout)
+   iBumperEnable = int(data.get('ID_BUMPER_ENABLE'))
+   iFrontWheelDrive = int(data.get('ID_FRONT_WHEEL_DRIVE'))
+   iMlLineTracking = int(data.get('ID_ML_LINE_TRACKING'))
+   #mower.StartMowing(mowerSpeed, fixTimeout)
+   mower.StartMowing(mowerSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking)
 
 
 def CmdUploadMap():

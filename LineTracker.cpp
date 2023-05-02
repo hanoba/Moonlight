@@ -145,11 +145,9 @@ void trackLine(){
   // if we race we still have rotateLeft or rotateRight true
   if ( (targetDist < 0.5) || (lastTargetDist < 0.5) || (fabs(distToPath) > 0.5) ||
        rotateLeft || rotateRight ) {
-#if MOONLIGHT_LINE_TRACKING == 0
     if (SMOOTH_CURVES)
-      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 120);
+      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < (MOONLIGHT_LINE_TRACKING ? 40 : 120));
     else     
-#endif
       angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 20);
   } else {
      angleToTargetFits = true;
@@ -159,36 +157,40 @@ void trackLine(){
     // angular control (if angle to far away, rotate to next waypoint)
     linear = 0;
     angular = 0.5;               
-    if ((!rotateLeft) && (!rotateRight)){ // decide for one rotation direction (and keep it)
-#if MOONLIGHT_LINE_TRACKING
-       rotateRight = trackerDiffDelta < 0;
-       rotateLeft = !rotateRight;
-#else
-      int r = 0;
-      // no idea but don't work in reverse mode...
-      if (!maps.trackReverse) {
-        r = get_turn_direction_preference();
-    }        
-      // store last_rotation_target point
-      last_rotation_target.setXY(target.x(), target.y());
-      
-      if (r == 1) {
-        //CONSOLE.println("force turn right");
-        rotateLeft = false;
-        rotateRight = true;
-      }
-      else if (r == -1) {
-        //CONSOLE.println("force turn left");
-        rotateLeft = true;
-      rotateRight = false;
-    }
-      else if (trackerDiffDelta < 0) {
-        rotateRight = true;
-      } else {
-        rotateLeft = true;
-      }
-#endif
-      trackerDiffDelta_positive = (trackerDiffDelta >= 0);
+    if ((!rotateLeft) && (!rotateRight)) // decide for one rotation direction (and keep it)
+    {
+       if (MOONLIGHT_LINE_TRACKING)
+       {
+          rotateRight = trackerDiffDelta < 0;
+          rotateLeft = !rotateRight;
+       }         
+       else   
+       {
+          int r = 0;
+          // no idea but don't work in reverse mode...
+          if (!maps.trackReverse) {
+            r = get_turn_direction_preference();
+          }        
+          // store last_rotation_target point
+          last_rotation_target.setXY(target.x(), target.y());
+          
+          if (r == 1) {
+            //CONSOLE.println("force turn right");
+            rotateLeft = false;
+            rotateRight = true;
+          }
+          else if (r == -1) {
+            //CONSOLE.println("force turn left");
+            rotateLeft = true;
+            rotateRight = false;
+          }
+          else if (trackerDiffDelta < 0) {
+            rotateRight = true;
+          } else {
+            rotateLeft = true;
+          }
+       }
+       trackerDiffDelta_positive = (trackerDiffDelta >= 0);
     }        
     if (trackerDiffDelta_positive != (trackerDiffDelta >= 0)) {
       CONSOLE.println("reset left / right rotation - DiffDelta overflow");

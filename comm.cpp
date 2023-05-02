@@ -29,6 +29,8 @@ float statMaxControlCycleTime = 0;
 static bool writeMapFlag = false;
 bool SMOOTH_CURVES = SMOOTH_CURVES_DEFAULT;
 bool ENABLE_PATH_FINDER = ENABLE_PATH_FINDER_DEFAULT;
+bool MOONLIGHT_LINE_TRACKING = MOONLIGHT_LINE_TRACKING_DEFAULT;
+bool BUMPER_ENABLE = BUMPER_ENABLE_DEFAULT;
 
 // answer Bluetooth with CRC
 void cmdAnswer(String s)
@@ -249,7 +251,16 @@ void cmdControl(String cmd)
           if (intValue > 0) maps.skipNextMowingPoint();
       } else if (counter == 8){
           if (intValue >= 0) sonar.enabled = (intValue == 1);
-      }
+      } else if (counter == 9) {  // bBumperEnable, bFrontWheelDrive, bMlLineTracking
+          if (intValue == 0) BUMPER_ENABLE = false; 
+          if (intValue == 1) BUMPER_ENABLE = true; 
+      } else if (counter == 10) {  // bBumperEnable, bFrontWheelDrive, bMlLineTracking
+          if (intValue == 0) motorDriver.frontWheelDrive = false; 
+          if (intValue == 1) motorDriver.frontWheelDrive = true; 
+      } else if (counter == 11) {  // bBumperEnable, bFrontWheelDrive, bMlLineTracking
+          if (intValue == 0) MOONLIGHT_LINE_TRACKING = false; 
+          if (intValue == 1) MOONLIGHT_LINE_TRACKING = true; 
+      } 
       counter++;
       lastCommaIdx = idx;
     }
