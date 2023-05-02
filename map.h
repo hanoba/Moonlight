@@ -170,6 +170,8 @@ class Map
     bool checkpoint(float x, float y);
     // choose progress (0..100%) in mowing point list
     void setMowingPointPercent(float perc);
+    // choose progress (0..100%) in mowing point list
+    void setMowingPoint(int val);
     // skip next mowing point
     void skipNextMowingPoint();
     // move progress to last mowing point

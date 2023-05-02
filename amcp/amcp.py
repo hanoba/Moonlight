@@ -276,7 +276,7 @@ def ArdumowerControlProgram():
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
    theme_dark.widget_font_size=18
    theme_dark.title_font_size=24
-   config_menu = pygame_menu.Menu('Configuration Menu', 600, 700, theme=theme_dark)
+   config_menu = pygame_menu.Menu('Configuration Menu', 600, 800, theme=theme_dark)
 
    config_menu.add.button('Toggle Bluetooth Logging (b=off,B=on)', mower.ToggleBluetoothLogging)
    config_menu.add.button('Toggle UseGPSfloatForPosEstimation (p=off,P=on)', mower.ToggleUseGPSfloatForPosEstimation)
@@ -292,6 +292,7 @@ def ArdumowerControlProgram():
    config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
    config_menu.add.text_input('Mower speed in m/s: ', textinput_id='ID_MOWER_SPEED', default='0.35')
    config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='0')
+   config_menu.add.text_input('Set Mowing Point: ', textinput_id='ID_MOWING_POINT', default='-1')
    config_menu.add.text_input('Enable Bumper: ', textinput_id='ID_BUMPER_ENABLE', default='1')
    config_menu.add.text_input('Front Wheel Drive: ', textinput_id='ID_FRONT_WHEEL_DRIVE', default='0')
    config_menu.add.text_input('Moonlight Line Tracking: ', textinput_id='ID_ML_LINE_TRACKING', default='0')
@@ -633,11 +634,12 @@ def CmdStartMowing():
    data = config_menu.get_input_data()
    fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
    mowerSpeed = float(data.get('ID_MOWER_SPEED'))
+   iMowingPoint = int(data.get('ID_MOWING_POINT'))
    iBumperEnable = int(data.get('ID_BUMPER_ENABLE'))
    iFrontWheelDrive = int(data.get('ID_FRONT_WHEEL_DRIVE'))
    iMlLineTracking = int(data.get('ID_ML_LINE_TRACKING'))
    #mower.StartMowing(mowerSpeed, fixTimeout)
-   mower.StartMowing(mowerSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking)
+   mower.StartMowing(mowerSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint)
 
 
 def CmdUploadMap():

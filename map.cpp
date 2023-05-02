@@ -764,6 +764,18 @@ void Map::setMowingPointPercent(float perc){
   }
 }
 
+
+// set desired progress in mowing points list
+void Map::setMowingPoint(int val)
+{
+  if (mowPoints.numPoints == 0) return;
+  mowPointsIdx = val < 0 ? mowPointsIdx : val;
+  if (mowPointsIdx >= mowPoints.numPoints) {
+    mowPointsIdx = mowPoints.numPoints-1;
+  }
+}
+
+
 void Map::skipNextMowingPoint(){
   if (mowPoints.numPoints == 0) return;
   mowPointsIdx++;
@@ -1605,7 +1617,7 @@ bool Map::findPath(Point &src, Point &dst){
   CONSOLE.print(dst.y());
   CONSOLE.println(")");  
   
-  if (ENABLE_PATH_FINDER){    
+  if (cfgEnablePathFinder){    
     CONSOLE.println("path finder is enabled");      
     
     // create path-finder obstacles    

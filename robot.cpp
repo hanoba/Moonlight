@@ -370,7 +370,7 @@ void sensorTest(){
         }
         CONSOLE.print("\t");
       }    
-      if (BUMPER_ENABLE){
+      if (cfgBumperEnable){
         CONSOLE.print("bumper (triggered): ");
         CONSOLE.print(((int)bumper.obstacle()));
         CONSOLE.print("\t");
@@ -1091,7 +1091,7 @@ void detectObstacle()
      }    
    }   
    
-   if (BUMPER_ENABLE)
+   if (cfgBumperEnable)
    {
       if ( (millis() > linearMotionStartTime + 5000) && (bumper.obstacle()) )
       {  
@@ -1395,7 +1395,7 @@ void run()
 void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){  
   static bool SMOOTH_CURVES_saved = SMOOTH_CURVES_DEFAULT;
   if ((stateOp == op) && (!allowRepeat)) return;  
-  if (stateOp == OP_DOCK && op != OP_DOCK) SMOOTH_CURVES = SMOOTH_CURVES_saved;
+  if (stateOp == OP_DOCK && op != OP_DOCK) cfgSmoothCurves = SMOOTH_CURVES_saved;
   CONSOLE.print("setOperation op=");
   CONSOLE.print(op);
   bool error = false;
@@ -1412,9 +1412,9 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       driveReverseStopTime = millis()+6000;
       break;
     case OP_DOCK:
-      // SMOOTH_CURVES==false during docking and it is restored after docking is complete
-      if (stateOp != OP_DOCK) SMOOTH_CURVES_saved = SMOOTH_CURVES;
-      SMOOTH_CURVES = false;
+      // cfgSmoothCurves==false during docking and it is restored after docking is complete
+      if (stateOp != OP_DOCK) SMOOTH_CURVES_saved = cfgSmoothCurves;
+      cfgSmoothCurves = false;
       CONSOLE.println(" OP_DOCK");
       if (initiatedbyOperator) maps.clearObstacles();
       dockingInitiatedByOperator = initiatedbyOperator;      

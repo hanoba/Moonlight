@@ -128,7 +128,7 @@ void trackLine(){
   float targetDist = maps.distanceToTargetPoint(stateX, stateY);
   
   float lastTargetDist = maps.distanceToLastTargetPoint(stateX, stateY);  
-  if (SMOOTH_CURVES)
+  if (cfgSmoothCurves)
     targetReached = (targetDist < 0.2);    
   else 
     targetReached = (targetDist < 0.05);    
@@ -145,8 +145,8 @@ void trackLine(){
   // if we race we still have rotateLeft or rotateRight true
   if ( (targetDist < 0.5) || (lastTargetDist < 0.5) || (fabs(distToPath) > 0.5) ||
        rotateLeft || rotateRight ) {
-    if (SMOOTH_CURVES)
-      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < (MOONLIGHT_LINE_TRACKING ? 40 : 120));
+    if (cfgSmoothCurves)
+      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < (cfgMoonlightLineTracking ? 40 : 120));
     else     
       angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 20);
   } else {
@@ -159,7 +159,7 @@ void trackLine(){
     angular = 0.5;               
     if ((!rotateLeft) && (!rotateRight)) // decide for one rotation direction (and keep it)
     {
-       if (MOONLIGHT_LINE_TRACKING)
+       if (cfgMoonlightLineTracking)
        {
           rotateRight = trackerDiffDelta < 0;
           rotateLeft = !rotateRight;
@@ -255,8 +255,8 @@ void trackLine(){
     //CONSOLE.print(",");        
     //CONSOLE.println(angular/PI*180.0);            
     if (maps.trackReverse) linear *= -1;   // reverse line tracking needs negative speed
-    if (!SMOOTH_CURVES) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
-    //if (SMOOTH_CURVES) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
+    if (!cfgSmoothCurves) angular = max(-PI/16, min(PI/16, angular)); // restrict steering angle for stanley
+    //if (cfgSmoothCurves) angular = max(-PI/8, min(PI/8, angular)); // restrict steering angle for stanley
     //else  angular = max(-PI/16, min(PI/16, angular));
   }
   // check some pre-conditions that can make linear+angular speed zero

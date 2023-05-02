@@ -27,10 +27,10 @@ float statMaxControlCycleTime = 0;
 //HB New map control
 //static uint8_t currentMapIndex = 0;
 static bool writeMapFlag = false;
-bool SMOOTH_CURVES = SMOOTH_CURVES_DEFAULT;
-bool ENABLE_PATH_FINDER = ENABLE_PATH_FINDER_DEFAULT;
-bool MOONLIGHT_LINE_TRACKING = MOONLIGHT_LINE_TRACKING_DEFAULT;
-bool BUMPER_ENABLE = BUMPER_ENABLE_DEFAULT;
+bool cfgSmoothCurves = SMOOTH_CURVES_DEFAULT;
+bool cfgEnablePathFinder = ENABLE_PATH_FINDER_DEFAULT;
+bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
+bool cfgBumperEnable = BUMPER_ENABLE_DEFAULT;
 
 // answer Bluetooth with CRC
 void cmdAnswer(String s)
@@ -251,15 +251,17 @@ void cmdControl(String cmd)
           if (intValue > 0) maps.skipNextMowingPoint();
       } else if (counter == 8){
           if (intValue >= 0) sonar.enabled = (intValue == 1);
-      } else if (counter == 9) {  // bBumperEnable, bFrontWheelDrive, bMlLineTracking
-          if (intValue == 0) BUMPER_ENABLE = false; 
-          if (intValue == 1) BUMPER_ENABLE = true; 
-      } else if (counter == 10) {  // bBumperEnable, bFrontWheelDrive, bMlLineTracking
+      } else if (counter == 9) {  // bBumperEnable
+          if (intValue == 0) cfgBumperEnable = false; 
+          if (intValue == 1) cfgBumperEnable = true; 
+      } else if (counter == 10) {  // bFrontWheelDrive
           if (intValue == 0) motorDriver.frontWheelDrive = false; 
           if (intValue == 1) motorDriver.frontWheelDrive = true; 
-      } else if (counter == 11) {  // bBumperEnable, bFrontWheelDrive, bMlLineTracking
-          if (intValue == 0) MOONLIGHT_LINE_TRACKING = false; 
-          if (intValue == 1) MOONLIGHT_LINE_TRACKING = true; 
+      } else if (counter == 11) {  // bMoonlightLineTracking
+          if (intValue == 0) cfgMoonlightLineTracking = false; 
+          if (intValue == 1) cfgMoonlightLineTracking = true; 
+      } else if (counter == 12) { 
+          if (intValue >= 0) maps.setMowingPoint(intValue); 
       } 
       counter++;
       lastCommaIdx = idx;
@@ -636,18 +638,18 @@ void cmdToggleSmoothCurves()
 {
     String s = F("YS");
     cmdAnswer(s);
-    SMOOTH_CURVES = !SMOOTH_CURVES;
-    CONSOLE.print("=SMOOTH_CURVES = ");
-    CONSOLE.println(SMOOTH_CURVES);
+    cfgSmoothCurves = !cfgSmoothCurves;
+    CONSOLE.print("=cfgSmoothCurves = ");
+    CONSOLE.println(cfgSmoothCurves);
 }
 
 void cmdToggleEnablePathFinder()
 {
     String s = F("YF");
     cmdAnswer(s);
-    ENABLE_PATH_FINDER = !ENABLE_PATH_FINDER;
-    CONSOLE.print("=ENABLE_PATH_FINDER = ");
-    CONSOLE.println(ENABLE_PATH_FINDER);
+    cfgEnablePathFinder = !cfgEnablePathFinder;
+    CONSOLE.print("=cfgEnablePathFinder = ");
+    CONSOLE.println(cfgEnablePathFinder);
 }
 
 void cmdToggleUseGPSfloatForPosEstimation()
@@ -1336,8 +1338,8 @@ void outputConsole()
     PRINT("%c", USE_GPS_FLOAT_FOR_POS_ESTIMATION ? 'P' : 'p');
     PRINT("%c", USE_GPS_FLOAT_FOR_DELTA_ESTIMATION ? 'D' : 'd');
     PRINT("%c", gps.verbose ? 'G' : 'g');
-    PRINT("%c", SMOOTH_CURVES ? 'S' : 's');
-    PRINT("%c", ENABLE_PATH_FINDER ? 'F' : 'f');
+    PRINT("%c", cfgSmoothCurves ? 'S' : 's');
+    PRINT("%c", cfgEnablePathFinder ? 'F' : 'f');
     PRINT(" MAP%d", maps.mapID);
     PRINT(" %3d", maps.mowPointsIdx);
     PRINT("/%-3d", maps.mowPoints.numPoints);

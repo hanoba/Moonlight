@@ -125,7 +125,6 @@
     <ClInclude Include="buzzer.h" />
     <ClInclude Include="comm.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="config_example.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="cpu.h" />
     <ClInclude Include="file_cmds.h" />
