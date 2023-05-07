@@ -23,6 +23,7 @@ void RCModel::DoRemoteControl(String cmd)
    if (cmd.length() < 6) return;
    int counter = 0;
    int lastCommaIdx = 0;
+   int slowDown=1;
    for (int idx = 0; idx < cmd.length(); idx++) 
    {
        char ch = cmd[idx];
@@ -39,6 +40,7 @@ void RCModel::DoRemoteControl(String cmd)
            {   
                motor.enableMowMotor = intValue>>3 & 1;
                motor.setMowState(intValue>>3 & 1);
+               slowDown = 1 + (intValue & 3);
            }
            counter++;
            lastCommaIdx = idx;
@@ -51,7 +53,7 @@ void RCModel::DoRemoteControl(String cmd)
       static const float cLinear = 0.5 / 2048.;
       static const float cAngular = 1.0 / 2048.;
  
-      if (stateOp == OP_IDLE) motor.setLinearAngularSpeed(iLinear*cLinear, iAngular*cAngular, false);    
+      if (stateOp == OP_IDLE) motor.setLinearAngularSpeed(iLinear*cLinear/slowDown, iAngular*cAngular, false);    
       dataFlag = true;
    }
 }

@@ -31,6 +31,7 @@ bool cfgSmoothCurves = SMOOTH_CURVES_DEFAULT;
 bool cfgEnablePathFinder = ENABLE_PATH_FINDER_DEFAULT;
 bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
 bool cfgBumperEnable = BUMPER_ENABLE_DEFAULT;
+bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
 
 // answer Bluetooth with CRC
 void cmdAnswer(String s)
@@ -262,6 +263,9 @@ void cmdControl(String cmd)
           if (intValue == 1) cfgMoonlightLineTracking = true; 
       } else if (counter == 12) { 
           if (intValue >= 0) maps.setMowingPoint(intValue); 
+      } else if (counter == 13) {  // bMoonlightLineTracking
+          if (intValue == 0) cfgEnableTiltDetection = false; 
+          if (intValue == 1) cfgEnableTiltDetection = true; 
       } 
       counter++;
       lastCommaIdx = idx;

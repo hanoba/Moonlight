@@ -139,6 +139,7 @@ def PrintHelpText():
    WriteTextBox(str.format("Number of waypoints:   {:3d}   ", numWayPoints))
    WriteTextBox("v   Print version number     ")
    WriteTextBox("m   Start mowing             ")
+   WriteTextBox("M   Start mowing from wayp.  ")
    WriteTextBox("i   Stop mowing              ")
    WriteTextBox("d   Start docking            ")
    WriteTextBox("a   Start undocking          ")
@@ -291,11 +292,12 @@ def ArdumowerControlProgram():
    config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
    config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
    config_menu.add.text_input('Mower speed in m/s: ', textinput_id='ID_MOWER_SPEED', default='0.35')
-   config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='0')
-   config_menu.add.text_input('Set Mowing Point: ', textinput_id='ID_MOWING_POINT', default='-1')
+   config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='60')
+   config_menu.add.text_input('Set Waypoint: ', textinput_id='ID_WAYPOINT', default='0')
    config_menu.add.text_input('Enable Bumper: ', textinput_id='ID_BUMPER_ENABLE', default='1')
    config_menu.add.text_input('Front Wheel Drive: ', textinput_id='ID_FRONT_WHEEL_DRIVE', default='0')
    config_menu.add.text_input('Moonlight Line Tracking: ', textinput_id='ID_ML_LINE_TRACKING', default='0')
+   config_menu.add.text_input('Enable Tilt Detection: ', textinput_id='ID_ENABLE_TILT_DETECTION', default='1')
    config_menu.add.text_input('GPS Config Filter: ', textinput_id='ID_GPS_CONFIG_FILTER', default='10,10,30')
    config_menu.add.button('Upload GPS Config Filter', CmdUploadGpsConfigFilter)
    config_menu.add.button('Return to Main Menu', pygame_menu.events.BACK)
@@ -304,12 +306,13 @@ def ArdumowerControlProgram():
    # Create Main Menu
    #------------------------------------------------------------------------------------------------- 
    theme_dark = pygame_menu.themes.THEME_DARK.copy()
-   theme_dark.widget_font_size=20
-   theme_dark.title_font_size=30
+   theme_dark.widget_font_size=18  #20
+   theme_dark.title_font_size=24  #30
    menu = pygame_menu.Menu('Main Menu', 600, 780, theme=theme_dark)
 
    menu.add.button('Show/Hide MainMenu (ESC)', CmdShowHideMainMenu)
    menu.add.button('Start mowing (m)', CmdStartMowing)
+   menu.add.button('Start mowing from waypoint (M)', CmdStartMowingFromWaypoint)
    menu.add.button('Stop mowing (i)', mower.StopMowing)
    menu.add.button('Start docking (d)', mower.StartDocking)
    menu.add.button('Start undocking (a)', mower.StartUndocking)
@@ -330,6 +333,11 @@ def ArdumowerControlProgram():
    menu.add.button('Mower Configuration', config_menu)
    menu.add.button('Quit (q)', pygame_menu.events.EXIT)
 
+   # set key repeat 
+   # delay_ms = 750
+   # interval_ms = 100
+   # pygame.key.set_repeat(delay_ms, interval_ms)
+   
    # solange die Variable True ist, soll das Spiel laufen
    programActive = True
 
@@ -414,7 +422,8 @@ def ArdumowerControlProgram():
                   elif event.key == pygame.K_i:
                      mower.StopMowing()
                   elif event.key == pygame.K_m:
-                     CmdStartMowing()
+                     if event.mod & pygame.KMOD_SHIFT: CmdStartMowingFromWaypoint()
+                     else: CmdStartMowing()
                   elif event.key == pygame.K_o:
                      mower.SwitchOffRobot()
                   #elif event.key == pygame.K_p:
@@ -512,18 +521,6 @@ def ArdumowerControlProgram():
       pygame.draw.circle(screen, RED, messungen[0], 2)
       pygame.draw.circle(screen, RED, messungen[1], 2)
       pygame.draw.circle(screen, RED, messungen[2], 2)
-      
-      # Show mower location
-      mowerLocation = maps.Map2ScreenXY(udp.stateX, udp.stateY)
-      pygame.draw.circle(screen, YELLOW, mowerLocation, 5, 1)
-      
-      # Show mower GPS location
-      gpsLocation = maps.Map2ScreenXY(udp.gpsX, udp.gpsY)
-      pygame.draw.circle(screen, PURPLE, gpsLocation, 3)
-      
-      # Show target location
-      targetLocation = maps.Map2ScreenXY(udp.targetX, udp.targetY)
-      pygame.draw.circle(screen, GREEN, targetLocation, 5, 1)
    
       # Show log message
       PrintLogMsg()
@@ -571,12 +568,25 @@ def ArdumowerControlProgram():
 
       if DrawHeatmapFlag: heatmap.DrawHeatmap(screen)
       
+      # Show mower location
+      mowerLocation = maps.Map2ScreenXY(udp.stateX, udp.stateY)
+      pygame.draw.circle(screen, YELLOW, mowerLocation, 5, 1)
+      
+      # Show mower GPS location
+      gpsLocation = maps.Map2ScreenXY(udp.gpsX, udp.gpsY)
+      pygame.draw.circle(screen, PURPLE, gpsLocation, 3)
+      
+      # Show target location
+      targetLocation = maps.Map2ScreenXY(udp.targetX, udp.targetY)
+      pygame.draw.circle(screen, GREEN, targetLocation, 5, 1)
+      
       PrintDistance()
       PrintMouseDistance()
       PrintRefPointDistance()
       PrintMousePosition()
       PrintCurrentPointPosition()
       ShowGuiMessage()
+      udp.ForwardRemoteControlMessage()
       
       # Draw menu
       if menu.is_enabled():
@@ -593,10 +603,14 @@ def CmdShowHideMainMenu():
    global editMode
    editMode = False
    menu.toggle()
-   data = menu.get_input_data()
-   #if menu.is_enabled(): PrintGuiMessage("")
-   #mapsFileName = data.get('ID_MAPS_FILE_NAME')
-   #print("Maps File Name: " + mapsFileName)
+   #data = menu.get_input_data()
+
+   # set key repeat 
+   #if menu.is_enabled(): 
+   #   delay_ms = 750
+   #   interval_ms = 75
+   #   pygame.key.set_repeat(delay_ms, interval_ms)
+   #else: pygame.key.set_repeat(0)
 
 def CmdToggleShowWaypoints():
    global showCurrentWayPoints
@@ -629,18 +643,23 @@ def CmdUploadGpsConfigFilter():
    mower.UploadGpsConfigFilter(gpsConfigFilter)
 
 
-def CmdStartMowing():
+def CmdStartMowing(iWaypoint = -1):
    global config_menu
    data = config_menu.get_input_data()
    fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
    mowerSpeed = float(data.get('ID_MOWER_SPEED'))
-   iMowingPoint = int(data.get('ID_MOWING_POINT'))
    iBumperEnable = int(data.get('ID_BUMPER_ENABLE'))
    iFrontWheelDrive = int(data.get('ID_FRONT_WHEEL_DRIVE'))
    iMlLineTracking = int(data.get('ID_ML_LINE_TRACKING'))
-   #mower.StartMowing(mowerSpeed, fixTimeout)
-   mower.StartMowing(mowerSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint)
+   iEnableTiltDetetction = int(data.get('ID_ENABLE_TILT_DETECTION'))
+   mower.StartMowing(mowerSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iWaypoint, iEnableTiltDetetction)
 
+
+def CmdStartMowingFromWaypoint():
+   global config_menu
+   data = config_menu.get_input_data()
+   iWaypoint = int(data.get('ID_WAYPOINT'))
+   CmdStartMowing(iWaypoint)
 
 def CmdUploadMap():
    mapId = currentMapIndex + 1

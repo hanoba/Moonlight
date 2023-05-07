@@ -42,10 +42,6 @@ def WriteLog(text, end="\n"):
       f.write(time+text)
       f.close
 
-host = ""
-port = 4210
-bufsize = 256
-
 stateX = -10.0
 stateY = -10.0
 targetX = 10.0
@@ -53,10 +49,25 @@ targetY = stateY
 gpsX = stateX + 1
 gpsY = stateY + 1
 
+# UDP socket for Ardumower
+host = ""
+port = 4210
+bufsize = 256
+
 addr = (host, port)
 UDPSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDPSock.bind(addr)
 UDPSock.setblocking(0)
+
+# UDP socket for remote control
+hostRc = ""
+portRc = 4215
+
+addrRc = (hostRc, portRc)
+UDPSockRc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+UDPSockRc.bind(addrRc)
+UDPSockRc.setblocking(0)
+
 
 today = date.today()
 LogFileName = today.strftime("log/%Y-%m-%d-amcp-log.txt")
@@ -88,6 +99,17 @@ def ReceiveRaw():
       #msg = data
    return msg
 
+
+# Forward RC message to Ardumower - if available
+def ForwardRemoteControlMessage():
+   try: 
+      (data, clientAddrRc) = UDPSockRc.recvfrom(bufsize)
+   except socket.error:
+      pass
+   else:   
+      msg = data.decode('utf-8', errors="ignore")
+      UDPSock.sendto(msg.encode('utf-8'), clientAddr)
+   return
 
 # Receive message from ArduMower - if available
 def ReceiveMowerMessage():

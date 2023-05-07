@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.54 HB 2023-05-02"
+#define VER "Ardumower Moonlight, V168.55 HB 2023-05-07"
 
 #define CONTROL_PERIOD_MS 20
 #define LOG_PERIOD_MS 5000
@@ -35,6 +35,7 @@ extern bool cfgSmoothCurves;
 extern bool cfgEnablePathFinder;
 extern bool cfgMoonlightLineTracking;
 extern bool cfgBumperEnable;
+extern bool cfgEnableTiltDetection;
 
 enum OperationType {
       OP_IDLE,      

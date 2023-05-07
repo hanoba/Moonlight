@@ -193,23 +193,24 @@ def ReadMapFromSdCard(mapId):
    else: PrintGuiMessage("Maps not synchronized")
    #udp.ExecCmd(str.format('AT+R,{:d}', mapId))
 
-def StartMowing(fSpeed=0.25, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1):
+def StartMowing(fSpeed=0.25, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1):
    # AT+C,1,1,0.39,0,0,-1,-1,0,0x8  # -1 means no change, keep current value
-   #bEnableMowMotor = 1           # on
-   #iOperationType = 1            # 1=OP_MOW
-   #fSpeed = 0.25                 # m/s
-   #iFixTimeout = 0               # 0 = no fix timeout
-   #bFinishAndRestart = 0         # disabled
-   #fMowingPointPercent = -1      # 
-   #bSkipNextMowingPoint = -1     #
-   #bEnableSonar = 0              # disabled
-   #bBumperEnable                 # 0 or 1
-   #bFrontWheelDrive              # 0 or 1
-   #bMoonlightLineTracking        # 0 or 1
-   #iMowingPoint                  #
+   # 1: bEnableMowMotor = 1           # on
+   # 2: iOperationType = 1            # 1=OP_MOW
+   # 3: fSpeed = 0.25                 # m/s
+   # 4: iFixTimeout = 0               # 0 = no fix timeout
+   # 5: bFinishAndRestart = 0         # disabled
+   # 6: fMowingPointPercent = -1      # 
+   # 7: bSkipNextMowingPoint = -1     #
+   # 8: bEnableSonar = 0              # disabled
+   # 9: bBumperEnable                 # 0 or 1
+   #10: bFrontWheelDrive              # 0 or 1
+   #11: bMoonlightLineTracking        # 0 or 1
+   #12: iMowingPoint                  #
+   #13: iEnableTiltDetetction         # 0 or 1
 
    #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-   cmd = str.format('AT+C,1,1,{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d}', fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint)     
+   cmd = str.format('AT+C,1,1,{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d},{:d}', fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction)     
    udp.ExecCmd(cmd)
 
 def StartDocking():

@@ -647,33 +647,35 @@ void readIMU(){
          pitchSum = 0;
       }
 #endif
-      #ifdef ENABLE_TILT_DETECTION
-        rollChange += (imu.roll-stateRoll);
-        pitchChange += (imu.pitch-statePitch);               
-        rollChange = 0.95 * rollChange;
-        pitchChange = 0.95 * pitchChange;
-        statePitch = imu.pitch;
-        stateRoll = imu.roll;        
-        //CONSOLE.print(rollChange/PI*180.0);
-        //CONSOLE.print(",");
-        //CONSOLE.println(pitchChange/PI*180.0);
-        if ( (fabs(scalePI(imu.roll)) > 60.0/180.0*PI) || (fabs(scalePI(imu.pitch)) > 100.0/180.0*PI)
-             || (fabs(rollChange) > 30.0/180.0*PI) || (fabs(pitchChange) > 60.0/180.0*PI)   )  {
-          CONSOLE.println("ERROR IMU tilt");
-          CONSOLE.print("imu ypr=");
-          CONSOLE.print(imu.yaw/PI*180.0);
-          CONSOLE.print(",");
-          CONSOLE.print(imu.pitch/PI*180.0);
-          CONSOLE.print(",");
-          CONSOLE.print(imu.roll/PI*180.0);
-          CONSOLE.print(" rollChange=");
-          CONSOLE.print(rollChange/PI*180.0);
-          CONSOLE.print(" pitchChange=");
-          CONSOLE.println(pitchChange/PI*180.0);
-          stateSensor = SENS_IMU_TILT;
-          setOperation(OP_ERROR);
-        }           
-      #endif
+      if (cfgEnableTiltDetection)
+      {
+         rollChange += (imu.roll-stateRoll);
+         pitchChange += (imu.pitch-statePitch);               
+         rollChange = 0.95 * rollChange;
+         pitchChange = 0.95 * pitchChange;
+         statePitch = imu.pitch;
+         stateRoll = imu.roll;        
+         //CONSOLE.print(rollChange/PI*180.0);
+         //CONSOLE.print(",");
+         //CONSOLE.println(pitchChange/PI*180.0);
+         if ( (fabs(scalePI(imu.roll)) > 60.0/180.0*PI) || (fabs(scalePI(imu.pitch)) > 100.0/180.0*PI)
+              || (fabs(rollChange) > 30.0/180.0*PI) || (fabs(pitchChange) > 60.0/180.0*PI)   )  
+         {
+            CONSOLE.println("=ERROR IMU tilt");
+            CONSOLE.print("imu ypr=");
+            CONSOLE.print(imu.yaw/PI*180.0);
+            CONSOLE.print(",");
+            CONSOLE.print(imu.pitch/PI*180.0);
+            CONSOLE.print(",");
+            CONSOLE.print(imu.roll/PI*180.0);
+            CONSOLE.print(" rollChange=");
+            CONSOLE.print(rollChange/PI*180.0);
+            CONSOLE.print(" pitchChange=");
+            CONSOLE.println(pitchChange/PI*180.0);
+            stateSensor = SENS_IMU_TILT;
+            setOperation(OP_ERROR);
+         }           
+      }
       motor.robotPitch = scalePI(imu.pitch);
       maxPitch = max(maxPitch, motor.robotPitch);
       if (upHillDetectionFlag)
