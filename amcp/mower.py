@@ -193,7 +193,7 @@ def ReadMapFromSdCard(mapId):
    else: PrintGuiMessage("Maps not synchronized")
    #udp.ExecCmd(str.format('AT+R,{:d}', mapId))
 
-def StartMowing(fSpeed=0.25, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1):
+def StartMowing(fSpeed=0.25, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9):
    # AT+C,1,1,0.39,0,0,-1,-1,0,0x8  # -1 means no change, keep current value
    # 1: bEnableMowMotor = 1           # on
    # 2: iOperationType = 1            # 1=OP_MOW
@@ -210,7 +210,8 @@ def StartMowing(fSpeed=0.25, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0,
    #13: iEnableTiltDetetction         # 0 or 1
 
    #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-   cmd = str.format('AT+C,1,1,{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d},{:d}', fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction)     
+   cmd = str.format('AT+C,1,1,{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d},{:d},{:.2f}', 
+         fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular)     
    udp.ExecCmd(cmd)
 
 def StartDocking():

@@ -291,7 +291,8 @@ def ArdumowerControlProgram():
    config_menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
    config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
    config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
-   config_menu.add.text_input('Mower speed in m/s: ', textinput_id='ID_MOWER_SPEED', default='0.35')
+   config_menu.add.text_input('Linear speed in m/s: ', textinput_id='ID_LINEAR_SPEED', default='0.35')
+   config_menu.add.text_input('Angular speed in rad/s: ', textinput_id='ID_ANGULAR_SPEED', default='0.9')
    config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='60')
    config_menu.add.text_input('Set Waypoint: ', textinput_id='ID_WAYPOINT', default='0')
    config_menu.add.text_input('Enable Bumper: ', textinput_id='ID_BUMPER_ENABLE', default='1')
@@ -647,12 +648,13 @@ def CmdStartMowing(iWaypoint = -1):
    global config_menu
    data = config_menu.get_input_data()
    fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
-   mowerSpeed = float(data.get('ID_MOWER_SPEED'))
+   linearSpeed = float(data.get('ID_LINEAR_SPEED'))
+   angularSpeed = float(data.get('ID_ANGULAR_SPEED'))
    iBumperEnable = int(data.get('ID_BUMPER_ENABLE'))
    iFrontWheelDrive = int(data.get('ID_FRONT_WHEEL_DRIVE'))
    iMlLineTracking = int(data.get('ID_ML_LINE_TRACKING'))
    iEnableTiltDetetction = int(data.get('ID_ENABLE_TILT_DETECTION'))
-   mower.StartMowing(mowerSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iWaypoint, iEnableTiltDetetction)
+   mower.StartMowing(linearSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iWaypoint, iEnableTiltDetetction, angularSpeed)
 
 
 def CmdStartMowingFromWaypoint():

@@ -142,6 +142,7 @@ float lastPosN = 0;
 float lastPosE = 0;
 
 unsigned long linearMotionStartTime = 0;
+unsigned long bumperDeadTime = 0;
 unsigned long driveReverseStopTime = 0;
 unsigned long nextControlTime = 0;
 unsigned long lastComputeTime = 0;
@@ -178,9 +179,11 @@ int freeMemory() {
 }
 
 // reset motion measurement
-void resetLinearMotionMeasurement(){
-  linearMotionStartTime = millis();  
-  //stateGroundSpeed = 1.0;
+void resetLinearMotionMeasurement()
+{
+   linearMotionStartTime = millis();  
+   bumperDeadTime = linearMotionStartTime + BUMPER_DEAD_TIME;
+   //stateGroundSpeed = 1.0;
 }
 
 void resetGPSMotionMeasurement(){
@@ -1095,8 +1098,9 @@ void detectObstacle()
    
    if (cfgBumperEnable)
    {
-      if ( (millis() > linearMotionStartTime + 5000) && (bumper.obstacle()) )
+      if (millis() > bumperDeadTime && bumper.obstacle())
       {  
+         bumperDeadTime = millis() + BUMPER_DEAD_TIME;
          CONSOLE.println("=bumper obstacle!");    
          statMowBumperCounter++;
          triggerObstacle();    
@@ -1325,6 +1329,7 @@ void run()
                      maps.skipNextMowingPoint();
                      maps.skipNextMowingPoint();
                      setOperation(stateOp, true);    // continue current operation
+                     bumperDeadTime = millis() + BUMPER_DEAD_TIME;
                   }
                }
             } 

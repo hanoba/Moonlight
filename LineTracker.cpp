@@ -156,7 +156,7 @@ void trackLine(){
   if (!angleToTargetFits){
     // angular control (if angle to far away, rotate to next waypoint)
     linear = 0;
-    angular = 0.5;               
+    angular = cfgAngularSpeed;      //HB was 0.5;               
     if ((!rotateLeft) && (!rotateRight)) // decide for one rotation direction (and keep it)
     {
        if (cfgMoonlightLineTracking)
@@ -171,8 +171,6 @@ void trackLine(){
           if (!maps.trackReverse) {
             r = get_turn_direction_preference();
           }        
-          // store last_rotation_target point
-          last_rotation_target.setXY(target.x(), target.y());
           
           if (r == 1) {
             //CONSOLE.println("force turn right");
@@ -190,6 +188,8 @@ void trackLine(){
             rotateLeft = true;
           }
        }
+       // store last_rotation_target point
+       last_rotation_target.setXY(target.x(), target.y());
        trackerDiffDelta_positive = (trackerDiffDelta >= 0);
     }        
     if (trackerDiffDelta_positive != (trackerDiffDelta >= 0)) {
