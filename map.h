@@ -201,6 +201,10 @@ class Map
     bool save();
     void stressTest();
     long calcMapCRC();
+    bool isObstacleMap();
+    bool isObstacleMowPoint();
+    bool obstacle();
+    bool obstacleTargetReached = false;
   private:
     void finishedUploadingMap();
     void checkMemoryErrors();

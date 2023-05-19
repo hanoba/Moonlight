@@ -1838,7 +1838,6 @@ void Map::stressTest(){
 }
   
   
-
 // integer calculation correctness test
 void Map::testIntegerCalcs(){  
   Point pt;
@@ -1862,4 +1861,24 @@ void Map::testIntegerCalcs(){
     CONSOLE.print(",");
   }   
 }
-    
+ 
+bool Map::isObstacleMap() 
+{ 
+   return mapID >= 11; 
+}
+
+bool Map::isObstacleMowPoint() 
+{ 
+   return isObstacleMap() && (mowPointsIdx & 1) == 1; 
+}
+
+// inform LineTracker that obstacle has been hit
+bool Map::obstacle()
+{
+   if (isObstacleMowPoint())
+   {
+      obstacleTargetReached = true;
+      return true;
+   }
+   return false;
+}

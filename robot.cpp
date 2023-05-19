@@ -1024,13 +1024,13 @@ bool robotShouldMove(){
 }
 
 
-void triggerObstacle(){
-   CONSOLE.println("triggerObstacle");    
+void triggerObstacle()
+{
+   CONSOLE.println(F("=triggerObstacle"));
    statMowObstacles++;    
    if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
    {
-      driveReverseStopTime = millis() + 3000;
-      //driveReverseStopTime = millis() + 2000;    
+      if (maps.obstacle() == false) driveReverseStopTime = millis() + 3000;
    } else { 
       stateSensor = SENS_OBSTACLE;
       setOperation(OP_ERROR);

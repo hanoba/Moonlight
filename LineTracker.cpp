@@ -112,7 +112,8 @@ int get_turn_direction_preference() {
 // control robot velocity (linear,angular) to track line to next waypoint (target)
 // uses a stanley controller for line tracking
 // https://medium.com/@dingyan7361/three-methods-of-vehicle-lateral-control-pure-pursuit-stanley-and-mpc-db8cc1d32081
-void trackLine(){  
+void trackLine()
+{  
   Point target = maps.targetPoint;
   Point lastTarget = maps.lastTargetPoint;
   float linear = 1.0;  
@@ -128,10 +129,12 @@ void trackLine(){
   float targetDist = maps.distanceToTargetPoint(stateX, stateY);
   
   float lastTargetDist = maps.distanceToLastTargetPoint(stateX, stateY);  
-  if (cfgSmoothCurves)
-    targetReached = (targetDist < 0.2);    
+  // MAP11..14 are "bumper maps". Mow until bumper hits for odd mow points
+  if (maps.isObstacleMap()) targetReached = maps.obstacleTargetReached;
+  else if (cfgSmoothCurves)
+     targetReached = (targetDist < 0.2);    
   else 
-    targetReached = (targetDist < 0.05);    
+     targetReached = (targetDist < 0.05);    
   
   if ( (last_rotation_target.x() != target.x() || last_rotation_target.y() != target.y()) &&
         (rotateLeft || rotateRight ) ) {
@@ -322,32 +325,43 @@ void trackLine(){
   // if (detectLift()) mow = false; // in any case, turn off mower motor if lifted 
   motor.setMowState(mow);
    
-  if (targetReached){
-    rotateLeft = false;
-    rotateRight = false;
-    if (maps.wayMode == WAY_MOW){
-      maps.clearObstacles(); // clear obstacles if target reached
-    }
-    bool straight = maps.nextPointIsStraight();
-    if (!maps.nextPoint(false)){
-      // finish        
-      if (stateOp == OP_DOCK){
-        CONSOLE.println("docking finished!");
-        setOperation(OP_IDLE); 
-      } else {
-        CONSOLE.println("mowing finished!");
-        if (!finishAndRestart){             
-          if (DOCKING_STATION){
-            setOperation(OP_DOCK);               
-          } else {
-            setOperation(OP_IDLE); 
-          }
-        }                   
-      }
-    } else {      
-      // next waypoint          
-      //if (!straight) angleToTargetFits = false;      
-    }
+  if (targetReached)
+  {
+     linear = 0;
+     angular = 0;
+     if (maps.isObstacleMowPoint() && maps.obstacleTargetReached) 
+     {
+        motorDriver.frontWheelDrive = true;
+        maps.obstacleTargetReached = false;
+     }
+     else motorDriver.frontWheelDrive = false;
+     rotateLeft = false;
+     rotateRight = false;
+     if (maps.wayMode == WAY_MOW){
+       maps.clearObstacles(); // clear obstacles if target reached
+     }
+     bool straight = maps.nextPointIsStraight();
+     if (!maps.nextPoint(false)){
+       // finish        
+       if (stateOp == OP_DOCK){
+         CONSOLE.println("docking finished!");
+         setOperation(OP_IDLE); 
+       } else {
+         CONSOLE.println("mowing finished!");
+         if (!finishAndRestart){             
+           if (DOCKING_STATION){
+             setOperation(OP_DOCK);               
+           } else {
+             setOperation(OP_IDLE); 
+           }
+         }                   
+       }
+     } else {      
+       // next waypoint          
+       //if (!straight) angleToTargetFits = false;      
+     }
   }  
+  motor.setLinearAngularSpeed(linear, angular);      
+
 }
 
