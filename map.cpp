@@ -901,23 +901,23 @@ bool Map::startDocking(float stateX, float stateY){
     if (findPath(src, dst)){      
       return true;
     } else {
-      CONSOLE.println("ERROR: no path");
+      CONSOLE.println(F("=ERROR: no path"));
       return false;
     }
   } else {
-    CONSOLE.println("ERROR: no points");
+    CONSOLE.println(F("=ERROR: no points"));
     return false; 
   }
 }
 
 bool Map::startMowing(float stateX, float stateY){  
-  CONSOLE.println("Map::startMowing");
+  CONSOLE.println(F("Map::startMowing"));
   //stressTest();
   //testIntegerCalcs();
   //return false;
   // ------
   if ((memoryCorruptions != 0) || (memoryAllocErrors != 0)){
-    CONSOLE.println("ERROR startMowing: memory errors");
+    CONSOLE.println(F("=ERROR startMowing: memory errors"));
     return false; 
   }  
   shouldDock = false;
@@ -1778,7 +1778,7 @@ bool Map::findPath(Point &src, Point &dst){
       }
     } 
     
-    CONSOLE.print("finish nodes=");
+    CONSOLE.print(F("finish nodes="));
     CONSOLE.println(pathFinderNodes.numNodes);
       
     if ((currentNode != NULL) && (distance(*currentNode->point, *end->point) < 0.02)) {
@@ -1793,7 +1793,7 @@ bool Map::findPath(Point &src, Point &dst){
       int idx = nodeCount-1;
       while(curr) {                                
         freePoints.points[idx].assign( *curr->point );
-        CONSOLE.print("node pt=");
+        CONSOLE.print(F("node pt="));
         CONSOLE.print(curr->point->x());
         CONSOLE.print(",");
         CONSOLE.println(curr->point->y());
@@ -1802,7 +1802,7 @@ bool Map::findPath(Point &src, Point &dst){
       }            
     } else {
       // No result was found
-      CONSOLE.println("pathfinder: no path");      
+      CONSOLE.println(F("=ERROR: No path found by pathfinder"));      
       return false;
       //freePoints.alloc(2);
       //freePoints.points[0].assign(src);    

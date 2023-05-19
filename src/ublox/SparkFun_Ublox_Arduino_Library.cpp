@@ -229,14 +229,20 @@ void SFE_UBLOX_GPS::GnssWarmRestart()
 
 void SFE_UBLOX_GPS::GnssColdRestart()
 {
-  // Issue hard reset
+  // Issue hardware reset
+  // 0x00 = Hardware reset (watchdog) immediately
+  // 0x01 = Controlled software reset
+  // 0x02 = Controlled software reset (GNSS only)
+  // 0x04 = Hardware reset (watchdog) after shutdown
+  // 0x08 = Controlled GNSS stop
+  // 0x09 = Controlled GNSS start
   packetCfg.cls = UBX_CLASS_CFG;
   packetCfg.id = UBX_CFG_RST;
   packetCfg.len = 4;
   packetCfg.startingSpot = 0;
   payloadCfg[0] = 0xff;       // cold start
   payloadCfg[1] = 0xff;       // cold start
-  payloadCfg[2] = 0x02;       // 0x02=software reset (GNSS only)
+  payloadCfg[2] = 0x00;       // 0x00=hardware reset (was 0x02)
   payloadCfg[3] = 0;          // reserved
   sendCommand(&packetCfg, 0); // don't expect ACK
 }
