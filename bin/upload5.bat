@@ -6,6 +6,9 @@ echo Erzwinge Reset durch oeffnen/schliessen mit 1200 bps auf dem Port %PORT%
 mode %PORT%:1200
 :: timeout /T 10 wartet 10 Sekunden, die Wartezeit kann mit einer beliebigen Taste übersprungen werden, um dies zu verhindern gibt es den Parameter: /nobreak
 timeout /T 1 >nul
+echo.
+echo Uploading file %BIN%
+echo.
 :: Usage: bossac.exe [OPTION...] [FILE]
 :: Basic Open Source SAM-BA Application (BOSSA) Version 1.6.1-arduino
 :: Flash programmer for Atmel SAM devices.

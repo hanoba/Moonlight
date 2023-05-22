@@ -1215,7 +1215,7 @@ void outputConsoleInit()
 
    GetDateTime(now);
    //timestampOffset_sec = now.second + (now.minute + now.hour * 60) * 60 - millis()/1000;
-   CONSOLE.print("Current datetime: ");
+   CONSOLE.print(F("Current datetime: "));
    CONSOLE.println(DateTime2String(now));
 }
 
@@ -1224,9 +1224,10 @@ void outputConsole()
   char buf[40];
   static const float DEGREE = 180 / PI;
 
-  if (millis() > nextInfoTime){
+  if (millis() > nextInfoTime)
+  {
     bool started = (nextInfoTime == 0);
-    nextInfoTime = millis() + LOG_PERIOD_MS; //(simulationFlag ? 1000: LOG_PERIOD_MS);
+    nextInfoTime = millis() + LOG_PERIOD_MS;  //(simulationFlag ? 1000: LOG_PERIOD_MS);
 
     //unsigned long totalsecs = millis()/1000 + timestampOffset_sec;
     //unsigned long totalmins = totalsecs/60;
@@ -1352,6 +1353,12 @@ void outputConsole()
     PRINT("/%-3d", maps.mowPoints.numPoints);
 
     CONSOLE.println();
+
+    // log additional info
+    // PRINT(" posStep=%f ", sim.posStep);
+    // PRINT(" deltaStep=%f ", sim.deltaStep);
+    // CONSOLE.println();
+
     //logCPUHealth();
   }
 }

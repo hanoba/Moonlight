@@ -35,6 +35,45 @@ FRAME_RATE = 20
 
 aliveCounter=0
 
+# Mower
+B = 4
+L = 8
+MowerPolygon = [(-L,-B), (0,-B), (L,0), (0,B), (-L,B)]
+
+
+def Rotate(poly, phi):
+   cos_phi = math.cos(phi)
+   sin_phi = math.sin(phi)
+   length = len(poly)
+   for i in range(length):
+       (x,y) = poly[i]
+       xn = x*cos_phi - y*sin_phi
+       yn=  x*sin_phi + y*cos_phi
+       poly[i] = (xn,yn)
+   return
+
+
+def DrawMower():
+    (mowerPosX, mowerPosY) = maps.Map2ScreenXY(udp.stateX, udp.stateY)
+    #(mowerPosX, mowerPosY) = maps.Map2ScreenXY(0, 0)
+    #print((mowerPosX, mowerPosY))
+    #mowerLocation = maps.Map2ScreenXY(udp.stateX, udp.stateY)
+    pygame.draw.circle(screen, YELLOW, (mowerPosX, mowerPosY), 5, 1)
+    delta = udp.stateDeltaDegree * math.pi / 180
+    poly = MowerPolygon.copy()
+    Rotate(poly, delta)
+    length = len(poly)
+    for i in range(length):
+        (x,y) = poly[i]
+        x =  (mowerPosX + x)
+        y =  (mowerPosY - y)
+        poly[i] = (x,y)
+    fcol = GREEN
+    #print(poly)
+    pygame.draw.polygon(screen, fcol, poly)
+    return
+
+
 def KeepMowerAlive(aliveCounterThreshold):
    global aliveCounter
    aliveCounter += 1
@@ -570,8 +609,9 @@ def ArdumowerControlProgram():
       if DrawHeatmapFlag: heatmap.DrawHeatmap(screen)
       
       # Show mower location
-      mowerLocation = maps.Map2ScreenXY(udp.stateX, udp.stateY)
-      pygame.draw.circle(screen, YELLOW, mowerLocation, 5, 1)
+      #mowerLocation = maps.Map2ScreenXY(udp.stateX, udp.stateY)
+      #pygame.draw.circle(screen, YELLOW, mowerLocation, 5, 1)
+      DrawMower()
       
       # Show mower GPS location
       gpsLocation = maps.Map2ScreenXY(udp.gpsX, udp.gpsY)

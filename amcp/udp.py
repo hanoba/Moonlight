@@ -44,6 +44,7 @@ def WriteLog(text, end="\n"):
 
 stateX = -10.0
 stateY = -10.0
+stateDeltaDegree = 0
 targetX = 10.0
 targetY = stateY
 gpsX = stateX + 1
@@ -113,7 +114,7 @@ def ForwardRemoteControlMessage():
 
 # Receive message from ArduMower - if available
 def ReceiveMowerMessage():
-   global stateX, stateY
+   global stateX, stateY, stateDeltaDegree
    global targetX, targetY
    global gpsX, gpsY
    global logMessage
@@ -129,6 +130,9 @@ def ReceiveMowerMessage():
          targetY = float(fields[n+1])
          stateX = float(fields[n+2])
          stateY = float(fields[n+3])
+         f = fields[n+4]
+         f = f[0:len(f)-1]
+         stateDeltaDegree = float(f)
          gpsX = float(fields[n+5])
          gpsY = float(fields[n+6])
          logMessage = msg[1:len(msg)-2]

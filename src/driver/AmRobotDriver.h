@@ -31,6 +31,7 @@ class AmMotorDriver: public MotorDriver {
     void getMotorCurrent(float &leftCurrent, float &rightCurrent, float &mowCurrent) override;
     void getMotorEncoderTicks(int &leftTicks, int &rightTicks, int &mowTicks) override;
     bool frontWheelDrive = false;
+    bool reverseDrive = false;
 protected:
     void setMC33926(int pinDir, int pinPWM, int speed);
 

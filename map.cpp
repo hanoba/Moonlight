@@ -1869,7 +1869,7 @@ bool Map::isObstacleMap()
 
 bool Map::isObstacleMowPoint() 
 { 
-   return isObstacleMap() && (mowPointsIdx & 1) == 1; 
+   return isObstacleMap() && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;  
 }
 
 // inform LineTracker that obstacle has been hit

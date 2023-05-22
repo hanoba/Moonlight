@@ -625,7 +625,7 @@ void readIMU(){
       // quaternion values -- to estimate roll, pitch, and yaw
       //  toEulerianAngle(imu.calcQuat(imu.qw), imu.calcQuat(imu.qx), imu.calcQuat(imu.qy), imu.calcQuat(imu.qz), imu.roll, imu.pitch, imu.yaw);
       imu.computeEulerAngles(false);   
-      if (motorDriver.frontWheelDrive)
+      if (motorDriver.reverseDrive ? !motorDriver.frontWheelDrive : motorDriver.frontWheelDrive)
       {
          imu.yaw = imu.yaw>0 ? imu.yaw-PI : imu.yaw+PI;
          imu.pitch = -imu.pitch;
@@ -781,7 +781,7 @@ void start()
 #if defined(ENABLE_SD)
   if (SD.begin(SDCARD_SS_PIN))
   {
-     CONSOLE.println("SD card found!");
+     CONSOLE.println(F("SD card found!"));
      SdCardDateTimeInit();
 #if defined(ENABLE_SD_LOG)        
      sdSerial.beginSD();
@@ -789,10 +789,10 @@ void start()
   }
   else
   {
-     CONSOLE.println("no SD card found");
+     CONSOLE.println(F("no SD card found"));
   }
 #endif 
-
+  startWIFI();
   outputConsoleInit();
 
   logResetCause();
@@ -822,22 +822,22 @@ void start()
     tof.setTimeout(500);
     if (!tof.init())
     {
-      CONSOLE.println("Failed to detect and initialize tof sensor");
+      CONSOLE.println(F("Failed to detect and initialize tof sensor"));
       delay(1000);
     }
     tof.startContinuous(100);
   }        
   
-  CONSOLE.print("SERIAL_BUFFER_SIZE=");
+  CONSOLE.print(F("SERIAL_BUFFER_SIZE="));
   CONSOLE.print(SERIAL_BUFFER_SIZE);
-  CONSOLE.println(" (increase if you experience GPS checksum errors)");
-  CONSOLE.println("-----------------------------------------------------");
-  CONSOLE.println("NOTE: if you experience GPS checksum errors, try to increase UART FIFO size:");
-  CONSOLE.println("1. Arduino IDE->File->Preferences->Click on 'preferences.txt' at the bottom");
-  CONSOLE.println("2. Locate file 'packages/arduino/hardware/sam/xxxxx/cores/arduino/RingBuffer.h");
-  CONSOLE.println("   for Grand Central M4 'packages/adafruit/hardware/samd/xxxxx/cores/arduino/RingBuffer.h");  
-  CONSOLE.println("change:     #define SERIAL_BUFFER_SIZE 128     into into:     #define SERIAL_BUFFER_SIZE 1024");
-  CONSOLE.println("-----------------------------------------------------");
+  CONSOLE.println(F(" (increase if you experience GPS checksum errors)"));
+  CONSOLE.println(F("-----------------------------------------------------"));
+  CONSOLE.println(F("NOTE: if you experience GPS checksum errors, try to increase UART FIFO size:"));
+  CONSOLE.println(F("1. Arduino IDE->File->Preferences->Click on 'preferences.txt' at the bottom"));
+  CONSOLE.println(F("2. Locate file 'packages/arduino/hardware/sam/xxxxx/cores/arduino/RingBuffer.h"));
+  CONSOLE.println(F("   for Grand Central M4 'packages/adafruit/hardware/samd/xxxxx/cores/arduino/RingBuffer.h"));  
+  CONSOLE.println(F("change:     #define SERIAL_BUFFER_SIZE 128     into into:     #define SERIAL_BUFFER_SIZE 1024"));
+  CONSOLE.println(F("-----------------------------------------------------"));
   
   gps.begin();   
   maps.begin();      
@@ -846,7 +846,7 @@ void start()
   if (!simulationFlag) myHumidity.begin();    
 
   // initialize ESP module
-  startWIFI();  
+  //HB startWIFI();  moved up
 
   rcmodel.begin();  
   

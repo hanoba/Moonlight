@@ -2,12 +2,12 @@
 class Sim
 {
    float posX, posY;    // simulated mower position
-   float posStep;
    float delta;         // simulated mower direction
-   float deltaStep;
    float speed;
    unsigned long nextGpsMsgTime;    // for GPS logging
 public:
+   float posStep;
+   float deltaStep;
    bool activeFlag = false;
    bool homeFlag = true;
    bool SetLinearAngularSpeed(float lin, float ang);

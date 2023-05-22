@@ -130,7 +130,7 @@ void trackLine()
   
   float lastTargetDist = maps.distanceToLastTargetPoint(stateX, stateY);  
   // MAP11..14 are "bumper maps". Mow until bumper hits for odd mow points
-  if (maps.isObstacleMap()) targetReached = maps.obstacleTargetReached;
+  if (maps.isObstacleMowPoint()) targetReached = maps.obstacleTargetReached;
   else if (cfgSmoothCurves)
      targetReached = (targetDist < 0.2);    
   else 
@@ -321,20 +321,21 @@ void trackLine()
       langleToTargetFits = angleToTargetFits;
   }
 
-  motor.setLinearAngularSpeed(linear, angular);      
+  //HB moved down: motor.setLinearAngularSpeed(linear, angular);      
   // if (detectLift()) mow = false; // in any case, turn off mower motor if lifted 
   motor.setMowState(mow);
    
   if (targetReached)
   {
+     CONSOLE.println(F(" Target reached!"));
      linear = 0;
      angular = 0;
      if (maps.isObstacleMowPoint() && maps.obstacleTargetReached) 
      {
-        motorDriver.frontWheelDrive = true;
+        motorDriver.reverseDrive = true;
         maps.obstacleTargetReached = false;
      }
-     else motorDriver.frontWheelDrive = false;
+     else motorDriver.reverseDrive = false;
      rotateLeft = false;
      rotateRight = false;
      if (maps.wayMode == WAY_MOW){
@@ -344,10 +345,10 @@ void trackLine()
      if (!maps.nextPoint(false)){
        // finish        
        if (stateOp == OP_DOCK){
-         CONSOLE.println("docking finished!");
+         CONSOLE.println(F("=docking finished!"));
          setOperation(OP_IDLE); 
        } else {
-         CONSOLE.println("mowing finished!");
+         CONSOLE.println(F("=mowing finished!"));
          if (!finishAndRestart){             
            if (DOCKING_STATION){
              setOperation(OP_DOCK);               
@@ -361,7 +362,7 @@ void trackLine()
        //if (!straight) angleToTargetFits = false;      
      }
   }  
-  motor.setLinearAngularSpeed(linear, angular);      
+  motor.setLinearAngularSpeed(linear, angular);
 
 }
 

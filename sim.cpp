@@ -55,6 +55,7 @@ bool Sim::ComputeRobotState()
       gps.relPosN = posY;
       gps.height = 415;
       gps.dgpsAge = millis();
+      lastFixTime = gps.dgpsAge;
 
       // simulate GPS logging
 #ifdef MOONLIGHT_LOG_GPS_POSITION

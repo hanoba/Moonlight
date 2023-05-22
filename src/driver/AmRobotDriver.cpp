@@ -111,15 +111,15 @@ void AmMotorDriver::setMC33926(int pinDir, int pinPWM, int speed) {
     
 void AmMotorDriver::setMotorPwm(int leftPwm, int rightPwm, int mowPwm)
 {
-   if (frontWheelDrive)    // swap left and right and change direction
+   if (reverseDrive ? !frontWheelDrive : frontWheelDrive)    // swap left and right and change direction
    {
       int tmp = leftPwm;
       leftPwm = -rightPwm;
       rightPwm = -tmp;
    }
-  setMC33926(pinMotorLeftDir, pinMotorLeftPWM, leftPwm);
-  setMC33926(pinMotorRightDir, pinMotorRightPWM, rightPwm);
-  setMC33926(pinMotorMowDir, pinMotorMowPWM, mowPwm);
+   setMC33926(pinMotorLeftDir, pinMotorLeftPWM, leftPwm);
+   setMC33926(pinMotorRightDir, pinMotorRightPWM, rightPwm);
+   setMC33926(pinMotorMowDir, pinMotorMowPWM, mowPwm);
 }
 
 
@@ -173,7 +173,7 @@ void AmMotorDriver::getMotorCurrent(float &leftCurrent, float &rightCurrent, flo
 
 void AmMotorDriver::getMotorEncoderTicks(int &leftTicks, int &rightTicks, int &mowTicks)
 {
-   if (frontWheelDrive)    // swap left and right
+   if (reverseDrive ? !frontWheelDrive : frontWheelDrive)    // swap left and right
    {
       leftTicks = odomTicksRight;
       rightTicks = odomTicksLeft;  
