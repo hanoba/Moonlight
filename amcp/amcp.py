@@ -6,6 +6,7 @@ import plan
 import udp
 import mower
 import heatmap
+import param
 from datetime import datetime
 from version import versionString
 import pygame_menu
@@ -328,17 +329,17 @@ def ArdumowerControlProgram():
    config_menu.add.button('GNSS Cold Reboot', mower.GnssColdReboot)
    config_menu.add.button('Sync RTC with current time', mower.SyncRtc)
    config_menu.add.button('ClearStatistics (c)', mower.ClearStatistics)
-   config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default='maps.json')
-   config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default='export.json')
-   config_menu.add.text_input('Linear speed in m/s: ', textinput_id='ID_LINEAR_SPEED', default='0.35')
-   config_menu.add.text_input('Angular speed in rad/s: ', textinput_id='ID_ANGULAR_SPEED', default='0.9')
-   config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default='60')
-   config_menu.add.text_input('Set Waypoint: ', textinput_id='ID_WAYPOINT', default='0')
-   config_menu.add.text_input('Enable Bumper: ', textinput_id='ID_BUMPER_ENABLE', default='1')
-   config_menu.add.text_input('Front Wheel Drive: ', textinput_id='ID_FRONT_WHEEL_DRIVE', default='0')
-   config_menu.add.text_input('Moonlight Line Tracking: ', textinput_id='ID_ML_LINE_TRACKING', default='0')
-   config_menu.add.text_input('Enable Tilt Detection: ', textinput_id='ID_ENABLE_TILT_DETECTION', default='1')
-   config_menu.add.text_input('GPS Config Filter: ', textinput_id='ID_GPS_CONFIG_FILTER', default='10,10,30')
+   config_menu.add.text_input('Maps File Name: ', textinput_id='ID_MAPS_FILE_NAME', default=param.mapFileName)
+   config_menu.add.text_input('Export File Name: ', textinput_id='ID_EXPORT_FILE_NAME', default=param.exportFileName)
+   config_menu.add.text_input('Linear speed in m/s: ', textinput_id='ID_LINEAR_SPEED', default=param.linearSpeed)
+   config_menu.add.text_input('Angular speed in rad/s: ', textinput_id='ID_ANGULAR_SPEED', default=param.angularSpeed)
+   config_menu.add.text_input('Fix Timeout in sec: ', textinput_id='ID_FIX_TIMEOUT', default=param.fixTimeout)
+   config_menu.add.text_input('Set Waypoint: ', textinput_id='ID_WAYPOINT', default=param.waypoint)
+   config_menu.add.text_input('Enable Bumper: ', textinput_id='ID_BUMPER_ENABLE', default=param.bumperEnable)
+   config_menu.add.text_input('Front Wheel Drive: ', textinput_id='ID_FRONT_WHEEL_DRIVE', default=param.frontWheelDrive)
+   config_menu.add.text_input('Moonlight Line Tracking: ', textinput_id='ID_ML_LINE_TRACKING', default=param.mlLineTracking)
+   config_menu.add.text_input('Enable Tilt Detection: ', textinput_id='ID_ENABLE_TILT_DETECTION', default=param.enableTiltDetection)
+   config_menu.add.text_input('GPS Config Filter: ', textinput_id='ID_GPS_CONFIG_FILTER', default=param.gpsConfigFilter)
    config_menu.add.button('Upload GPS Config Filter', CmdUploadGpsConfigFilter)
    config_menu.add.button('Return to Main Menu', pygame_menu.events.BACK)
 
@@ -731,3 +732,21 @@ def CmdConvertRectangleToTrapezoid():
 ArdumowerControlProgram()
 udp.close()
 pygame.quit()
+
+# save mower configuration
+global config_menu
+data = config_menu.get_input_data()
+file = open("param.py","w")
+file.write("mapFileName='"+data.get('ID_MAPS_FILE_NAME')+"'\n")
+file.write("exportFileName='"+data.get('ID_EXPORT_FILE_NAME')+"'\n")
+file.write("linearSpeed='"+data.get('ID_LINEAR_SPEED')+"'\n")
+file.write("angularSpeed='"+data.get('ID_ANGULAR_SPEED')+"'\n")
+file.write("fixTimeout='"+data.get('ID_FIX_TIMEOUT')+"'\n")
+file.write("waypoint='"+data.get('ID_WAYPOINT')+"'\n")
+file.write("bumperEnable='"+data.get('ID_BUMPER_ENABLE')+"'\n")
+file.write("frontWheelDrive='"+data.get('ID_FRONT_WHEEL_DRIVE')+"'\n")
+file.write("mlLineTracking='"+data.get('ID_ML_LINE_TRACKING')+"'\n")
+file.write("enableTiltDetection='"+data.get('ID_ENABLE_TILT_DETECTION')+"'\n")
+file.write("gpsConfigFilter='"+data.get('ID_GPS_CONFIG_FILTER')+"'\n")
+
+file.close() 
