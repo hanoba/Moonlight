@@ -221,9 +221,9 @@ void trackLine()
       linear = 0.1; // reduce speed when approaching/leaving waypoints          
     } 
     else {
-      if (gps.solution == UBLOX::SOL_FLOAT)        
-        linear = max(setSpeed/2, 0.2); // reduce speed for float solution
-      else
+      //if (gps.solution == UBLOX::SOL_FLOAT)        
+      //  linear = max(setSpeed/2, 0.2); // reduce speed for float solution
+      //else
         linear = setSpeed;         // desired speed
       if (sonar.nearObstacle()) linear = 0.1; // slow down near obstacles
       if (upHillFlag) linear = 0.1;   //HB vermeiden, dass Mower kippt bei grossen Steigungen
