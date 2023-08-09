@@ -1880,5 +1880,5 @@ bool Map::obstacle()
       obstacleTargetReached = true;
       return true;
    }
-   return false;
+   return isObstacleMap();
 }
