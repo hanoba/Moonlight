@@ -1415,6 +1415,8 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       dockingInitiatedByOperator = true;
       motor.setLinearAngularSpeed(0,0);
       motor.setMowState(false);
+      //HB: reservseDrive might be true in cases of ObstacleMaps!
+      motorDriver.reverseDrive = false;
       break;
     case OP_UNDOCK:
       CONSOLE.println(" OP_UNDOCK");
