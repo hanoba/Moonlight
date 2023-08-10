@@ -1087,7 +1087,7 @@ void detectObstacle()
          if (tofMeasurements.getAverage(avg) == tofMeasurements.OK){
            //CONSOLE.println(avg);
            if (avg < TOF_OBSTACLE_CM * 10){
-             CONSOLE.println("ToF obstacle!");    
+             CONSOLE.println(F("ToF obstacle!"));
              triggerObstacle();                
              return; 
            }
@@ -1101,14 +1101,14 @@ void detectObstacle()
       if (millis() > bumperDeadTime && bumper.obstacle())
       {  
          bumperDeadTime = millis() + BUMPER_DEAD_TIME;
-         CONSOLE.println("=bumper obstacle!");    
+         CONSOLE.println(F("=bumper obstacle!"));    
          statMowBumperCounter++;
          triggerObstacle();    
          return;
       }
    }
    if (sonar.obstacle() && (maps.wayMode != WAY_DOCK)){
-     CONSOLE.println("=sonar obstacle!");    
+     CONSOLE.println(F("=sonar obstacle!"));    
      statMowSonarCounter++;
      if (SONAR_TRIGGER_OBSTACLES){
        triggerObstacle();
@@ -1116,18 +1116,21 @@ void detectObstacle()
      }        
    }  
    // check if GPS motion (obstacle detection)  
-   if (millis() > nextGPSMotionCheckTime){        
-     resetGPSMotionMeasurement();
-     float dX = lastGPSMotionX - stateX;
-     float dY = lastGPSMotionY - stateY;
-     float delta = sqrt( sq(dX) + sq(dY) );    
-     if (delta < 0.05){
-       if (GPS_MOTION_DETECTION){
-         CONSOLE.println("=gps no motion => obstacle!");
-         statMowGPSMotionTimeoutCounter++;
-         triggerObstacle();
-         return;
-       }
+   if (millis() > nextGPSMotionCheckTime)
+   {        
+     resetGPSMotionMeasurement();  
+     if (GPS_MOTION_DETECTION)
+     {
+         float dX = lastGPSMotionX - stateX;
+         float dY = lastGPSMotionY - stateY;
+         float delta = sqrt( sq(dX) + sq(dY) );    
+         if (delta < 0.05)
+         {
+             CONSOLE.println(F("=gps no motion => obstacle!"));
+             statMowGPSMotionTimeoutCounter++;
+             triggerObstacle();
+             return;
+         }
      }
      lastGPSMotionX = stateX;      
      lastGPSMotionY = stateY;      
