@@ -113,8 +113,6 @@ class NodeList  // owns nodes!
 // perimeter points:  fixed and transfered by the phone
 
 extern bool USE_IMU; // allow using IMU?
-extern bool USE_GPS_FLOAT_FOR_POS_ESTIMATION;    // use GPS float solution for position estimation?
-extern bool USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;  // use GPS float solution for delta estimation?
 
 
 class Map
@@ -132,6 +130,7 @@ class Map
     bool useGPSfloatForPosEstimation;    // use GPS float solution for position estimation?
     bool useGPSfloatForDeltaEstimation;  // use GPS float solution for delta estimation?
     bool useIMU; // allow using IMU?
+    bool isObstacleMap = false;
     
     
     
@@ -201,7 +200,6 @@ class Map
     bool save();
     void stressTest();
     long calcMapCRC();
-    bool isObstacleMap();
     bool isObstacleMowPoint();
     bool obstacle();
     bool obstacleTargetReached = false;

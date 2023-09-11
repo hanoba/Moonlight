@@ -23,8 +23,6 @@ unsigned long memoryCorruptions = 0;
 unsigned long memoryAllocErrors = 0;
 
 bool USE_IMU = true; // allow using IMU?
-bool USE_GPS_FLOAT_FOR_POS_ESTIMATION = false;
-bool USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = false;
 
 Point::Point(){
   init();
@@ -467,8 +465,8 @@ void Map::begin(){
   wayMode = WAY_MOW;
   trackReverse = false;
   trackSlow = false;
-  useGPSfloatForPosEstimation = USE_GPS_FLOAT_FOR_POS_ESTIMATION;    
-  useGPSfloatForDeltaEstimation = USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
+  useGPSfloatForPosEstimation = false;    
+  useGPSfloatForDeltaEstimation = false;
   useIMU = USE_IMU; //HB true;
   mowPointsIdx = 0;
   freePointsIdx = 0;
@@ -871,8 +869,6 @@ void Map::setIsDocked(bool flag){
     dockPointsIdx = 0;    
     trackReverse = false;             
     trackSlow = false;
-    useGPSfloatForPosEstimation = USE_GPS_FLOAT_FOR_POS_ESTIMATION;    
-    useGPSfloatForDeltaEstimation = USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
     useIMU = USE_IMU;   //HB true;
   }  
 }
@@ -1862,14 +1858,9 @@ void Map::testIntegerCalcs(){
   }   
 }
  
-bool Map::isObstacleMap() 
-{ 
-   return mapID >= 11; 
-}
-
 bool Map::isObstacleMowPoint() 
 { 
-   return isObstacleMap() && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;  
+   return isObstacleMap && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;  
 }
 
 // inform LineTracker that obstacle has been hit
@@ -1880,5 +1871,5 @@ bool Map::obstacle()
       obstacleTargetReached = true;
       return true;
    }
-   return isObstacleMap();
+   return isObstacleMap;
 }

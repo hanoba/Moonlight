@@ -1315,7 +1315,7 @@ void run()
                motor.setLinearAngularSpeed(-0.2,0);
                if (millis() > driveReverseStopTime)
                {
-                  CONSOLE.println("driveReverseStopTime");
+                  CONSOLE.println(F("driveReverseStopTime"));
                   motor.stopImmediately(false);
                   driveReverseStopTime = 0;
                   if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
@@ -1349,6 +1349,7 @@ void run()
             if (battery.underVoltage())
             {
                stateSensor = SENS_BAT_UNDERVOLTAGE;
+               CONSOLE.println(F("=Low battery Mowing stopped"));
                setOperation(OP_IDLE);
                //buzzer.sound(SND_OVERCURRENT, true);        
             } 
@@ -1361,7 +1362,7 @@ void run()
             }
             if (stopButton.triggered())
             {
-               CONSOLE.println("stopButton triggered!");
+               CONSOLE.println(F("=stopButton triggered!"));
                stateSensor = SENS_STOP_BUTTON;
                setOperation(OP_IDLE);
             }

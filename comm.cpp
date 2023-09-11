@@ -269,6 +269,12 @@ void cmdControl(String cmd)
           if (intValue == 1) cfgEnableTiltDetection = true; 
       } else if (counter == 14) {  
           if (floatValue >= 0) cfgAngularSpeed = floatValue; 
+      } else if (counter == 15) {  
+          if (intValue == 0) maps.useGPSfloatForPosEstimation = false; 
+          if (intValue == 1) maps.useGPSfloatForPosEstimation = true; 
+      } else if (counter == 16) {  
+          if (intValue == 0) maps.isObstacleMap = false; 
+          if (intValue == 1) maps.isObstacleMap = true; 
       } 
       counter++;
       lastCommaIdx = idx;
@@ -663,20 +669,18 @@ void cmdToggleUseGPSfloatForPosEstimation()
 {
     String s = F("YP");
     cmdAnswer(s);
-    USE_GPS_FLOAT_FOR_POS_ESTIMATION = !USE_GPS_FLOAT_FOR_POS_ESTIMATION;
-    maps.useGPSfloatForPosEstimation = USE_GPS_FLOAT_FOR_POS_ESTIMATION;    
-    CONSOLE.print("=USE_GPS_FLOAT_FOR_POS_ESTIMATION = ");
-    CONSOLE.println(USE_GPS_FLOAT_FOR_POS_ESTIMATION);
+    maps.useGPSfloatForPosEstimation = !maps.useGPSfloatForPosEstimation;    
+    CONSOLE.print("=useGPSfloatForPosEstimation = ");
+    CONSOLE.println(maps.useGPSfloatForPosEstimation);
 }
 
 void cmdToggleUseGPSfloatForDeltaEstimationEstimation()
 {
     String s = F("YD");
     cmdAnswer(s);
-    USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = !USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
-    maps.useGPSfloatForDeltaEstimation = USE_GPS_FLOAT_FOR_DELTA_ESTIMATION;
+    maps.useGPSfloatForDeltaEstimation = !maps.useGPSfloatForDeltaEstimation;
     CONSOLE.print("=USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = ");
-    CONSOLE.println(USE_GPS_FLOAT_FOR_DELTA_ESTIMATION);
+    CONSOLE.println(maps.useGPSfloatForDeltaEstimation);
 }
 
 void cmdToggleGpsLogging()    //HB disabled
@@ -1343,8 +1347,8 @@ void outputConsole()
     PRINT("%3.0f%%%", stateHumidity);
 
     PRINT(" %c", bluetoothLoggingFlag ? 'B' : 'b');
-    PRINT("%c", USE_GPS_FLOAT_FOR_POS_ESTIMATION ? 'P' : 'p');
-    PRINT("%c", USE_GPS_FLOAT_FOR_DELTA_ESTIMATION ? 'D' : 'd');
+    PRINT("%c", maps.useGPSfloatForPosEstimation ? 'P' : 'p');
+    PRINT("%c", maps.useGPSfloatForDeltaEstimation ? 'D' : 'd');
     PRINT("%c", gps.verbose ? 'G' : 'g');
     PRINT("%c", cfgSmoothCurves ? 'S' : 's');
     PRINT("%c", cfgEnablePathFinder ? 'F' : 'f');

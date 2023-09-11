@@ -2,6 +2,7 @@
 import pygame
 import math
 import maps
+import mapcfg
 import plan
 import udp
 import mower
@@ -685,7 +686,7 @@ def CmdUploadGpsConfigFilter():
    mower.UploadGpsConfigFilter(gpsConfigFilter)
 
 
-def CmdStartMowing(iWaypoint = -1):
+def CmdStartMowingOld(iWaypoint = -1):
    global config_menu
    data = config_menu.get_input_data()
    fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
@@ -696,6 +697,34 @@ def CmdStartMowing(iWaypoint = -1):
    iMlLineTracking = int(data.get('ID_ML_LINE_TRACKING'))
    iEnableTiltDetetction = int(data.get('ID_ENABLE_TILT_DETECTION'))
    mower.StartMowing(linearSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iWaypoint, iEnableTiltDetetction, angularSpeed)
+
+
+def CmdStartMowing(iWaypoint = -1):
+   global config_menu
+   data = config_menu.get_input_data()
+   fixTimeout = int(data.get('ID_FIX_TIMEOUT'))
+   angularSpeed = float(data.get('ID_ANGULAR_SPEED'))
+   iEnableTiltDetetction = int(data.get('ID_ENABLE_TILT_DETECTION'))
+
+   # check mapcfg
+   iUseFloat = mapcfg.UseGpsFloatForPosEstimation(currentMapIndex)
+   iObstacleMap = mapcfg.MapType(currentMapIndex)
+   
+   iBumperEnable = mapcfg.BumperEnable(currentMapIndex)
+   if (iBumperEnable == -1): iBumperEnable = int(data.get('ID_BUMPER_ENABLE'))
+
+   linearSpeed = mapcfg.LinearSpeed(currentMapIndex)
+   if (linearSpeed == -1): linearSpeed = float(data.get('ID_LINEAR_SPEED'))
+
+   iMlLineTracking = mapcfg.LineTracking(currentMapIndex)
+   if (iMlLineTracking == -1): iMlLineTracking = int(data.get('ID_ML_LINE_TRACKING'))
+   
+   iFrontWheelDrive = mapcfg.FrontWheelDrive(currentMapIndex)
+   if (iFrontWheelDrive == -1): iFrontWheelDrive = int(data.get('ID_FRONT_WHEEL_DRIVE'))
+   
+   mower.StartMowing(linearSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iWaypoint, iEnableTiltDetetction, angularSpeed, iUseFloat, iObstacleMap)
+
+
 
 
 def CmdStartMowingFromWaypoint():

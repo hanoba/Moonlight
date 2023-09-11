@@ -149,7 +149,7 @@ void trackLine()
   if ( (targetDist < 0.5) || (lastTargetDist < 0.5) || (fabs(distToPath) > 0.5) ||
        rotateLeft || rotateRight ) {
     if (cfgSmoothCurves)
-      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < (cfgMoonlightLineTracking ? 40 : 120));
+      angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 120);    //HB (cfgMoonlightLineTracking ? 40 : 120));
     else     
       angleToTargetFits = (fabs(trackerDiffDelta)/PI*180.0 < 20);
   } else {
