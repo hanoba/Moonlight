@@ -307,8 +307,8 @@ def ClearStatistics():
    udp.ExecCmd(CMD_ClearStatistics)
 
 def UploadMap(mapId):
-   if mapId < 1 or mapId > 15:
-      print("ERROR: Valid range for MapId is 1 to 15");
+   if mapId < 1 or mapId > 20:
+      print("ERROR: Valid range for MapId is 1 to 20");
       return
    mapIndex = mapId - 1
    PrintGuiMessage("Uploading map started...");

@@ -43,6 +43,11 @@ mapCfg = [
    [ 12, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
    [ 13, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
    [ 14, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
+   [ 15, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 16, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 17, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 18, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 19, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
 ]
 
 def MapId(i):

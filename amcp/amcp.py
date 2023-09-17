@@ -200,8 +200,8 @@ def PrintHelpText():
    WriteTextBox("x   Select exclusion points  ")
    WriteTextBox("#   Select reference points  ")
    WriteTextBox("1..9   Select MAP1 to MAP9   ")
-   WriteTextBox("0      Select MAP10          ")
-   WriteTextBox("^1..^4 Select MAP11 to MAP14 ")
+   WriteTextBox("0/^0   Select MAP10/MAP20    ")
+   WriteTextBox("^1..^9 Select MAP11 to MAP19 ")
    WriteTextBox("^z/^y  Undo / Redo           ")
 
 
@@ -427,17 +427,23 @@ def ArdumowerControlProgram():
                      if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(13)
                      else: SetCurrentMapIndex(3)
                   elif event.key == pygame.K_5:
-                     SetCurrentMapIndex(4)
+                     if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(14)
+                     else: SetCurrentMapIndex(4)
                   elif event.key == pygame.K_6:
-                     SetCurrentMapIndex(5)
+                     if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(15)
+                     else: SetCurrentMapIndex(5)
                   elif event.key == pygame.K_7:
-                     SetCurrentMapIndex(6)
+                     if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(16)
+                     else: SetCurrentMapIndex(6)
                   elif event.key == pygame.K_8:
-                     SetCurrentMapIndex(7)
+                     if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(17)
+                     else: SetCurrentMapIndex(7)
                   elif event.key == pygame.K_9:
-                     SetCurrentMapIndex(8)
+                     if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(18)
+                     else: SetCurrentMapIndex(8)
                   elif event.key == pygame.K_0:
-                     SetCurrentMapIndex(9)
+                     if event.mod & pygame.KMOD_CTRL:  SetCurrentMapIndex(19)
+                     else: SetCurrentMapIndex(9)
                   elif event.key == pygame.K_a:
                      mower.StartUndocking()
                   elif event.key == pygame.K_b:
