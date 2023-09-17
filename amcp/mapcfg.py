@@ -48,6 +48,7 @@ mapCfg = [
    [ 17, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 18, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 19, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
+   [ 20, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
 ]
 
 def MapId(i):
