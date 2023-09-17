@@ -250,7 +250,7 @@ def CreateWaypoints(rectangle, n):
         topFlag = not topFlag
     return waypoints
 
-def CreateBumperWaypoints(rectangle, n):
+def CreateBumperWaypointsOld(rectangle, n):
     waypoints = []
     if len(rectangle) != 4:
         print("Error: CreateWaypoints needs a rectangle as input")
@@ -299,6 +299,57 @@ def CreateBumperWaypoints(rectangle, n):
             waypoints.append((Vnext[0],Vnext[1]))
             #Vnext = np.add(Va, VlaneBottom*(i+1))
             #if i < numLanes-1: waypoints.append((Vnext[0],Vnext[1]))
+        topFlag = not topFlag
+    return waypoints
+
+
+def CreateBumperWaypoints(rectangle, n):
+    waypoints = []
+    if len(rectangle) != 4:
+        print("Error: CreateWaypoints needs a rectangle as input")
+        return waypoints
+    # Durchmesser der neuen Messer: 25 cm
+    # Durchmesser der alten Messer: 21.5 cm
+    #maxLaneDistance = 0.16*scalingFactor
+    maxLaneDistance = 0.16*scalingFactor
+    Va = np.array(rectangle[n])
+    Vb = np.array(rectangle[(n + 1) & 3])
+    Vc = np.array(rectangle[(n + 2) & 3])
+    Vd = np.array(rectangle[(n + 3) & 3])
+    Vba = np.subtract(Vb,Va)
+    Vcb = np.subtract(Vc,Vb)
+    Vda = np.subtract(Vd,Va)
+    #Vortho = np.array((-Vba[1], Vba[0]))
+    #Vortho = Vortho/np.linalg.norm(Vortho)
+    
+    Lcb = np.linalg.norm(Vcb)
+    Lda = np.linalg.norm(Vda)
+    Vcb_n = Vcb/Lcb
+    Vda_n = Vda/Lda
+    numLanesCb = 1 + math.floor(Lcb/maxLaneDistance+1)
+    numLanesDa = 1 + math.floor(Lda/maxLaneDistance+1)
+
+    if numLanesCb > numLanesDa: numLanes = numLanesCb
+    else: numLanes = numLanesDa
+
+    laneDistanceCb = Lcb / (numLanes - 1)
+    laneDistanceDa = Lda / (numLanes - 1)
+
+    print("NumLanesCb=", numLanesCb)
+    print("NumLanesDa=", numLanesDa)
+
+    VlaneTop = Vcb_n * laneDistanceCb
+    VlaneBottom = Vda_n * laneDistanceDa
+
+    topFlag = True
+    waypoints.append((Va[0],Va[1]))
+    for i in range(numLanes):
+        if topFlag:
+            Vnext = np.add(Vb, VlaneTop*i)
+            waypoints.append((Vnext[0],Vnext[1]))
+        else:
+            Vnext = np.add(Va, VlaneBottom*i)
+            waypoints.append((Vnext[0],Vnext[1]))
         topFlag = not topFlag
     return waypoints
 
