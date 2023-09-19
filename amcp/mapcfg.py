@@ -29,25 +29,25 @@ FastSpeed = 0.50
 SlowSpeed = 0.25
 
 mapCfg = [
-   [  1, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, SunrayTracking,    DefaultSpeed ],        # Einfahrt   
-   [  2, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Grigelat kurz
-   [  3, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Brunner lang
-   [  4, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Grigelat/Brunner unten
-   [  5, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Grigelat lang
-   [  6, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, SunrayTracking,    DefaultSpeed ],        # Schuppen/Wald
-   [  7, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Tischtennis
-   [  8, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Schuppen/Hang
-   [  9, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, SunrayTracking,    DefaultSpeed ],        # Hinterm Haus
-   [ 10, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, SunrayTracking,    DefaultSpeed ],        # Teststrecke
+   [  1, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Einfahrt   
+   [  2, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Grigelat kurz
+   [  3, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Brunner lang
+   [  4, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Grigelat/Brunner unten
+   [  5, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Grigelat lang
+   [  6, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Wald
+   [  7, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Tischtennis
+   [  8, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Hang
+   [  9, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
+   [ 10, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Teststrecke
    [ 11, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
    [ 12, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
    [ 13, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
-   [ 14, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
+   [ 14, ObstacleMap, FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
    [ 15, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 16, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 17, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 18, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 19, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
+   [ 19, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 20, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
 ]
 
