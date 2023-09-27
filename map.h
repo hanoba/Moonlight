@@ -15,7 +15,10 @@
 enum WayType {WAY_PERIMETER, WAY_EXCLUSION, WAY_DOCK, WAY_MOW, WAY_FREE};
 typedef enum WayType WayType;
 
-#define MAX_MAP_ID 15
+// map type
+enum MapType { MT_NORMAL_U=0, MT_NORMAL_V=1, MT_OBSTACLE=2 };
+
+#define MAX_MAP_ID 20
 
 class Point
 {
@@ -130,7 +133,7 @@ class Map
     bool useGPSfloatForPosEstimation;    // use GPS float solution for position estimation?
     bool useGPSfloatForDeltaEstimation;  // use GPS float solution for delta estimation?
     bool useIMU; // allow using IMU?
-    bool isObstacleMap = false;
+    bool mapType = MT_NORMAL_U;
     
     
     
@@ -201,6 +204,7 @@ class Map
     void stressTest();
     long calcMapCRC();
     bool isObstacleMowPoint();
+    bool isMowPointNormalV();
     bool obstacle();
     bool obstacleTargetReached = false;
   private:

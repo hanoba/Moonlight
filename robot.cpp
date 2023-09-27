@@ -246,9 +246,9 @@ bool loadState(){
   }
   uint32_t marker = 0;
   stateFile.read((uint8_t*)&marker, sizeof(marker));
-  maps.mapID = marker & 15;
+  maps.mapID = marker & 0x1F;
   if (maps.mapID==0 || maps.mapID > MAX_MAP_ID) maps.mapID==3;
-  if ((marker & 0xFFFFfff0) != 0x10001000)
+  if ((marker & 0xFFFFffE0) != 0x10001000)
   {
     CONSOLE.print("ERROR: invalid marker: ");
     CONSOLE.println(marker, HEX);

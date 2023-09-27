@@ -275,8 +275,7 @@ void cmdControl(String cmd)
           if (intValue == 0) maps.useGPSfloatForPosEstimation = false; 
           if (intValue == 1) maps.useGPSfloatForPosEstimation = true; 
       } else if (counter == 16) {  
-          if (intValue == 0) maps.isObstacleMap = false; 
-          if (intValue == 1) maps.isObstacleMap = true; 
+          if (intValue >= 0) maps.mapType = intValue;
       } 
       counter++;
       lastCommaIdx = idx;

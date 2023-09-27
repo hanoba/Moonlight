@@ -25,7 +25,7 @@ r=3
 iCurrentRefPoint = r
 editMode = False
 
-currentMapIndex = 3
+currentMapIndex = param.lastMapIndex
 currentMapChecksum = 0
 #currentWayPoints = []
 showCurrentWayPoints = False
@@ -367,8 +367,8 @@ def ArdumowerControlProgram():
    menu.add.button('Save Maps', CmdStoreMaps)
    menu.add.button('Export Maps in SunrayApp format', CmdExportMaps)
    menu.add.button('Show/Hide Waypoints (^w)', CmdToggleShowWaypoints)
-   menu.add.button('Create Waypoints (^c)', CmdCreateWaypoints)
-   menu.add.button('Create Bumper Waypoints', CmdCreateBumperWaypoints)
+   menu.add.button('Create U Waypoints (^c)', CmdCreateUtypeWaypoints)
+   menu.add.button('Create V Waypoints (^v)', CmdCreateVtypeWaypoints)
    menu.add.button('Convert Rectangle To Trapezoid (^p)', CmdConvertRectangleToTrapezoid)
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
    menu.add.button('Get RTC Date & Time', mower.GetRtcDateTime)
@@ -493,7 +493,8 @@ def ArdumowerControlProgram():
                      if event.mod & pygame.KMOD_CTRL:
                         CmdToggleShowWaypoints()
                   elif event.key == pygame.K_v:
-                     mower.GetVersionNumber()
+                     if event.mod & pygame.KMOD_CTRL: CmdCreateVtypeWaypoints()
+                     else: mower.GetVersionNumber()
                   elif event.key == pygame.K_x:       # exclusion points
                      SetCurrentMapIndex(maps.MAP_INDEX_PERIMETER_WITH_EXCLUSION)
                   elif event.key == pygame.K_y:
@@ -729,9 +730,6 @@ def CmdStartMowing(iWaypoint = -1):
    
    mower.StartMowing(linearSpeed, fixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iWaypoint, iEnableTiltDetetction, angularSpeed, iUseFloat, iObstacleMap)
 
-
-
-
 def CmdStartMowingFromWaypoint():
    global config_menu
    data = config_menu.get_input_data()
@@ -743,7 +741,7 @@ def CmdUploadMap():
    mower.UploadMap(mapId)
 
    
-def CmdCreateWaypoints():
+def CmdCreateUtypeWaypoints():
    global lastPerimeter
    global showCurrentWayPoints
    lastPerimeter=maps.perimeters[currentMapIndex].copy()
@@ -751,7 +749,7 @@ def CmdCreateWaypoints():
    showCurrentWayPoints = True
 
    
-def CmdCreateBumperWaypoints():
+def CmdCreateVtypeWaypoints():
    global lastPerimeter
    global showCurrentWayPoints
    lastPerimeter=maps.perimeters[currentMapIndex].copy()
@@ -782,5 +780,6 @@ file.write("frontWheelDrive='"+data.get('ID_FRONT_WHEEL_DRIVE')+"'\n")
 file.write("mlLineTracking='"+data.get('ID_ML_LINE_TRACKING')+"'\n")
 file.write("enableTiltDetection='"+data.get('ID_ENABLE_TILT_DETECTION')+"'\n")
 file.write("gpsConfigFilter='"+data.get('ID_GPS_CONFIG_FILTER')+"'\n")
+file.write("lastMapIndex="+str(currentMapIndex)+"\n")
 
 file.close() 

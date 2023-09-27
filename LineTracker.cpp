@@ -218,7 +218,7 @@ void trackLine()
           || ((linearMotionStartTime != 0) && (millis() < linearMotionStartTime + 3000))                      // leaving  
        ) 
     {
-      linear = maps.isObstacleMap ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1; // reduce speed when approaching/leaving waypoints          
+      linear = maps.mapType != MT_NORMAL_U ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1; // reduce speed when approaching/leaving waypoints          
     } 
     else {
       //if (gps.solution == UBLOX::SOL_FLOAT)        
@@ -234,7 +234,7 @@ void trackLine()
           CONSOLE.println("motor overload detected: reduce linear speed");
       }
       printmotoroverload = true;
-      linear = maps.isObstacleMap ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1;  
+      linear = maps.mapType != MT_NORMAL_U ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1;  
     } else {
       printmotoroverload = false;
     }   
@@ -327,14 +327,23 @@ void trackLine()
    
   if (targetReached)
   {
-     CONSOLE.println(F(" Target reached!"));
      linear = 0;
      angular = 0;
+
+     // print mapType
+     CONSOLE.print(F(" MapType="));
+     if (maps.mapType==MT_OBSTACLE) CONSOLE.print(F(" MT_OBSTACLE"));
+     else if (maps.mapType==MT_NORMAL_V) CONSOLE.print(F(" MT_NORMAL_V"));
+     else CONSOLE.print(F(" MT_NORMAL_U"));
+     
      if (maps.isObstacleMowPoint() && maps.obstacleTargetReached) 
      {
         //HB motorDriver.reverseDrive = true;
         maps.obstacleTargetReached = false;
+        CONSOLE.print(F(" Obstacle target reached! "));
      }
+     else if (maps.isMowPointNormalV()) CONSOLE.print(F(" V target reached! "));
+     else CONSOLE.print(F(" U target reached! "));
      //HB else motorDriver.reverseDrive = false;
      rotateLeft = false;
      rotateRight = false;
@@ -362,7 +371,9 @@ void trackLine()
      //   next waypoint          
      //  if (!straight) angleToTargetFits = false;      
      //}
-     motorDriver.reverseDrive = maps.isObstacleMowPoint();
+     motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
+     CONSOLE.print(F(" ReverseDrive="));
+     CONSOLE.println(motorDriver.reverseDrive);
   }  
   motor.setLinearAngularSpeed(linear, angular);
 
