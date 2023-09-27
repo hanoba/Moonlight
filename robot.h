@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.61 HB 2023-09-11"
+#define VER "Ardumower Moonlight, V168.62 HB 2023-09-26"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -39,6 +39,7 @@ extern bool cfgMoonlightLineTracking;
 extern bool cfgBumperEnable;
 extern bool cfgEnableTiltDetection;
 extern float cfgAngularSpeed;
+extern const float cfgSlowSpeedObstacleMap;
 
 enum OperationType {
       OP_IDLE,      

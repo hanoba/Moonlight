@@ -552,14 +552,12 @@ def ArdumowerControlProgram():
       PrintHelpText()
       
       # Garten und Gebäude zeichnen
-      # pygame.draw.lines(screen, WHITE, True, garten_old, 3)
       pygame.draw.lines(screen, GREEN, True, maps.garten, 3)
       pygame.draw.lines(screen, BLUE,  True, maps.haus, 3)
       pygame.draw.lines(screen, BLUE,  True, maps.terrasse, 3)
       pygame.draw.lines(screen, BLUE,  True, maps.schuppen, 3)
    
       # Nullpunkt
-      # pygame.draw.circle(screen, WHITE, origin, 6)
       DrawCross(WHITE, origin)
       
       # DockPoints zeichnen
@@ -607,18 +605,19 @@ def ArdumowerControlProgram():
       # Remember last reference point
       if currentMapIndex == iRefPoints: iCurrentRefPoint = r
       
-      # draw maps.perimeters[currentMapIndex]
-      # pygame.draw.lines(screen, BLUE,  True, maps.perimeters[currentMapIndex], 1)
+      # Draw current edit point
       pygame.draw.circle(screen, WHITE, maps.perimeters[currentMapIndex][r], 3)
-      if showCurrentWayPoints and len(maps.wayPoints[currentMapIndex]) > 2: 
+
+      # Draw waypoints (if enabled)
+      numWayPoints = len(maps.wayPoints[currentMapIndex])
+      if showCurrentWayPoints and numWayPoints > 2: 
          pygame.draw.lines(screen, WHITE, False, maps.wayPoints[currentMapIndex], 1)
-         pygame.draw.circle(screen, RED, maps.wayPoints[currentMapIndex][0], 3)
+         pygame.draw.circle(screen, GREEN, maps.wayPoints[currentMapIndex][0], 5)
+         pygame.draw.circle(screen, RED, maps.wayPoints[currentMapIndex][numWayPoints-1], 5)
 
       if DrawHeatmapFlag: heatmap.DrawHeatmap(screen)
       
       # Show mower location
-      #mowerLocation = maps.Map2ScreenXY(udp.stateX, udp.stateY)
-      #pygame.draw.circle(screen, YELLOW, mowerLocation, 5, 1)
       DrawMower()
       
       # Show mower GPS location

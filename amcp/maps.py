@@ -331,6 +331,7 @@ def CreateBumperWaypoints(rectangle, n):
 
     if numLanesCb > numLanesDa: numLanes = numLanesCb
     else: numLanes = numLanesDa
+    numLanes = numLanes | 1     # numLanes should be odd
 
     laneDistanceCb = Lcb / (numLanes - 1)
     laneDistanceDa = Lda / (numLanes - 1)
@@ -351,6 +352,7 @@ def CreateBumperWaypoints(rectangle, n):
             Vnext = np.add(Va, VlaneBottom*i)
             waypoints.append((Vnext[0],Vnext[1]))
         topFlag = not topFlag
+    waypoints.append((Vd[0],Vd[1]))
     return waypoints
 
 

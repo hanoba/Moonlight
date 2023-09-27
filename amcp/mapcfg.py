@@ -39,16 +39,16 @@ mapCfg = [
    [  8, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Hang
    [  9, NormalMap,   BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
    [ 10, NormalMap,   BackWheelDrive,  PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Teststrecke
-   [ 11, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
-   [ 12, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
-   [ 13, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
-   [ 14, ObstacleMap, FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
-   [ 15, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 16, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 17, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 18, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 19, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 20, ObstacleMap, FrontWheelDrive, PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
+   [ 11, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
+   [ 12, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
+   [ 13, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
+   [ 14, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
+   [ 15, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner
+   [ 16, NormalMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
+   [ 17, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 18, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 19, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 20, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ]         # neu
 ]
 
 def MapId(i):

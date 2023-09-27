@@ -218,7 +218,7 @@ void trackLine()
           || ((linearMotionStartTime != 0) && (millis() < linearMotionStartTime + 3000))                      // leaving  
        ) 
     {
-      linear = 0.1; // reduce speed when approaching/leaving waypoints          
+      linear = maps.isObstacleMap ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1; // reduce speed when approaching/leaving waypoints          
     } 
     else {
       //if (gps.solution == UBLOX::SOL_FLOAT)        
@@ -231,10 +231,10 @@ void trackLine()
     // slow down speed in case of overload and overwrite all prior speed 
     if ( (motor.motorLeftOverload) || (motor.motorRightOverload) || (motor.motorMowOverload) ){
       if (!printmotoroverload) {
-          CONSOLE.println("motor overload detected: reduce linear speed to 0.1");
+          CONSOLE.println("motor overload detected: reduce linear speed");
       }
       printmotoroverload = true;
-      linear = 0.1;  
+      linear = maps.isObstacleMap ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1;  
     } else {
       printmotoroverload = false;
     }   
@@ -332,10 +332,10 @@ void trackLine()
      angular = 0;
      if (maps.isObstacleMowPoint() && maps.obstacleTargetReached) 
      {
-        motorDriver.reverseDrive = true;
+        //HB motorDriver.reverseDrive = true;
         maps.obstacleTargetReached = false;
      }
-     else motorDriver.reverseDrive = false;
+     //HB else motorDriver.reverseDrive = false;
      rotateLeft = false;
      rotateRight = false;
      if (maps.wayMode == WAY_MOW){
@@ -357,10 +357,12 @@ void trackLine()
            }
          }                   
        }
-     } else {      
-       // next waypoint          
-       //if (!straight) angleToTargetFits = false;      
-     }
+     } 
+     // else {      
+     //   next waypoint          
+     //  if (!straight) angleToTargetFits = false;      
+     //}
+     motorDriver.reverseDrive = maps.isObstacleMowPoint();
   }  
   motor.setLinearAngularSpeed(linear, angular);
 

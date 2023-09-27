@@ -33,6 +33,8 @@ bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
 bool cfgBumperEnable = BUMPER_ENABLE_DEFAULT;
 bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
 float cfgAngularSpeed = 0.5;
+const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
+
 
 // answer Bluetooth with CRC
 void cmdAnswer(String s)

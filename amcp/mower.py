@@ -27,9 +27,15 @@ from datetime import datetime
 from time import sleep
 
 currentMapChecksum = 0
-#currentWayPoints = []
 showCurrentWayPoints = False
 numMaps = 0
+
+OP_IDLE     = 0
+OP_MOW      = 1        
+OP_CHARGE   = 2
+OP_ERROR    = 3
+OP_DOCK     = 4
+OP_UNDOCK   = 5
 
 CMD_Ping = "AT+Y6"
 CMD_UploadGpsConfigFilter = "AT+A"
@@ -193,58 +199,68 @@ def ReadMapFromSdCard(mapId):
    else: PrintGuiMessage("Maps not synchronized")
    #udp.ExecCmd(str.format('AT+R,{:d}', mapId))
 
-def StartMowing(fSpeed=0.25, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
-   # AT+C,1,1,0.39,0,0,-1,-1,0,0x8  # -1 means no change, keep current value
-   # 1: bEnableMowMotor = 1           # on
-   # 2: iOperationType = 1            # 1=OP_MOW
-   # 3: fSpeed = 0.25                 # m/s
-   # 4: iFixTimeout = 0               # 0 = no fix timeout
-   # 5: bFinishAndRestart = 0         # disabled
-   # 6: fMowingPointPercent = -1      # 
-   # 7: bSkipNextMowingPoint = -1     #
-   # 8: bEnableSonar = 0              # disabled
-   # 9: bBumperEnable                 # 0 or 1
-   #10: bFrontWheelDrive              # 0 or 1
-   #11: bMoonlightLineTracking        # 0 or 1
-   #12: iMowingPoint                  #
-   #13: iEnableTiltDetetction         # 0 or 1
-   #14: fAngular                      # 
-   #15: iUseFloat                     # 0 or 1
-   #16: iObstacleMap                  # 0 or 1
+def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFrontWheelDrive=-1, iMlLineTracking=-1, 
+            iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
+   # Parameters:
+   #  1: bEnableMowMotor               # on if OP_MOW
+   #  2: iOperationType = 1            # OP_IDLE, OP_MOW, ...
+   #  3: fSpeed = 0.25                 # m/s
+   #  4: iFixTimeout = 0               # 0 = no fix timeout
+   #  5: bFinishAndRestart = 0         # hardcoded
+   #  6: fMowingPointPercent = -1      # hardcoded
+   #  7: bSkipNextMowingPoint = -1     # hardcoded
+   #  8: bEnableSonar = 0              # hardcoded
+   #  9: bBumperEnable                 # 0 or 1
+   # 10: bFrontWheelDrive              # 0 or 1
+   # 11: bMoonlightLineTracking        # 0 or 1
+   # 12: iMowingPoint                  #
+   # 13: iEnableTiltDetetction         # 0 or 1
+   # 14: fAngular                      # 
+   # 15: iUseFloat                     # 0 or 1
+   # 16: iObstacleMap                  # 0 or 1
+   # Note: -1 means no change, keep current value
 
    #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-   cmd = str.format('AT+C,1,1,{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d}', 
-         fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, iObstacleMap)     
+   if iOpType == OP_MOW: iEnableMowMotor = 1
+   else: iEnableMowMotor = 0
+   
+   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d}', 
+         iEnableMowMotor, iOpType, fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, iObstacleMap)     
    udp.ExecCmd(cmd)
+
+def StartMowing(fSpeed=0.5, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
+   SetOperationType(OP_MOW, fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, iObstacleMap)
 
 def StartDocking():
-   # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
-   #bEnableMowMotor = 0           # off
-   #iOperationType = 4            # 4=OP_DOCK
-   fSpeed = 0.3                   # m/s
-   #iFixTimeout = 0               # 0 = no fix timeout
-   #bFinishAndRestart = 0         # disabled
-   #fMowingPointPercent = -1      # 
-   #bSkipNextMowingPoint = -1     # disabled
-   #bEnableSonar = 0              # disabled
-   #bBumperEnable,                # discarded (unchanged)
-   #bFrontWheelDrive              # discarded (unchanged)
-   #bMlLineTracking               # discarded (unchanged)
-   cmd = str.format('AT+C,0,4,{:.2f},0,0,-1,-1,0', fSpeed)
-   udp.ExecCmd(cmd)
+   # # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
+   # #bEnableMowMotor = 0           # off
+   # #iOperationType = 4            # 4=OP_DOCK
+   # fSpeed = 0.3                   # m/s
+   # #iFixTimeout = 0               # 0 = no fix timeout
+   # #bFinishAndRestart = 0         # disabled
+   # #fMowingPointPercent = -1      # 
+   # #bSkipNextMowingPoint = -1     # disabled
+   # #bEnableSonar = 0              # disabled
+   # #bBumperEnable,                # discarded (unchanged)
+   # #bFrontWheelDrive              # discarded (unchanged)
+   # #bMlLineTracking               # discarded (unchanged)
+   # cmd = str.format('AT+C,0,4,{:.2f},0,0,-1,-1,0', fSpeed)
+   # udp.ExecCmd(cmd)
+   SetOperationType(OP_DOCK, fSpeed=0.3, iFixTimeout=0, iFrontWheelDrive=0)
 
 def StartUndocking():
-   # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
-   #bEnableMowMotor = 0           # off
-   #iOperationType = 5            # 5=OP_UNDOCK
-   fSpeed = 0.1                   # m/s
-   #iFixTimeout = 0               # 0 = no fix timeout
-   #bFinishAndRestart = 0         # disabled
-   #fMowingPointPercent = -1      # 
-   #bSkipNextMowingPoint = -1     # disabled
-   #bEnableSonar = 0              # disabled
-   cmd = str.format('AT+C,0,5,{:.2f},0,0,-1,-1,0', fSpeed)
-   udp.ExecCmd(cmd)
+   # # AT+C,-1,1,0.39,0,0,-1,-1,0,0x8
+   # #bEnableMowMotor = 0           # off
+   # #iOperationType = 5            # 5=OP_UNDOCK
+   # fSpeed = 0.1                   # m/s
+   # #iFixTimeout = 0               # 0 = no fix timeout
+   # #bFinishAndRestart = 0         # disabled
+   # #fMowingPointPercent = -1      # 
+   # #bSkipNextMowingPoint = -1     # disabled
+   # #bEnableSonar = 0              # disabled
+   # cmd = str.format('AT+C,0,5,{:.2f},0,0,-1,-1,0', fSpeed)
+   # udp.ExecCmd(cmd)
+   SetOperationType(OP_UNDOCK, fSpeed=0.1, iFixTimeout=0, iFrontWheelDrive=0)
 
 def SwitchOffRobot():
    udp.ExecCmd(CMD_SwitchOffRobot)
