@@ -65,5 +65,6 @@
         <File name="amcp\amcmd.bat" />
         <File name="amcp\maps.json" />
         <File name="amcp\mapcfg.py" />
+        <File name="amcp\param.py" />
     </Project>
 </NotepadPlus>

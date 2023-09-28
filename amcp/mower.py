@@ -189,7 +189,8 @@ def Ping():
    udp.ExecCmd(CMD_Ping)
    
 def ReadMapFromSdCard(mapId):
-   udp.send(str.format('AT+R,{:d}', mapId))
+   #udp.send(str.format('AT+R,{:d}', mapId))
+   udp.ExecCmd(str.format('AT+R,{:d}', mapId))
    mapIndex = mapId - 1
    expectedCheckSum = maps.ComputeMapChecksum(mapIndex)
    mowerChecksum = GetSummary()

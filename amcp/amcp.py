@@ -13,6 +13,35 @@ from version import versionString
 import pygame_menu
 #from msg import guiMessage
 from udp import PrintGuiMessage, GetGuiMessage
+from win32gui import SetWindowPos
+import tkinter as tk
+
+ShowWindow = 0
+HideWindow = 1
+
+def HideShowWindow(hide):
+   if hide==HideWindow: screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.HIDDEN)
+   else: screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.SHOWN)
+
+def HideShowWindowOld(hide):
+   root = tk.Tk()  # create only one instance for Tk()
+   root.withdraw()  # keep the root window from appearing
+   
+   screen_w, screen_h = root.winfo_screenwidth(), root.winfo_screenheight()
+   ###win_w = 250
+   ###win_h = 300
+   win_w = pygame.display.Info().current_w 
+   win_h = pygame.display.Info().current_h
+   
+   x = round((screen_w - win_w) / 2)
+   y = round((screen_h - win_h) / 2) ## * 0.8)  # 80 % of the actual height
+   
+   # pygame screen parameter for further use in code
+   screen = pygame.display.set_mode((win_w, win_h))
+   
+   # Set window position center-screen and on top of other windows
+   # Here 2nd parameter (hide) is essential for putting window on top/back
+   SetWindowPos(pygame.display.get_wm_info()['window'], hide, x, y, 0, 0, 1)
 
 #guiMessage=""
 
@@ -667,8 +696,10 @@ def CmdToggleShowWaypoints():
    PrintGuiMessage("Show waypoints = " + str(showCurrentWayPoints))
 
 def CmdReadMapFromSdCard():
+   HideShowWindow(HideWindow);
    mapId = currentMapIndex + 1
    mower.ReadMapFromSdCard(mapId)
+   HideShowWindow(ShowWindow);
 
 def CmdStoreMaps():
    global config_menu
@@ -737,8 +768,10 @@ def CmdStartMowingFromWaypoint():
    CmdStartMowing(iWaypoint)
 
 def CmdUploadMap():
+   HideShowWindow(HideWindow);
    mapId = currentMapIndex + 1
    mower.UploadMap(mapId)
+   HideShowWindow(ShowWindow);
 
    
 def CmdCreateUtypeWaypoints():
