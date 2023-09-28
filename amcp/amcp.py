@@ -13,37 +13,13 @@ from version import versionString
 import pygame_menu
 #from msg import guiMessage
 from udp import PrintGuiMessage, GetGuiMessage
-from win32gui import SetWindowPos
-import tkinter as tk
 
-ShowWindow = 0
-HideWindow = 1
 
-def HideShowWindow(hide):
-   if hide==HideWindow: screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.HIDDEN)
-   else: screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.SHOWN)
-
-def HideShowWindowOld(hide):
-   root = tk.Tk()  # create only one instance for Tk()
-   root.withdraw()  # keep the root window from appearing
+def HideWindow():
+   screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.HIDDEN)
    
-   screen_w, screen_h = root.winfo_screenwidth(), root.winfo_screenheight()
-   ###win_w = 250
-   ###win_h = 300
-   win_w = pygame.display.Info().current_w 
-   win_h = pygame.display.Info().current_h
-   
-   x = round((screen_w - win_w) / 2)
-   y = round((screen_h - win_h) / 2) ## * 0.8)  # 80 % of the actual height
-   
-   # pygame screen parameter for further use in code
-   screen = pygame.display.set_mode((win_w, win_h))
-   
-   # Set window position center-screen and on top of other windows
-   # Here 2nd parameter (hide) is essential for putting window on top/back
-   SetWindowPos(pygame.display.get_wm_info()['window'], hide, x, y, 0, 0, 1)
-
-#guiMessage=""
+def ShowWindow():
+   screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.SHOWN)
 
 LEFT = 1
 RIGHT = 3
@@ -513,7 +489,11 @@ def ArdumowerControlProgram():
                   elif event.key == pygame.K_q:
                      programActive = False
                   elif event.key == pygame.K_r:
-                     CmdReadMapFromSdCard()
+                     if event.mod & pygame.KMOD_CTRL:
+                        if editMode:
+                           lastPerimeter=maps.perimeters[currentMapIndex].copy()
+                           maps.ReorderRectangle(maps.perimeters[currentMapIndex], r)
+                     else: CmdReadMapFromSdCard()
                   elif event.key == pygame.K_s:
                      mower.PrintStatistics()
                   elif event.key == pygame.K_u:
@@ -696,10 +676,10 @@ def CmdToggleShowWaypoints():
    PrintGuiMessage("Show waypoints = " + str(showCurrentWayPoints))
 
 def CmdReadMapFromSdCard():
-   HideShowWindow(HideWindow);
+   HideWindow();
    mapId = currentMapIndex + 1
    mower.ReadMapFromSdCard(mapId)
-   HideShowWindow(ShowWindow);
+   ShowWindow();
 
 def CmdStoreMaps():
    global config_menu
@@ -768,10 +748,10 @@ def CmdStartMowingFromWaypoint():
    CmdStartMowing(iWaypoint)
 
 def CmdUploadMap():
-   HideShowWindow(HideWindow);
+   HideWindow();
    mapId = currentMapIndex + 1
    mower.UploadMap(mapId)
-   HideShowWindow(ShowWindow);
+   ShowWindow();
 
    
 def CmdCreateUtypeWaypoints():
