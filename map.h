@@ -133,7 +133,7 @@ class Map
     bool useGPSfloatForPosEstimation;    // use GPS float solution for position estimation?
     bool useGPSfloatForDeltaEstimation;  // use GPS float solution for delta estimation?
     bool useIMU; // allow using IMU?
-    bool mapType = MT_NORMAL_U;
+    MapType mapType = MT_NORMAL_U;
     
     
     

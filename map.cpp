@@ -1616,7 +1616,7 @@ int Map::findNextNeighbor(NodeList &nodes, PolygonList &obstacles, Node &node, i
 // https://briangrinstead.com/blog/astar-search-algorithm-in-javascript/
 bool Map::findPath(Point &src, Point &dst){
   if ((memoryCorruptions != 0) || (memoryAllocErrors != 0)){
-    CONSOLE.println("ERROR findPath: memory errors");
+    CONSOLE.println(F("ERROR findPath: memory errors"));
     return false; 
   }  
   
@@ -1631,15 +1631,16 @@ bool Map::findPath(Point &src, Point &dst){
   CONSOLE.print(dst.y());
   CONSOLE.println(")");  
   
-  if (cfgEnablePathFinder){    
-    CONSOLE.println("path finder is enabled");      
+  if (cfgEnablePathFinder)
+  {    
+    CONSOLE.println(F("path finder is enabled"));      
     
     // create path-finder obstacles    
     int idx = 0;
     if (!pathFinderObstacles.alloc(1 + exclusions.numPolygons + obstacles.numPolygons)) return false;
     
     if (freeMemory () < 5000){
-      CONSOLE.println("OUT OF MEMORY");
+      CONSOLE.println(F("OUT OF MEMORY"));
       return false;
     }
     

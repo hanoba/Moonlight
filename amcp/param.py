@@ -1,7 +1,7 @@
 mapFileName='maps.json'
 exportFileName='export.json'
 linearSpeed='0.5'
-angularSpeed='0.9'
+angularSpeed='1.93'
 fixTimeout='0'
 waypoint='26'
 bumperEnable='1'
