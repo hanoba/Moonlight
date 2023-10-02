@@ -5,6 +5,8 @@
 
 #include <Arduino.h>
 #include <SD.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "robot.h"
 #include "LineTracker.h"
@@ -1494,5 +1496,13 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
 }
 
 
-
+char *Sprintf(const char *format, ...)
+{
+   static char text[128];
+   va_list args;
+   va_start(args, format);
+   vsnprintf(text, 128, format, args);
+   va_end(args);
+   return text;
+}
 

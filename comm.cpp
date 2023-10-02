@@ -26,7 +26,7 @@ float statMaxControlCycleTime = 0;
 
 //HB New map control
 //static uint8_t currentMapIndex = 0;
-static bool writeMapFlag = false;
+//static bool writeMapFlag = false;
 bool cfgSmoothCurves = SMOOTH_CURVES_DEFAULT;
 bool cfgEnablePathFinder = ENABLE_PATH_FINDER_DEFAULT;
 bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
@@ -52,42 +52,42 @@ void cmdAnswer(String s)
    cmdResponse = s;
 }
 
-void WriteMap(String cmd)
-{
-   if (!writeMapFlag) return;
-
-   char mapFileName[32];
-   sprintf(mapFileName, "MAP%d.TXT", maps.mapID);
-   SDFile mapFile;
-
-   if (cmd == "")
-   {
-      CONSOLE.print("Create map file ");
-      CONSOLE.println(mapFileName);
-      SD.remove(mapFileName);
-      return;
-   }
-   else
-   {
-      mapFile = SD.open(mapFileName, FILE_WRITE);
-      if (mapFile)
-      {
-         const int BUF_SIZE = 128;
-         char buf[BUF_SIZE];
-
-         cmd.toCharArray(buf, BUF_SIZE-2);
-         int i = strlen(buf);
-         buf[i++] = 13;
-         buf[i++] = 10;
-         buf[i] = 0;
-         mapFile.write(buf);
-         mapFile.flush();
-         mapFile.close();
-         return;
-      }
-   }
-   CONSOLE.println("=ERROR opening map file for writing");
-}
+//void WriteMap(String cmd)
+//{
+//   if (!writeMapFlag) return;
+//
+//   char mapFileName[32];
+//   sprintf(mapFileName, "MAP%d.TXT", maps.mapID);
+//   SDFile mapFile;
+//
+//   if (cmd == "")
+//   {
+//      CONSOLE.print("Create map file ");
+//      CONSOLE.println(mapFileName);
+//      SD.remove(mapFileName);
+//      return;
+//   }
+//   else
+//   {
+//      mapFile = SD.open(mapFileName, FILE_WRITE);
+//      if (mapFile)
+//      {
+//         const int BUF_SIZE = 128;
+//         char buf[BUF_SIZE];
+//
+//         cmd.toCharArray(buf, BUF_SIZE-2);
+//         int i = strlen(buf);
+//         buf[i++] = 13;
+//         buf[i++] = 10;
+//         buf[i] = 0;
+//         mapFile.write(buf);
+//         mapFile.flush();
+//         mapFile.close();
+//         return;
+//      }
+//   }
+//   CONSOLE.println("=ERROR opening map file for writing");
+//}
 
 // Get/set data/time of the RTC
 void cmdRtc(String cmd)
@@ -160,60 +160,62 @@ static void cmdReadMapFile(String cmd)
    int mapId = cmd.substring(5).toInt();
    if (mapId<1 || mapId>MAX_MAP_ID)
    {
-      CONSOLE.print("Illegal MapId: ");
+      CONSOLE.print("=Illegal MapId: ");
       CONSOLE.println(mapId);
    }
    else
    {
       char fileName[16];
-      sprintf(fileName, "MAP%d.TXT", mapId);
-      CONSOLE.print("=Loading map from file ");
-      CONSOLE.println(fileName);
-
-      udpSerial.DisableLogging();
-      SDFile dataFile = SD.open(fileName);
-
-      // if the file is available, read it:
-      if (dataFile)
-      {
-         const bool NO_CHECKSUM_CHECK = false;
-         const int LINE_SIZE = 256;
-         char line[LINE_SIZE];
-         maps.mapID = mapId;
-         int i = 0;
-         while (dataFile.available())
-         {
-            char ch = dataFile.read();
-            //CONSOLE.write(ch);
-            if (ch != 10)
-            {
-               if (ch == 13 || i == LINE_SIZE - 1)
-               {
-                  line[i] = 0;
-                  processCmd(NO_CHECKSUM_CHECK, line);
-                  i = 0;
-                  watchdogReset();
-               }
-               else
-               {
-                  line[i++] = ch;
-               }
-            }
-         }
-         if (i)
-         {
-            line[i] = 0;
-            processCmd(NO_CHECKSUM_CHECK, line);
-         }
-         mapCheckSum = maps.mapCRC;
-      }
-      else 
-      {
-         CONSOLE.print("=error opening file ");
-         CONSOLE.println(fileName);
-      }
-      dataFile.close();
-      udpSerial.EnableLogging();
+      snprintf(fileName, 16, "MAP%d.BIN", mapId);
+      maps.load(fileName);
+      mapCheckSum = maps.mapCRC;
+      //HB CONSOLE.print("=Loading map from file ");
+      //HB CONSOLE.println(fileName);
+      //HB 
+      //HB udpSerial.DisableLogging();
+      //HB SDFile dataFile = SD.open(fileName);
+      //HB 
+      //HB // if the file is available, read it:
+      //HB if (dataFile)
+      //HB {
+      //HB    const bool NO_CHECKSUM_CHECK = false;
+      //HB    const int LINE_SIZE = 256;
+      //HB    char line[LINE_SIZE];
+      //HB    maps.mapID = mapId;
+      //HB    int i = 0;
+      //HB    while (dataFile.available())
+      //HB    {
+      //HB       char ch = dataFile.read();
+      //HB       //CONSOLE.write(ch);
+      //HB       if (ch != 10)
+      //HB       {
+      //HB          if (ch == 13 || i == LINE_SIZE - 1)
+      //HB          {
+      //HB             line[i] = 0;
+      //HB             processCmd(NO_CHECKSUM_CHECK, line);
+      //HB             i = 0;
+      //HB             watchdogReset();
+      //HB          }
+      //HB          else
+      //HB          {
+      //HB             line[i++] = ch;
+      //HB          }
+      //HB       }
+      //HB    }
+      //HB    if (i)
+      //HB    {
+      //HB       line[i] = 0;
+      //HB       processCmd(NO_CHECKSUM_CHECK, line);
+      //HB    }
+      //HB    mapCheckSum = maps.mapCRC;
+      //HB }
+      //HB else 
+      //HB {
+      //HB    CONSOLE.print("=error opening file ");
+      //HB    CONSOLE.println(fileName);
+      //HB }
+      //HB dataFile.close();
+      //HB udpSerial.EnableLogging();
    }
    String s = F("R,");
    s += mapCheckSum;
@@ -395,7 +397,7 @@ void cmdSensorTest(){
 void cmdWaypoint(String cmd)
 {
   if (cmd.length()<6) return;
-  WriteMap(cmd);
+  //HB WriteMap(cmd);
   int counter = 0;
   int lastCommaIdx = 0;
   int widx=0;
@@ -449,8 +451,7 @@ void cmdWaypoint(String cmd)
 void cmdWayCount(String cmd)
 {
   if (cmd.length()<6) return;
-  WriteMap(cmd);
-  //writeMapFlag = false;
+  //HB WriteMap(cmd);
   int counter = 0;
   int lastCommaIdx = 0;
   for (int idx=0; idx < cmd.length(); idx++){
@@ -484,8 +485,8 @@ void cmdWayCount(String cmd)
 void cmdExclusionCount(String cmd)
 {
   if (cmd.length()<6) return;
-  WriteMap(cmd);
-  writeMapFlag = false;
+  //HB WriteMap(cmd);
+  //HB writeMapFlag = false;
   int counter = 0;
   int lastCommaIdx = 0;
   int widx=0;
@@ -630,8 +631,8 @@ void cmdStartUploadMap(String cmd)
          maps.mapID = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
          CONSOLE.print("MapID=");
          CONSOLE.println(maps.mapID);
-         writeMapFlag = true;
-         WriteMap("");
+         //HB writeMapFlag = true;
+         //HB WriteMap("");
          break;
       }
    }

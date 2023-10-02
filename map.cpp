@@ -475,7 +475,7 @@ void Map::begin(){
   mapID = 3;
   CONSOLE.print("sizeof Point=");
   CONSOLE.println(sizeof(Point));  
-  load();
+  load("map.bin");
   dump();
 }
 
@@ -539,26 +539,31 @@ void Map::checkMemoryErrors(){
 }
 
 
-bool Map::load(){
+bool Map::load(char *fileName)
+{
   bool res = true;
 #if defined(ENABLE_SD_RESUME)  
-  CONSOLE.print("map load... ");
-  if (!SD.exists("map.bin")) {
-    CONSOLE.println("no map file!");
+  CONSOLE.print(F(" loading map from file ")); 
+  CONSOLE.println(fileName);
+  if (!SD.exists(fileName)) {
+    CONSOLE.print(F("=file not found: "));
+    CONSOLE.println(fileName);
     return false;
   }
-  mapFile = SD.open("map.bin", FILE_READ);
+  mapFile = SD.open(fileName, FILE_READ);
   if (!mapFile){        
-    CONSOLE.println("ERROR opening file for reading");
+    CONSOLE.print(F("=ERROR opening file "));
+    CONSOLE.println(fileName);
     return false;
   }
   uint32_t marker = 0;
   mapFile.read((uint8_t*)&marker, sizeof(marker));
   if (marker != 0x00001000){
-    CONSOLE.print("ERROR: invalid marker: ");
+    CONSOLE.print(F("=ERROR: invalid marker: "));
     CONSOLE.println(marker, HEX);
     return false;
   }
+  clearMap(); 
   res &= (mapFile.read((uint8_t*)&mapCRC, sizeof(mapCRC)) != 0); 
   res &= (mapFile.read((uint8_t*)&exclusionPointsCount, sizeof(exclusionPointsCount)) != 0);     
   res &= perimeterPoints.read(mapFile);
@@ -569,30 +574,38 @@ bool Map::load(){
   mapFile.close();  
   long expectedCRC = calcMapCRC();
   if (mapCRC != expectedCRC){
-    CONSOLE.print("ERROR: invalid map CRC:");
+    CONSOLE.print(F("=ERROR: invalid map CRC:"));
     CONSOLE.print(mapCRC);
-    CONSOLE.print(" expected:");
+    CONSOLE.print(F(" expected:"));
     CONSOLE.println(expectedCRC);
     res = false;
   }
   if (res){
-    CONSOLE.println("ok");
+    CONSOLE.println(F(" ok"));
   } else {
-    CONSOLE.println("ERROR loading map");
+    CONSOLE.print(F("=ERROR loading file "));
+    CONSOLE.println(fileName);
     clearMap(); 
   }
+  //HB copied from Map::setWayCount
+  mowPointsIdx = 0;
+  dockPointsIdx = 0;
+  freePointsIdx = 0;  
 #endif
   return res;
 }
 
 
-bool Map::save(){
+bool Map::save(char *fileName)
+{
   bool res = true;
 #if defined(ENABLE_SD_RESUME)  
-  CONSOLE.print("map save... ");
-  mapFile = SD.open("map.bin", O_WRITE | O_CREAT);
+  CONSOLE.print(F(" saving map to file "));
+  CONSOLE.println(fileName);
+  mapFile = SD.open(fileName, O_WRITE | O_CREAT);
   if (!mapFile){        
-    CONSOLE.println("ERROR opening file for writing");
+    CONSOLE.print(F("=ERROR opening file for writing: "));
+    CONSOLE.println(fileName);
     return false;
   }
   uint32_t marker = 0x00001000;
@@ -606,9 +619,9 @@ bool Map::save(){
     res &= mowPoints.write(mapFile);        
   }      
   if (res){
-    CONSOLE.println("ok");
+    CONSOLE.println(F(" ok"));
   } else {
-    CONSOLE.println("ERROR saving map");
+    CONSOLE.println(F("=ERROR saving map"));
   }
   mapFile.flush();
   mapFile.close();
@@ -619,15 +632,20 @@ bool Map::save(){
 
 
 void Map::finishedUploadingMap(){
-  CONSOLE.println("finishedUploadingMap");
+  CONSOLE.println(F(" finishedUploadingMap"));
   mapCRC = calcMapCRC();
   dump();
-  save();
+  save("map.bin");
+
+  char fileName[16];
+  snprintf(fileName, 16, "MAP%d.BIN", mapID);
+
+  save(fileName);
 }
  
    
 void Map::clearMap(){
-  CONSOLE.println("clearMap");
+  CONSOLE.println(F(" clearMap"));
   points.dealloc();    
   perimeterPoints.dealloc();    
   exclusions.dealloc();
@@ -643,7 +661,7 @@ void Map::clearMap(){
 // set point
 bool Map::setPoint(int idx, float x, float y){  
   if ((memoryCorruptions != 0) || (memoryAllocErrors != 0)){
-    CONSOLE.println("ERROR setPoint: memory errors");
+    CONSOLE.println(F("=ERROR setPoint: memory errors"));
     return false; 
   }  
   if (idx == 0){   
@@ -651,7 +669,7 @@ bool Map::setPoint(int idx, float x, float y){
   }    
   if (idx % 100 == 0){
     if (freeMemory () < 20000){
-      CONSOLE.println("OUT OF MEMORY");
+      CONSOLE.println(F("=OUT OF MEMORY"));
       return false;
     }
   }

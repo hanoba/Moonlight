@@ -62,6 +62,7 @@ def CheckSum(send_data):
 #   #print("SENT:", send_data)
 
 def main():
+   numLines = 0
    argc = len(sys.argv)
    if argc > 1: maps.LoadMaps()
    logFlag = True

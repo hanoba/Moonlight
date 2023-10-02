@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.63 HB 2023-09-27"
+#define VER "Ardumower Moonlight, V168.65 HB 2023-10-02"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -160,5 +160,6 @@ void triggerObstacle();
 void sensorTest();
 void resetLinearMotionMeasurement();
 
+char *Sprintf(const char *format, ...);
 
 #endif

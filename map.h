@@ -199,8 +199,8 @@ class Map
     void clearObstacles();
     void clearMap();
     void dump();    
-    bool load();
-    bool save();
+    bool load(char *fileName);
+    bool save(char* fileName);
     void stressTest();
     long calcMapCRC();
     bool isObstacleMowPoint();
