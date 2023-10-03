@@ -184,11 +184,9 @@ def PrintHelpText():
    WriteTextBox(str.format("Checksum:         {:8d}   ", currentMapChecksum))
    WriteTextBox(str.format("Number of waypoints:   {:3d}   ", numWayPoints))
    WriteTextBox("v   Print version number     ")
-   WriteTextBox("m   Start mowing             ")
+   WriteTextBox("m/i Start/stop mowing        ")
    WriteTextBox("M   Start mowing from wayp.  ")
-   WriteTextBox("i   Stop mowing              ")
-   WriteTextBox("d   Start docking            ")
-   WriteTextBox("a   Start undocking          ")
+   WriteTextBox("d/a Start docking/undocking  ")
    WriteTextBox("o   Switch ArduMower off     ")
    WriteTextBox("s   PrintStatistics          ")
    WriteTextBox("r   Read map from SD card    ")
@@ -197,8 +195,10 @@ def PrintHelpText():
    WriteTextBox("BS  Remove point             ")
    WriteTextBox("^e  Toggle edit mode         ")
    WriteTextBox("^w  Show/hide waypoints      ")
-   WriteTextBox("^c  Create waypoints         ")
+   WriteTextBox("^u  Create U waypoints       ")
+   WriteTextBox("^v  Create V waypoints       ")
    WriteTextBox("^p  Make parallel            ")
+   WriteTextBox("^r  Reorder rectangle        ")
    WriteTextBox("TAB Select next point        ")
    WriteTextBox("SPC Select previous point    ")
    WriteTextBox("ESC Show/hide menu           ")
@@ -372,8 +372,9 @@ def ArdumowerControlProgram():
    menu.add.button('Save Maps', CmdStoreMaps)
    menu.add.button('Export Maps in SunrayApp format', CmdExportMaps)
    menu.add.button('Show/Hide Waypoints (^w)', CmdToggleShowWaypoints)
-   menu.add.button('Create U Waypoints (^c)', CmdCreateUtypeWaypoints)
+   menu.add.button('Create U Waypoints (^u)', CmdCreateUtypeWaypoints)
    menu.add.button('Create V Waypoints (^v)', CmdCreateVtypeWaypoints)
+   menu.add.button('CmdReorder Rectangle (^r)', CmdReorderRectangle)
    menu.add.button('Convert Rectangle To Trapezoid (^p)', CmdConvertRectangleToTrapezoid)
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
    menu.add.button('Get RTC Date & Time', mower.GetRtcDateTime)
@@ -454,15 +455,7 @@ def ArdumowerControlProgram():
                   elif event.key == pygame.K_b:
                      mower.ToggleBluetoothLogging()
                   elif event.key == pygame.K_c:
-                     if event.mod & pygame.KMOD_CTRL:
-                        if editMode:
-                           lastPerimeter=maps.perimeters[currentMapIndex].copy()
-                           maps.wayPoints[currentMapIndex] = maps.CreateWaypoints(maps.perimeters[currentMapIndex], r)
-                           showCurrentWayPoints = True
-                     else:
                         mower.ClearStatistics()
-                  #elif event.key == pygame.K_d:
-                  #   mower.ToggleUseGPSfloatForDeltaEstimation()
                   elif event.key == pygame.K_d:
                      mower.StartDocking()
                   elif event.key == pygame.K_e:
@@ -479,8 +472,6 @@ def ArdumowerControlProgram():
                      else: CmdStartMowing()
                   elif event.key == pygame.K_o:
                      mower.SwitchOffRobot()
-                  #elif event.key == pygame.K_p:
-                  #   mower.ToggleUseGPSfloatForPosEstimation()
                   elif event.key == pygame.K_p:
                      if event.mod & pygame.KMOD_CTRL:
                         if editMode:
@@ -490,14 +481,17 @@ def ArdumowerControlProgram():
                      programActive = False
                   elif event.key == pygame.K_r:
                      if event.mod & pygame.KMOD_CTRL:
-                        if editMode:
-                           lastPerimeter=maps.perimeters[currentMapIndex].copy()
-                           maps.ReorderRectangle(maps.perimeters[currentMapIndex], r)
+                        if editMode: CmdReorderRectangle()
                      else: CmdReadMapFromSdCard()
                   elif event.key == pygame.K_s:
                      mower.PrintStatistics()
                   elif event.key == pygame.K_u:
-                     CmdUploadMap()
+                     if event.mod & pygame.KMOD_CTRL:
+                        if editMode:
+                           lastPerimeter=maps.perimeters[currentMapIndex].copy()
+                           maps.wayPoints[currentMapIndex] = maps.CreateWaypoints(maps.perimeters[currentMapIndex], r)
+                           showCurrentWayPoints = True
+                     else: CmdUploadMap()
                   elif event.key == pygame.K_w:
                      if event.mod & pygame.KMOD_CTRL:
                         CmdToggleShowWaypoints()
@@ -615,8 +609,11 @@ def ArdumowerControlProgram():
       # Remember last reference point
       if currentMapIndex == iRefPoints: iCurrentRefPoint = r
       
-      # Draw current edit point
+      # Draw current and next edit point
       pygame.draw.circle(screen, WHITE, maps.perimeters[currentMapIndex][r], 3)
+      if editMode:
+         next = (r + 1) % 4
+         pygame.draw.circle(screen, BLUE, maps.perimeters[currentMapIndex][next], 3)
 
       # Draw waypoints (if enabled)
       numWayPoints = len(maps.wayPoints[currentMapIndex])
@@ -773,6 +770,13 @@ def CmdConvertRectangleToTrapezoid():
    global lastPerimeter
    lastPerimeter=maps.perimeters[currentMapIndex].copy()
    maps.MakeParallel(maps.perimeters[currentMapIndex], r)
+
+def CmdReorderRectangle():
+   global r
+   lastPerimeter=maps.perimeters[currentMapIndex].copy()
+   maps.ReorderRectangle(maps.perimeters[currentMapIndex], r)
+   r = 0
+
 
 ArdumowerControlProgram()
 udp.close()

@@ -183,11 +183,20 @@ def MoveRectangle(rectangle, n, newPos):
         rectangle[i] = (x+dx,y+dy)
 
 def ReorderRectangle(rectangle, n):
-    nb = (n + 1) & 3
-    nd = (n + 3) & 3
-    tmp = rectangle[nb]
-    rectangle[nb] = rectangle[nd]
-    rectangle[nd] = tmp
+   if len(rectangle) == 4:   
+      na = (n + 0) & 3
+      nb = (n + 1) & 3
+      nc = (n + 2) & 3
+      nd = (n + 3) & 3
+      tmp = rectangle.copy()
+      rectangle[0] = tmp[na]
+      rectangle[1] = tmp[nd]
+      rectangle[2] = tmp[nc]
+      rectangle[3] = tmp[nb]
+      #rectangle[nd] = tmp
+      #tmp = rectangle[nb]
+      #rectangle[nb] = rectangle[nd]
+      #rectangle[nd] = tmp
 
 def MakeParallel(rectangle, n):
     na = n;
