@@ -129,13 +129,13 @@ void trackLine()
   float targetDist = maps.distanceToTargetPoint(stateX, stateY);
   
   float lastTargetDist = maps.distanceToLastTargetPoint(stateX, stateY);  
-  // MAP11..14 are "bumper maps". Mow until bumper hits for odd mow points
-  if (maps.isObstacleMowPoint()) targetReached = maps.obstacleTargetReached;
+  // For ObstacleMaps mow until bumper hits for odd mow points
+  if (maps.isObstacleMowPoint()) targetReached = maps.obstacleTargetReached || (targetDist < 0.1);
   else if (cfgSmoothCurves)
      targetReached = (targetDist < 0.2);    
   else 
      targetReached = (targetDist < 0.05);    
-  
+
   if ( (last_rotation_target.x() != target.x() || last_rotation_target.y() != target.y()) &&
         (rotateLeft || rotateRight ) ) {
     // CONSOLE.println("reset left / right rot (target point changed)");

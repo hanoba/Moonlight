@@ -1,12 +1,12 @@
 mapFileName='maps.json'
 exportFileName='export.json'
 linearSpeed='0.5'
-angularSpeed='1.93'
+angularSpeed='0.9'
 fixTimeout='0'
-waypoint='26'
+waypoint='0'
 bumperEnable='1'
 frontWheelDrive='0'
 mlLineTracking='1'
 enableTiltDetection='1'
 gpsConfigFilter='10,10,30'
-lastMapIndex=12
+lastMapIndex=16
