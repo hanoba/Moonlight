@@ -167,6 +167,7 @@ static void cmdReadMapFile(String cmd)
    {
       char fileName[16];
       snprintf(fileName, 16, "MAP%d.BIN", mapId);
+      maps.mapID = mapId;
       maps.load(fileName);
       mapCheckSum = maps.mapCRC;
       //HB CONSOLE.print("=Loading map from file ");

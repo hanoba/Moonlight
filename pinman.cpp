@@ -10,6 +10,8 @@
   #include "wiring_private.h"
 #endif
 
+#undef PWM_FREQUENCY
+#undef TC_FREQUENCY
 #define PWM_FREQUENCY 3900
 #define TC_FREQUENCY 3900
 

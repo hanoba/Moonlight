@@ -119,7 +119,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\SD.h" />
     <ClInclude Include="..\..\..\..\..\..\Program Files (x86)\Arduino\libraries\SD\src\utility\SdFat.h" />
-    <ClInclude Include="..\..\..\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h" />
+    <ClInclude Include="..\..\..\..\..\..\Users\Harald\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h" />
     <ClInclude Include="battery.h" />
     <ClInclude Include="ble.h" />
     <ClInclude Include="buzzer.h" />

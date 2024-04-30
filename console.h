@@ -8,6 +8,7 @@
 //  - sdserial.h
 //  - udpserial.h
 
+#undef CONSOLE
 #if defined(_SAM3XA_)
   //#define CONSOLE SerialUSB   // Arduino Due: do not change (used for Due native USB serial console)
   #define CONSOLE Serial

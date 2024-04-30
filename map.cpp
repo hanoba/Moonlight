@@ -539,7 +539,7 @@ void Map::checkMemoryErrors(){
 }
 
 
-bool Map::load(char *fileName)
+bool Map::load(const char *fileName)
 {
   bool res = true;
 #if defined(ENABLE_SD_RESUME)  
@@ -596,7 +596,7 @@ bool Map::load(char *fileName)
 }
 
 
-bool Map::save(char *fileName)
+bool Map::save(const char *fileName)
 {
   bool res = true;
 #if defined(ENABLE_SD_RESUME)  

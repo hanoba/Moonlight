@@ -40,18 +40,18 @@ mapCfg = [
    [  6, NormalMapU,  DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Wald
    [  7, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Tischtennis
    [  8, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Hang
-   [  9, NormalMapV,  BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
+   [  9, NormalMapV,  FrontWheelDrive, PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
    [ 10, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Teststrecke
    [ 11, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
    [ 12, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
    [ 13, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
    [ 14, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
    [ 15, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner oben
-   [ 16, NormalMapV,  BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
+   [ 16, NormalMapV,  FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
    [ 17, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 18, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
    [ 19, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner unten
-   [ 20, NormalMapV,  BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ]         # Einfahrt neu
+   [ 20, NormalMapV,  FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ]         # Einfahrt neu
 ]
 
 def MapId(i):

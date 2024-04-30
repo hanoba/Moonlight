@@ -128,14 +128,14 @@
     <ClInclude Include="src\ublox\SparkFun_Ublox_Arduino_Library.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h">
-      <Filter>ArduinoLib</Filter>
-    </ClInclude>
     <ClInclude Include="src\mpu\SparkFunMPU9250-DMP.h">
       <Filter>src\mpu</Filter>
     </ClInclude>
     <ClInclude Include="LineTracker.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\Users\Harald\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h">
+      <Filter>ArduinoLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 @echo off
 set BOSSAC=C:\Users\Harald\AppData\Local\Arduino15\packages\arduino\tools\bossac\1.6.1-arduino/bossac.exe
-set BIN=Moonlight.ino.bin
+set BIN=Moonlight.V55.bin
 set PORT=COM4
 echo Erzwinge Reset durch oeffnen/schliessen mit 1200 bps auf dem Port %PORT%
 mode %PORT%:1200
@@ -42,7 +42,5 @@ timeout /T 1 >nul
 ::   -h, --help            display this help text
 ::   -U, --force_usb_port=true/false override USB port autodetection
 ::   -R, --reset           reset CPU (if supported)
-::%BOSSAC% -i --port=%PORT% -U false -e -w -b %BIN% -R 
-echo Uploading %BIN%
-%BOSSAC% -i -e -w -b %BIN% -R 
+%BOSSAC% -i --port=%PORT% -U false -e -w -b %BIN% -R 
 pause
