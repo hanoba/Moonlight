@@ -6,7 +6,8 @@ iBumper = 4
 iTracking = 5
 iSpeed = 6
 
-PosFloat = 1
+#PosFloat = 1
+PosFloat = 0    # set to PosFix!!!
 PosFix = 0
 
 #MT_NORMAL_U=0, MT_NORMAL_V=1, MT_OBSTACLE=2
@@ -34,10 +35,10 @@ SlowSpeed = 0.25
 mapCfg = [
    [  1, NormalMapV,  DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Einfahrt alt
    [  2, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Grigelat kurz
-   [  3, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Brunner lang
+   [  3, NormalMapU,  DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Brunner lang
    [  4, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Grigelat/Brunner unten
    [  5, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Grigelat lang
-   [  6, NormalMapU,  DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Wald
+   [  6, NormalMapV,  DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Wald
    [  7, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Tischtennis
    [  8, NormalMapU,  DefaultDrive,    PosFloat, BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Hang
    [  9, NormalMapV,  FrontWheelDrive, PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
@@ -48,8 +49,8 @@ mapCfg = [
    [ 14, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
    [ 15, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner oben
    [ 16, NormalMapV,  FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
-   [ 17, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
-   [ 18, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # neu
+   [ 17, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus/Wald
+   [ 18, NormalMapV,  FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Rhododendron Brunner
    [ 19, ObstacleMap, BackWheelDrive,  PosFloat, BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner unten
    [ 20, NormalMapV,  FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ]         # Einfahrt neu
 ]

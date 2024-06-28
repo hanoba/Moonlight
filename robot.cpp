@@ -1028,9 +1028,10 @@ bool robotShouldMove(){
 
 void triggerObstacle()
 {
-   CONSOLE.println(F("=triggerObstacle"));
-   statMowObstacles++;    
-   if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
+    statMowObstacles++;
+    CONSOLE.print(F("=triggerObstacle "));
+    CONSOLE.println(statMowObstacles);
+    if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
    {
       if (maps.obstacle() == false) driveReverseStopTime = millis() + 3000;
    } else { 

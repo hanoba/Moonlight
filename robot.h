@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.67 HB 2024-04-23"
+#define VER "Ardumower Moonlight, V168.68 HB 2024-06-28"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
