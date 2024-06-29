@@ -843,6 +843,23 @@ float Map::distanceToLastTargetPoint(float stateX, float stateY){
   return targetDist;
 }
 
+// This function returns true, if a FIXED GPS solution should be used to update the position (state)
+// For obstacle maps, a FIXED GPS solution should be used, if the mower is close a way point opposite 
+// to the fence.
+bool Map::useGpsSolutionFixed(float px, float py) 
+{
+    if (mapType != MT_OBSTACLE && mapType != MT_OBSTACLE_IGNORE_FIX) return true;
+    if (wayMode != WAY_MOW) return true;
+    if (mowPointsIdx == 0) return true;
+    if (mapType == MT_OBSTACLE_IGNORE_FIX) return false;
+    uint16_t i = mowPointsIdx & 0xFFFE;
+    float dX = px - mowPoints.points[i].x();
+    float dY = py - mowPoints.points[i].y();
+    return (sq(dX) + sq(dY)) < 0.25;    // 0.5m^2
+}
+
+
+
 // check if path from last target to target to next target is a curve
 bool Map::nextPointIsStraight(){
   if (wayMode != WAY_MOW) return false;
@@ -1879,7 +1896,7 @@ void Map::testIntegerCalcs(){
  
 bool Map::isObstacleMowPoint() 
 { 
-   return mapType == MT_OBSTACLE && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;  
+   return (mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_FIX) && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;
 }
  
 bool Map::isMowPointNormalV() 
@@ -1895,5 +1912,5 @@ bool Map::obstacle()
       obstacleTargetReached = true;
       return true;
    }
-   return mapType == MT_OBSTACLE;
+   return mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_FIX;
 }

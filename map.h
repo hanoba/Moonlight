@@ -16,7 +16,7 @@ enum WayType {WAY_PERIMETER, WAY_EXCLUSION, WAY_DOCK, WAY_MOW, WAY_FREE};
 typedef enum WayType WayType;
 
 // map type
-enum MapType { MT_NORMAL_U=0, MT_NORMAL_V=1, MT_OBSTACLE=2 };
+enum MapType { MT_NORMAL_U=0, MT_NORMAL_V=1, MT_OBSTACLE=2, MT_OBSTACLE_IGNORE_FIX=3 };
 
 #define MAX_MAP_ID 20
 
@@ -183,7 +183,7 @@ class Map
     // distance to target waypoint
     float distanceToTargetPoint(float stateX, float stateY);    
     float distanceToLastTargetPoint(float stateX, float stateY);
-    // go to next waypoint
+    bool useGpsSolutionFixed(float px, float py);
     bool nextPoint(bool sim);
     // next point is straight and not a sharp curve?   
     bool nextPointIsStraight();
