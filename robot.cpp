@@ -984,7 +984,7 @@ void computeRobotState()
           lastPosN = posN;
           lastPosE = posE;
       } 
-      if (gps.solution == UBLOX::SOL_FIXED && maps.useGpsSolutionFixed(posE, posN))
+      if (gps.solution == UBLOX::SOL_FIXED && maps.useGpsSolutionFixed(stateX, stateY))
       {
           // fix
           lastFixTime = millis();
