@@ -10,3 +10,4 @@ mlLineTracking='1'
 enableTiltDetection='0'
 gpsConfigFilter='10,10,30'
 lastMapIndex=14
+sonarEnable=1

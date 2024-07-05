@@ -22,6 +22,7 @@
 import math
 import maps
 import udp
+import param
 from udp import PrintGuiMessage
 from datetime import datetime
 from time import sleep
@@ -167,6 +168,9 @@ def GnssWarmReboot():
 def GnssColdReboot():
    udp.ExecCmd(CMD_GnssColdReboot)
 
+def SensorTest():
+   udp.ExecCmd(CMD_SensorTest)
+
 def ToggleBluetoothLogging():
    udp.ExecCmd(CMD_ToggleBluetoothLogging)
 
@@ -210,7 +214,7 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    #  5: bFinishAndRestart = 0         # hardcoded
    #  6: fMowingPointPercent = -1      # hardcoded
    #  7: bSkipNextMowingPoint = -1     # hardcoded
-   #  8: bEnableSonar = 0              # hardcoded
+   #  8: bEnableSonar                  # 0 or 1 see param.py
    #  9: bBumperEnable                 # 0 or 1
    # 10: bFrontWheelDrive              # 0 or 1
    # 11: bMoonlightLineTracking        # 0 or 1
@@ -225,8 +229,8 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    if iOpType == OP_MOW: iEnableMowMotor = 1
    else: iEnableMowMotor = 0
    
-   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,0,{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d}', 
-         iEnableMowMotor, iOpType, fSpeed, iFixTimeout, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, iObstacleMap)     
+   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d}', 
+      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, param.enableSonar, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, iObstacleMap)     
    udp.ExecCmd(cmd)
 
 def StartMowing(fSpeed=0.5, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
