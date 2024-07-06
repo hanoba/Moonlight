@@ -305,6 +305,8 @@ dy=1
 SetCurrentMapIndex(currentMapIndex)
 r=0
 
+# solange die Variable True ist, soll das Spiel laufen
+programActive = True
 
 def ArdumowerControlProgram():
    global currentMapIndex
@@ -316,6 +318,7 @@ def ArdumowerControlProgram():
    global numMaps
    global menu, config_menu
    global editMode
+   global programActive
 
    #------------------------------------------------------------------------------------------------- 
    # Create Config Menu
@@ -379,16 +382,13 @@ def ArdumowerControlProgram():
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
    menu.add.button('Get RTC Date & Time', mower.GetRtcDateTime)
    menu.add.button('Mower Configuration', config_menu)
-   menu.add.button('Quit (q)', pygame_menu.events.EXIT)
+   menu.add.button('Quit (q)', pygame_menu.events.EXIT)  #CmdQuit())
 
    # set key repeat 
    # delay_ms = 750
    # interval_ms = 100
    # pygame.key.set_repeat(delay_ms, interval_ms)
    
-   # solange die Variable True ist, soll das Spiel laufen
-   programActive = True
-
    # Init heatmap
    heatmap.CreateHeatMap()
    DrawHeatmapFlag = False
@@ -398,7 +398,7 @@ def ArdumowerControlProgram():
       events = pygame.event.get()
       for event in events:
          if event.type == pygame.QUIT:
-               programActive = False
+               cmdQuit()  #programActive = False
          elif event.type == pygame.KEYDOWN:
                #PrintGuiMessage("")
                if event.key == pygame.K_ESCAPE:
@@ -478,7 +478,7 @@ def ArdumowerControlProgram():
                            lastPerimeter=maps.perimeters[currentMapIndex].copy()
                            maps.MakeParallel(maps.perimeters[currentMapIndex], r)
                   elif event.key == pygame.K_q:
-                     programActive = False
+                     cmdQuit()   #programActive = False
                   elif event.key == pygame.K_r:
                      if event.mod & pygame.KMOD_CTRL:
                         if editMode: CmdReorderRectangle()
@@ -654,6 +654,10 @@ def ArdumowerControlProgram():
       # Refresh-Zeiten festlegen
       clock.tick(FRAME_RATE)
 
+def CmdQuit():
+    global programActive
+    programActive = False
+
 def CmdShowHideMainMenu():
    global editMode
    editMode = False
@@ -783,6 +787,7 @@ udp.close()
 pygame.quit()
 
 # save mower configuration
+print("save mower configuration")
 global config_menu
 data = config_menu.get_input_data()
 file = open("param.py","w")
@@ -799,5 +804,8 @@ file.write("enableTiltDetection='"+data.get('ID_ENABLE_TILT_DETECTION')+"'\n")
 file.write("gpsConfigFilter='"+data.get('ID_GPS_CONFIG_FILTER')+"'\n")
 file.write("lastMapIndex="+str(currentMapIndex)+"\n")
 file.write("sonarEnable="+str(param.sonarEnable)+"\n")
+file.write("sonarObstacleDist="+str(param.sonarObstacleDist)+"\n")
+file.write("sonarNearDist="+str(param.sonarNearDist)+"\n")
+file.write("sonarNearSpeed="+str(param.sonarNearSpeed)+"\n")
 
 file.close() 

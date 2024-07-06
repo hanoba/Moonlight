@@ -145,6 +145,7 @@ float lastPosE = 0;
 
 unsigned long linearMotionStartTime = 0;
 unsigned long bumperDeadTime = 0;
+unsigned long sonarDeadTime = 0;
 unsigned long driveReverseStopTime = 0;
 unsigned long nextControlTime = 0;
 unsigned long lastComputeTime = 0;
@@ -1029,8 +1030,8 @@ bool robotShouldMove(){
 void triggerObstacle()
 {
     statMowObstacles++;
-    CONSOLE.print(F("=triggerObstacle "));
-    CONSOLE.println(statMowObstacles);
+    //CONSOLE.print(F("=triggerObstacle "));
+    //CONSOLE.println(statMowObstacles);
     if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
    {
       if (maps.obstacle() == false) driveReverseStopTime = millis() + 3000;
@@ -1104,19 +1105,24 @@ void detectObstacle()
       if (millis() > bumperDeadTime && bumper.obstacle())
       {  
          bumperDeadTime = millis() + BUMPER_DEAD_TIME;
-         CONSOLE.println(F("=bumper obstacle!"));    
          statMowBumperCounter++;
-         triggerObstacle();    
+         CONSOLE.print(F("=bumper obstacle "));
+         CONSOLE.print(F(statMowBumperCounter));
+         triggerObstacle();
          return;
       }
    }
-   if (sonar.obstacle() && (maps.wayMode != WAY_DOCK)){
-     CONSOLE.println(F("=sonar obstacle!"));    
-     statMowSonarCounter++;
-     if (SONAR_TRIGGER_OBSTACLES){
-       triggerObstacle();
-       return;
-     }        
+   if (sonar.enabled && cfgSonarObstacleDist != 0)
+   {
+       if (millis() > sonarDeadTime && sonar.obstacle() && (maps.wayMode != WAY_DOCK))
+       {
+           sonarDeadTime = millis() + SONAR_DEAD_TIME;
+           statMowSonarCounter++;
+           CONSOLE.print(F("=sonar obstacle "));
+           CONSOLE.println(statMowSonarCounter);
+           triggerObstacle();
+           return;
+       }        
    }  
    // check if GPS motion (obstacle detection)  
    if (millis() > nextGPSMotionCheckTime)

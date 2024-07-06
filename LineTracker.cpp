@@ -225,7 +225,7 @@ void trackLine()
       //  linear = max(setSpeed/2, 0.2); // reduce speed for float solution
       //else
         linear = setSpeed;         // desired speed
-      if (sonar.nearObstacle()) linear = 0.1; // slow down near obstacles
+      if (sonar.nearObstacle()) linear = cfgSonarNearSpeed; // slow down near obstacles
       if (upHillFlag) linear = 0.1;   //HB vermeiden, dass Mower kippt bei grossen Steigungen
     }      
     // slow down speed in case of overload and overwrite all prior speed 

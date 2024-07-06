@@ -229,8 +229,9 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    if iOpType == OP_MOW: iEnableMowMotor = 1
    else: iEnableMowMotor = 0
    
-   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d}', 
-      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, param.enableSonar, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, iObstacleMap)     
+   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:d},{:d},{:.2f}', 
+      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, param.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
+      iObstacleMap, param.sonarObstacleDist, param.sonarNearDist, param.sonarNearSpeed)     
    udp.ExecCmd(cmd)
 
 def StartMowing(fSpeed=0.5, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):

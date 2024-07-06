@@ -32,6 +32,9 @@ bool cfgEnablePathFinder = ENABLE_PATH_FINDER_DEFAULT;
 bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
 bool cfgBumperEnable = BUMPER_ENABLE_DEFAULT;
 bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
+int cfgSonarObstacleDist = 10;  //HB cm (0=disabled)
+int cfgSonarNearDist = 60;      //HB cm (0=disabled)
+float cfgSonarNearSpeed = 0.2;
 float cfgAngularSpeed = 0.5;
 const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
 
@@ -278,10 +281,14 @@ void cmdControl(String cmd)
           if (intValue == 0) maps.useGPSfloatForPosEstimation = false; 
           if (intValue == 1) maps.useGPSfloatForPosEstimation = true; 
       } else if (counter == 16) {  
-          if (intValue >= 0) {
-             maps.mapType = (MapType) intValue;
-          }
-      } 
+          if (intValue >= 0) maps.mapType = (MapType) intValue;
+      } else if (counter == 17) {
+          if (intValue >= 0) cfgSonarObstacleDist = intValue;
+      } else if (counter == 18) {
+          if (intValue >= 0) cfgSonarNearDist = intValue;
+      } else if (counter == 19) {
+          if (floatValue >= 0) cfgSonarNearSpeed = floatValue;
+      }
       counter++;
       lastCommaIdx = idx;
     }

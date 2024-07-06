@@ -15,9 +15,9 @@
 class Sonar {
     public:      
 		bool enabled;
-	    int triggerLeftBelow;
-        int triggerCenterBelow;
-        int triggerRightBelow;
+	    //HB int triggerLeftBelow;
+        //HB int triggerCenterBelow;
+        //HB int triggerRightBelow;
 	    void begin();            
         void run();
 	    bool obstacle();	    
