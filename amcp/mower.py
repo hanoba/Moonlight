@@ -23,6 +23,7 @@ import math
 import maps
 import udp
 import param
+import config
 from udp import PrintGuiMessage
 from datetime import datetime
 from time import sleep
@@ -230,8 +231,8 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    else: iEnableMowMotor = 0
    
    cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:d},{:d},{:.2f}', 
-      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, param.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
-      iObstacleMap, param.sonarObstacleDist, param.sonarNearDist, param.sonarNearSpeed)     
+      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
+      iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.sonarNearSpeed)     
    udp.ExecCmd(cmd)
 
 def StartMowing(fSpeed=0.5, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):

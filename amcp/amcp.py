@@ -382,7 +382,8 @@ def ArdumowerControlProgram():
    menu.add.button('Get Map Checksum From Mower', mower.ComputeMapChecksum)
    menu.add.button('Get RTC Date & Time', mower.GetRtcDateTime)
    menu.add.button('Mower Configuration', config_menu)
-   menu.add.button('Quit (q)', pygame_menu.events.EXIT)  #CmdQuit())
+   #menu.add.button('Quit (q)', pygame_menu.events.EXIT)
+   menu.add.button('Quit (q)', CmdQuit)
 
    # set key repeat 
    # delay_ms = 750
@@ -478,7 +479,7 @@ def ArdumowerControlProgram():
                            lastPerimeter=maps.perimeters[currentMapIndex].copy()
                            maps.MakeParallel(maps.perimeters[currentMapIndex], r)
                   elif event.key == pygame.K_q:
-                     cmdQuit()   #programActive = False
+                     CmdQuit()   #programActive = False
                   elif event.key == pygame.K_r:
                      if event.mod & pygame.KMOD_CTRL:
                         if editMode: CmdReorderRectangle()
@@ -787,10 +788,11 @@ udp.close()
 pygame.quit()
 
 # save mower configuration
-print("save mower configuration")
+paramFile="param.py"
+print(f"save mower parameters in file {paramFile}")
 global config_menu
 data = config_menu.get_input_data()
-file = open("param.py","w")
+file = open(paramFile,"w")
 file.write("mapFileName='"+data.get('ID_MAPS_FILE_NAME')+"'\n")
 file.write("exportFileName='"+data.get('ID_EXPORT_FILE_NAME')+"'\n")
 file.write("linearSpeed='"+data.get('ID_LINEAR_SPEED')+"'\n")
@@ -803,9 +805,5 @@ file.write("mlLineTracking='"+data.get('ID_ML_LINE_TRACKING')+"'\n")
 file.write("enableTiltDetection='"+data.get('ID_ENABLE_TILT_DETECTION')+"'\n")
 file.write("gpsConfigFilter='"+data.get('ID_GPS_CONFIG_FILTER')+"'\n")
 file.write("lastMapIndex="+str(currentMapIndex)+"\n")
-file.write("sonarEnable="+str(param.sonarEnable)+"\n")
-file.write("sonarObstacleDist="+str(param.sonarObstacleDist)+"\n")
-file.write("sonarNearDist="+str(param.sonarNearDist)+"\n")
-file.write("sonarNearSpeed="+str(param.sonarNearSpeed)+"\n")
 
 file.close() 

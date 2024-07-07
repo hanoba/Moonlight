@@ -18,4 +18,5 @@ src/driver/AmRobotDriver.h.bak
 mist/
 amcp/Messreihe/
 amcp/maps - Kopie.json
-config.*
+config.h
+config.h.bak
