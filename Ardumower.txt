@@ -55,6 +55,7 @@
     <Project name="amcp">
         <File name="amcp\amcmd.py" />
         <File name="amcp\amcp.py" />
+        <File name="amcp\config.py" />
         <File name="amcp\date.py" />
         <File name="amcp\maps.py" />
         <File name="amcp\mower.py" />

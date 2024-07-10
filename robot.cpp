@@ -1107,7 +1107,7 @@ void detectObstacle()
          bumperDeadTime = millis() + BUMPER_DEAD_TIME;
          statMowBumperCounter++;
          CONSOLE.print(F("=bumper obstacle "));
-         CONSOLE.print(F(statMowBumperCounter));
+         CONSOLE.println(statMowBumperCounter);
          triggerObstacle();
          return;
       }

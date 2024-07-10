@@ -82,10 +82,11 @@ WriteLog("[udp] waiting for messages (port: " + str(port) + ") ...")
 #   clientAddr = ('192.168.20.100', 4211)
 
 hostName = socket.gethostname()
-if hostName=="HBA004" or hostName=="magic-mirror":
+if hostName=="AZ-KENKO" or hostName=="magic-mirror":
    clientAddr = ('192.168.178.71', 4211)
 else:
    clientAddr = ('192.168.20.100', 4211)
+print(f"Client IP address: {clientAddr}")
 
 # Receive message if available
 def ReceiveRaw():

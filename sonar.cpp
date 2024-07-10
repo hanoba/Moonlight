@@ -175,6 +175,9 @@ bool Sonar::nearObstacle()
   bool res = (distanceLeft < cfgSonarNearDist) || (distanceCenter < cfgSonarNearDist) || (distanceRight < cfgSonarNearDist);
   if (res){
     nearObstacleTimeout = millis() + SONAR_NEAR_TIMEOUT;  //HB was 5000
+    statMowSonarCounter++;
+    CONSOLE.print(F("=sonar near obstacle "));
+    CONSOLE.println(statMowSonarCounter);
   }
   return res;
 }
