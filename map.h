@@ -183,7 +183,7 @@ class Map
     // distance to target waypoint
     float distanceToTargetPoint(float stateX, float stateY);    
     float distanceToLastTargetPoint(float stateX, float stateY);
-    bool useGpsSolutionFixed(float px, float py);
+    bool useGpsSolution(float px, float py);
     bool nextPoint(bool sim);
     // next point is straight and not a sharp curve?   
     bool nextPointIsStraight();

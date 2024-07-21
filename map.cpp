@@ -843,10 +843,10 @@ float Map::distanceToLastTargetPoint(float stateX, float stateY){
   return targetDist;
 }
 
-// This function returns true, if a FIXED GPS solution should be used to update the position (state)
-// For obstacle maps, a FIXED GPS solution should be used, if the mower is close a way point opposite 
+// This function returns true, if a FIXED or FLOAT GPS solution should be used to update the position (state)
+// For obstacle maps, a FIXEDor FLOAT GPS solution should be used, if the mower is close a way point opposite 
 // to the fence.
-bool Map::useGpsSolutionFixed(float px, float py) 
+bool Map::useGpsSolution(float px, float py) 
 {
     if (mapType != MT_OBSTACLE && mapType != MT_OBSTACLE_IGNORE_FIX) return true;
     if (wayMode != WAY_MOW) return true;

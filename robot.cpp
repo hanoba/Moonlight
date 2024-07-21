@@ -898,6 +898,7 @@ void calcStats(){
 // without IMU: heading (stateDelta) is computed by odometry (deltaOdometry)
 void computeRobotState()
 {
+  static int lastGpsSolution = UBLOX::SOL_INVALID;
   if (sim.ComputeRobotState()) return;
 
   long leftDelta = motor.motorLeftTicks-stateLeftTicks;
@@ -931,7 +932,13 @@ void computeRobotState()
 #endif
   {
       gps.solutionAvail = false;        
-      stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * gps.groundSpeed;    
+      bool useGps = maps.useGpsSolution(stateX, stateY);
+      // to get an accurate delta estimation, both current and last GPS solutions must be SOL_FIXED.
+      bool useGpsForDeltaEstimation = gps.solution == UBLOX::SOL_FIXED && lastGpsSolution == UBLOX::SOL_FIXED;
+      if (gps.solution == UBLOX::SOL_FLOAT && maps.useGPSfloatForDeltaEstimation) useGpsForDeltaEstimation = true;
+      lastGpsSolution = gps.solution;
+      
+      stateGroundSpeed = 0.9 * stateGroundSpeed + 0.1 * abs(gps.groundSpeed);    
       //CONSOLE.println(stateGroundSpeed);
       float distGPS = sqrt( sq(posN-lastPosN)+sq(posE-lastPosE) );
 #if MOONLIGHT_GPS_JUMP
@@ -969,8 +976,7 @@ void computeRobotState()
             if (motor.linearSpeedSet < 0) stateDeltaGPS = scalePI(stateDeltaGPS + PI); // consider if driving reverse
             //stateDeltaGPS = scalePI(2*PI-gps.heading+PI/2);
             float diffDelta = distancePI(stateDelta, stateDeltaGPS);                 
-            if (    (gps.solution == UBLOX::SOL_FIXED)
-                 || ((gps.solution == UBLOX::SOL_FLOAT) && (maps.useGPSfloatForDeltaEstimation)) )
+            if (useGps && useGpsForDeltaEstimation)
             {   // allows planner to use float solution?         
               if (fabs(diffDelta/PI*180) > 45){ // IMU-based heading too far away => use GPS heading
                 stateDelta = stateDeltaGPS;
@@ -985,7 +991,7 @@ void computeRobotState()
           lastPosN = posN;
           lastPosE = posE;
       } 
-      if (gps.solution == UBLOX::SOL_FIXED && maps.useGpsSolutionFixed(stateX, stateY))
+      if (gps.solution == UBLOX::SOL_FIXED && useGps)
       {
           // fix
           lastFixTime = millis();
@@ -995,7 +1001,7 @@ void computeRobotState()
       else 
       {
           // float
-          if (maps.useGPSfloatForPosEstimation){ // allows planner to use float solution?
+          if (maps.useGPSfloatForPosEstimation && useGps){ // allows planner to use float solution?
             stateX = posE;
             stateY = posN;              
           }
