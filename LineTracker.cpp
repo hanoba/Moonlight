@@ -333,7 +333,7 @@ void trackLine()
      // print mapType
      CONSOLE.print(F(" MapType="));
      if (maps.mapType==MT_OBSTACLE) CONSOLE.print(F(" MT_OBSTACLE"));
-     else if (maps.mapType == MT_OBSTACLE_IGNORE_FIX) CONSOLE.print(F(" MT_OBSTACLE_IGNORE_FIX"));
+     else if (maps.mapType == MT_OBSTACLE_IGNORE_GPS) CONSOLE.print(F(" MT_OBSTACLE_IGNORE_GPS"));
      else if (maps.mapType==MT_NORMAL_V) CONSOLE.print(F(" MT_NORMAL_V"));
      else CONSOLE.print(F(" MT_NORMAL_U"));
      

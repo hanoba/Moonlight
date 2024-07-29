@@ -36,6 +36,7 @@ int cfgSonarObstacleDist = 10;  //HB cm (0=disabled)
 int cfgSonarNearDist = 60;      //HB cm (0=disabled)
 float cfgSonarNearSpeed = 0.2;
 float cfgAngularSpeed = 0.5;
+float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
 const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
 
 
@@ -281,7 +282,11 @@ void cmdControl(String cmd)
           if (intValue == 0) maps.useGPSfloatForPosEstimation = false; 
           if (intValue == 1) maps.useGPSfloatForPosEstimation = true; 
       } else if (counter == 16) {  
-          if (intValue >= 0) maps.mapType = (MapType) intValue;
+          if (intValue >= 0) {
+              uint16_t distCm = intValue >> 2;
+              cfgObstacleMapGpsThreshold = sq((float)distCm / 100.);
+              maps.mapType = (MapType)(intValue & 3);
+          }
       } else if (counter == 17) {
           if (intValue >= 0) cfgSonarObstacleDist = intValue;
       } else if (counter == 18) {

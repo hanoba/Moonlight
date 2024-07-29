@@ -848,14 +848,13 @@ float Map::distanceToLastTargetPoint(float stateX, float stateY){
 // to the fence.
 bool Map::useGpsSolution(float px, float py) 
 {
-    if (mapType != MT_OBSTACLE && mapType != MT_OBSTACLE_IGNORE_FIX) return true;
+    if (mapType != MT_OBSTACLE_IGNORE_GPS) return true;
     if (wayMode != WAY_MOW) return true;
     if (mowPointsIdx == 0) return true;
-    if (mapType == MT_OBSTACLE_IGNORE_FIX) return false;
     uint16_t i = mowPointsIdx & 0xFFFE;
     float dX = px - mowPoints.points[i].x();
     float dY = py - mowPoints.points[i].y();
-    return (sq(dX) + sq(dY)) < 0.64;    // 0.8m^2
+    return (sq(dX) + sq(dY)) < cfgObstacleMapGpsThreshold;   // in meter
 }
 
 
@@ -1896,7 +1895,7 @@ void Map::testIntegerCalcs(){
  
 bool Map::isObstacleMowPoint() 
 { 
-   return (mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_FIX) && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;
+   return (mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_GPS) && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;
 }
  
 bool Map::isMowPointNormalV() 
@@ -1912,5 +1911,5 @@ bool Map::obstacle()
       obstacleTargetReached = true;
       return true;
    }
-   return mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_FIX;
+   return mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_GPS;
 }
