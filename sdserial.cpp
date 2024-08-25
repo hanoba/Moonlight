@@ -45,7 +45,7 @@ void SDSerial::beginSD()
    sprintf(buf, "%02d%02d%02d%02d.gps", now.month, now.monthday, now.hour, now.minute);
    gpsLogFileName = (String)buf;
 
-   CONSOLE.print("logfile: ");
+   CONSOLE.print(F("logfile: "));
    CONSOLE.println(logFileName);    
    sdStarted = true;
 
@@ -54,7 +54,7 @@ void SDSerial::beginSD()
    //   logFileName += i;
    //   logFileName += ".txt";    
    //   if (!SD.exists(logFileName)) {
-   //     CONSOLE.print("logfile: ");
+   //     CONSOLE.print(F("logfile: "));
    //     CONSOLE.println(logFileName);    
    //     sdStarted = true;
    //     break; 
@@ -111,7 +111,7 @@ size_t SDSerial::write(uint8_t data){
       //  logFile.flush();
       //  logFile.close();            
       //} else {
-      //  CONSOLE.println("ERROR opening file for writing");
+      //  CONSOLE.println(F("ERROR opening file for writing"));
       //}
       writeSD(packetBuffer);
       packetIdx = 0;            

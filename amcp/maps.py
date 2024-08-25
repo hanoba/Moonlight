@@ -7,6 +7,7 @@ from time import sleep
 from datetime import datetime
 import udp
 import plan
+import config
 
 
 # Return values
@@ -220,9 +221,9 @@ def CreateWaypoints(rectangle, n):
     if len(rectangle) != 4:
         print("Error: CreateWaypoints needs a rectangle as input")
         return waypoints
-    # Durchmesser der neuen Messer: 25 cm
-    # Durchmesser der alten Messer: 21.5 cm
-    maxLaneDistance = 0.16*scalingFactor
+    #maxLaneDistance = 0.16*scalingFactor
+    maxLaneDistance = (config.dmMesser-config.uLaneOverlap)*scalingFactor
+
     Va = np.array(rectangle[n])
     Vb = np.array(rectangle[(n + 1) & 3])
     Vc = np.array(rectangle[(n + 2) & 3])
@@ -243,6 +244,8 @@ def CreateWaypoints(rectangle, n):
     numLanes = 1 + math.floor(perimeterDistance/maxLaneDistance+1)
     print("NumLanes=", numLanes)
     laneDistance = perimeterDistance / (numLanes - 1)
+    print("laneDistance=", laneDistance/scalingFactor)
+
     VlaneTop = Vcb_n * laneDistance / math.cos(alpha)
 
     Lda = np.linalg.norm(Vda)
@@ -266,68 +269,14 @@ def CreateWaypoints(rectangle, n):
         topFlag = not topFlag
     return waypoints
 
-def CreateBumperWaypointsOld(rectangle, n):
-    waypoints = []
-    if len(rectangle) != 4:
-        print("Error: CreateWaypoints needs a rectangle as input")
-        return waypoints
-    # Durchmesser der neuen Messer: 25 cm
-    # Durchmesser der alten Messer: 21.5 cm
-    #maxLaneDistance = 0.16*scalingFactor
-    maxLaneDistance = 0.16*scalingFactor
-    Va = np.array(rectangle[n])
-    Vb = np.array(rectangle[(n + 1) & 3])
-    Vc = np.array(rectangle[(n + 2) & 3])
-    Vd = np.array(rectangle[(n + 3) & 3])
-    Vba = np.subtract(Vb,Va)
-    Vcb = np.subtract(Vc,Vb)
-    Vda = np.subtract(Vd,Va)
-    Vortho = np.array((-Vba[1], Vba[0]))
-    Vortho = Vortho/np.linalg.norm(Vortho)
-    
-    Lcb = np.linalg.norm(Vcb)
-    Vcb_n = Vcb/Lcb
-    alpha = math.acos(np.dot(Vortho,Vcb_n))
-    print(Vortho)
-    print(Vcb_n)
-    print("alpha=", alpha)
-    perimeterDistance = Lcb*math.cos(alpha)
-    numLanes = 1 + math.floor(perimeterDistance/maxLaneDistance+1)
-    print("NumLanes=", numLanes)
-    laneDistance = perimeterDistance / (numLanes - 1)
-    VlaneTop = Vcb_n * laneDistance / math.cos(alpha)
-
-    Lda = np.linalg.norm(Vda)
-    Vda_n = Vda/Lda
-    beta = math.acos(np.dot(Vortho,Vda_n))
-    VlaneBottom = Vda_n * laneDistance / math.cos(beta)
-
-    topFlag = True
-    waypoints.append((Va[0],Va[1]))
-    for i in range(numLanes):
-        if topFlag:
-            Vnext = np.add(Vb, VlaneTop*i)
-            waypoints.append((Vnext[0],Vnext[1]))
-            #Vnext = np.add(Vb, VlaneTop*(i+1))
-            #if i < numLanes-1: waypoints.append((Vnext[0],Vnext[1]))
-        else:
-            Vnext = np.add(Va, VlaneBottom*i)
-            waypoints.append((Vnext[0],Vnext[1]))
-            #Vnext = np.add(Va, VlaneBottom*(i+1))
-            #if i < numLanes-1: waypoints.append((Vnext[0],Vnext[1]))
-        topFlag = not topFlag
-    return waypoints
-
 
 def CreateBumperWaypoints(rectangle, n):
     waypoints = []
     if len(rectangle) != 4:
         print("Error: CreateWaypoints needs a rectangle as input")
         return waypoints
-    # Durchmesser der neuen Messer: 25 cm
-    # Durchmesser der alten Messer: 21.5 cm
     #maxLaneDistance = 0.16*scalingFactor
-    maxLaneDistance = 0.16*scalingFactor
+    maxLaneDistance = (config.dmMesser-config.vLaneOverlap)*scalingFactor/2    # divide by 2 is needed for V waypoint creation
     Va = np.array(rectangle[n])
     Vb = np.array(rectangle[(n + 1) & 3])
     Vc = np.array(rectangle[(n + 2) & 3])
@@ -352,8 +301,10 @@ def CreateBumperWaypoints(rectangle, n):
     laneDistanceCb = Lcb / (numLanes - 1)
     laneDistanceDa = Lda / (numLanes - 1)
 
-    print("NumLanesCb=", numLanesCb)
-    print("NumLanesDa=", numLanesDa)
+    print(f"{numLanesCb=}")
+    print(f"{numLanesDa=}")
+    print("laneDistanceCb=", laneDistanceCb/scalingFactor)
+    print("laneDistanceDa=", laneDistanceDa/scalingFactor)
 
     VlaneTop = Vcb_n * laneDistanceCb
     VlaneBottom = Vda_n * laneDistanceDa
@@ -560,6 +511,58 @@ def main():
     print(garten)
     Map2Screen(garten)
     print(garten)
+
+
+#def CreateBumperWaypointsOld(rectangle, n):
+#    waypoints = []
+#    if len(rectangle) != 4:
+#        print("Error: CreateWaypoints needs a rectangle as input")
+#        return waypoints
+#    # Durchmesser der neuen Messer: 25 cm
+#    # Durchmesser der alten Messer: 21.5 cm
+#    maxLaneDistance = 0.16*scalingFactor
+#    Va = np.array(rectangle[n])
+#    Vb = np.array(rectangle[(n + 1) & 3])
+#    Vc = np.array(rectangle[(n + 2) & 3])
+#    Vd = np.array(rectangle[(n + 3) & 3])
+#    Vba = np.subtract(Vb,Va)
+#    Vcb = np.subtract(Vc,Vb)
+#    Vda = np.subtract(Vd,Va)
+#    Vortho = np.array((-Vba[1], Vba[0]))
+#    Vortho = Vortho/np.linalg.norm(Vortho)
+#    
+#    Lcb = np.linalg.norm(Vcb)
+#    Vcb_n = Vcb/Lcb
+#    alpha = math.acos(np.dot(Vortho,Vcb_n))
+#    print(Vortho)
+#    print(Vcb_n)
+#    print("alpha=", alpha)
+#    perimeterDistance = Lcb*math.cos(alpha)
+#    numLanes = 1 + math.floor(perimeterDistance/maxLaneDistance+1)
+#    print("NumLanes=", numLanes)
+#    laneDistance = perimeterDistance / (numLanes - 1)
+#    VlaneTop = Vcb_n * laneDistance / math.cos(alpha)
+#
+#    Lda = np.linalg.norm(Vda)
+#    Vda_n = Vda/Lda
+#    beta = math.acos(np.dot(Vortho,Vda_n))
+#    VlaneBottom = Vda_n * laneDistance / math.cos(beta)
+#
+#    topFlag = True
+#    waypoints.append((Va[0],Va[1]))
+#    for i in range(numLanes):
+#        if topFlag:
+#            Vnext = np.add(Vb, VlaneTop*i)
+#            waypoints.append((Vnext[0],Vnext[1]))
+#            #Vnext = np.add(Vb, VlaneTop*(i+1))
+#            #if i < numLanes-1: waypoints.append((Vnext[0],Vnext[1]))
+#        else:
+#            Vnext = np.add(Va, VlaneBottom*i)
+#            waypoints.append((Vnext[0],Vnext[1]))
+#            #Vnext = np.add(Va, VlaneBottom*(i+1))
+#            #if i < numLanes-1: waypoints.append((Vnext[0],Vnext[1]))
+#        topFlag = not topFlag
+#    return waypoints
 
 
 

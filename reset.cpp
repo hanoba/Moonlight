@@ -29,15 +29,15 @@ ResetCause getResetCause() {
 
 
 void logResetCause(){
-  CONSOLE.print("RESET cause: ");
+  CONSOLE.print(F("RESET cause: "));
   switch (getResetCause()){
-    case RST_UNKNOWN: CONSOLE.println("unknown"); break;
-    case RST_POWER_ON : CONSOLE.println("power-on"); break;
-    case RST_EXTERNAL : CONSOLE.println("external"); break;
-    case RST_BROWN_OUT : CONSOLE.println("brown-out"); break;
-    case RST_WATCHDOG : CONSOLE.println("watchdog"); break;
-    case RST_SOFTWARE : CONSOLE.println("software"); break;
-    case RST_BACKUP: CONSOLE.println("backup"); break;
+    case RST_UNKNOWN: CONSOLE.println(F("unknown")); break;
+    case RST_POWER_ON : CONSOLE.println(F("power-on")); break;
+    case RST_EXTERNAL : CONSOLE.println(F("external")); break;
+    case RST_BROWN_OUT : CONSOLE.println(F("brown-out")); break;
+    case RST_WATCHDOG : CONSOLE.println(F("watchdog")); break;
+    case RST_SOFTWARE : CONSOLE.println(F("software")); break;
+    case RST_BACKUP: CONSOLE.println(F("backup")); break;
   }
 }
 

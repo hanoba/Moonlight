@@ -487,11 +487,11 @@ def ArdumowerControlProgram():
                   elif event.key == pygame.K_s:
                      mower.PrintStatistics()
                   elif event.key == pygame.K_u:
-                     if event.mod & pygame.KMOD_CTRL:
-                        if editMode:
-                           lastPerimeter=maps.perimeters[currentMapIndex].copy()
-                           maps.wayPoints[currentMapIndex] = maps.CreateWaypoints(maps.perimeters[currentMapIndex], r)
-                           showCurrentWayPoints = True
+                     if event.mod & pygame.KMOD_CTRL: CmdCreateUtypeWaypoints()
+                     #   if editMode:
+                     #      lastPerimeter=maps.perimeters[currentMapIndex].copy()
+                     #      maps.wayPoints[currentMapIndex] = maps.CreateWaypoints(maps.perimeters[currentMapIndex], r)
+                     #      showCurrentWayPoints = True
                      else: CmdUploadMap()
                   elif event.key == pygame.K_w:
                      if event.mod & pygame.KMOD_CTRL:

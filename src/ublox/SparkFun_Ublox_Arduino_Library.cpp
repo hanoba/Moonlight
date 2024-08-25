@@ -2623,7 +2623,7 @@ boolean SFE_UBLOX_GPS::powerOff(uint32_t durationInMs,  uint16_t maxWait)
   {
     _debugSerial->print(F("Powering off for "));
     _debugSerial->print(durationInMs);
-    _debugSerial->println(" ms");
+    _debugSerial->println(F(" ms"));
   }
 
   // Power off device using UBX-RXM-PMREQ
@@ -2669,7 +2669,7 @@ boolean SFE_UBLOX_GPS::powerOffWithInterrupt(uint32_t durationInMs, uint32_t wak
   {
     _debugSerial->print(F("Powering off for "));
     _debugSerial->print(durationInMs);
-    _debugSerial->println(" ms");
+    _debugSerial->println(F(" ms"));
   }
 
   // Power off device using UBX-RXM-PMREQ

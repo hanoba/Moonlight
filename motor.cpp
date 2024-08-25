@@ -121,7 +121,7 @@ void Motor::setLinearAngularSpeed(float linear, float angular, bool useLinearRam
    // RPM = V / (2*PI*r) * 60
    motorRightRpmSet =  rspeed / (PI*(((float)wheelDiameter)/1000.0)) * 60.0;   
    motorLeftRpmSet = lspeed / (PI*(((float)wheelDiameter)/1000.0)) * 60.0;   
-   /*CONSOLE.print("setLinearAngularSpeed ");
+   /*CONSOLE.print(F("setLinearAngularSpeed "));
    CONSOLE.print(linear);
    CONSOLE.print(",");
    CONSOLE.print(rspeed);
@@ -184,14 +184,14 @@ void Motor::run() {
     if (millis() > nextResetMotorFaultTime){
       if (resetMotorFault){
         nextResetMotorFaultTime = millis() + 5000;
-        CONSOLE.print("resetMotorFaultCounter ");
+        CONSOLE.print(F("resetMotorFaultCounter "));
         CONSOLE.println(resetMotorFaultCounter);
         resetMotorFaultCounter++;        
         motorDriver.resetMotorFaults();
         resetMotorFault = false;  
         if (resetMotorFaultCounter > 10){ // too many successive motor faults
           //stopImmediately();
-          CONSOLE.println("ERROR: motor recovery failed");
+          CONSOLE.println(F("ERROR: motor recovery failed"));
           motorError = true;
         }
       } else {
@@ -207,7 +207,7 @@ void Motor::run() {
     {               
       if (!odometryError){
         // odometry error
-        CONSOLE.print("ERROR: odometry error rpm=");
+        CONSOLE.print(F("ERROR: odometry error rpm="));
         CONSOLE.print(motorLeftRpmCurr);
         CONSOLE.print(",");
         CONSOLE.println(motorRightRpmCurr);     
@@ -224,13 +224,13 @@ void Motor::run() {
     {        
         // at least one motor is not consuming current      
         if (!motorError){
-            CONSOLE.print("ERROR: motor malfunction pwm=");
+            CONSOLE.print(F("ERROR: motor malfunction pwm="));
             CONSOLE.print(motorLeftPWMCurr);
             CONSOLE.print(",");
             CONSOLE.print(motorRightPWMCurr);
             CONSOLE.print(",");
             CONSOLE.print(motorMowPWMCurr);
-            CONSOLE.print("  sense=");
+            CONSOLE.print(F("  sense="));
             CONSOLE.print(motorLeftSenseLP);
             CONSOLE.print(",");
             CONSOLE.print(motorRightSenseLP);
@@ -287,15 +287,15 @@ bool Motor::checkFault() {
   bool mowFault = false;
   motorDriver.getMotorFaults(leftFault, rightFault, mowFault);
   if (leftFault) {
-    CONSOLE.println("Error: motor left fault");
+    CONSOLE.println(F("Error: motor left fault"));
     fault = true;
   }
   if  (rightFault) {
-    CONSOLE.println("Error: motor right fault"); 
+    CONSOLE.println(F("Error: motor right fault")); 
     fault = true;
   }
   if (mowFault) {
-    CONSOLE.println("Error: motor mow fault");
+    CONSOLE.println(F("Error: motor mow fault"));
     fault = true;
   }
   return fault;
@@ -340,9 +340,9 @@ void Motor::sense(){
   motorMowOverload = (motorMowSenseLP > MOW_OVERLOAD_CURRENT);
   if (motorLeftOverload || motorRightOverload || motorMowOverload){
     if (motorOverloadDuration == 0){
-      CONSOLE.print("ERROR motor overload duration=");
+      CONSOLE.print(F("ERROR motor overload duration="));
       CONSOLE.print(motorOverloadDuration);
-      CONSOLE.print("  current=");
+      CONSOLE.print(F("  current="));
       CONSOLE.print(motorLeftSenseLP);
       CONSOLE.print(",");
       CONSOLE.print(motorRightSenseLP);
@@ -357,11 +357,11 @@ void Motor::sense(){
 
 
 void Motor::control(){  
-  /*CONSOLE.print("rpm set=");
+  /*CONSOLE.print(F("rpm set="));
   CONSOLE.print(motorLeftRpmSet);
   CONSOLE.print(",");
   CONSOLE.print(motorRightRpmSet);
-  CONSOLE.print("   curr=");
+  CONSOLE.print(F("   curr="));
   CONSOLE.print(motorLeftRpmCurr);
   CONSOLE.print(",");
   CONSOLE.println(motorRightRpmCurr);*/
@@ -403,16 +403,16 @@ void Motor::dumpOdoTicks(int seconds){
   motorRightTicks += ticksRight;
   CONSOLE.print("t=");
   CONSOLE.print(seconds);
-  CONSOLE.print("  ticks Left=");
+  CONSOLE.print(F("  ticks Left="));
   CONSOLE.print(motorLeftTicks);  
-  CONSOLE.print("  Right=");
+  CONSOLE.print(F("  Right="));
   CONSOLE.print(motorRightTicks);             
-  CONSOLE.print("  current Left=");
+  CONSOLE.print(F("  current Left="));
   CONSOLE.print(motorLeftSense);
-  CONSOLE.print("  Right=");
+  CONSOLE.print(F("  Right="));
   CONSOLE.print(motorRightSense);
 
-    CONSOLE.print(" Imot_mA=");    //HB
+    CONSOLE.print(F(" Imot_mA="));    //HB
     CONSOLE.print(motor.motorLeftSenseLP*1000.,0);
     CONSOLE.print(",");    
     CONSOLE.print(motor.motorRightSenseLP*1000.,0);
@@ -424,7 +424,7 @@ void Motor::dumpOdoTicks(int seconds){
 
 
 void Motor::test(){
-  CONSOLE.println("motor test - 10 revolutions");
+  CONSOLE.println(F("motor test - 10 revolutions"));
   motorLeftTicks = 0;  
   motorRightTicks = 0;  
   unsigned long nextInfoTime = 0;
@@ -459,6 +459,6 @@ void Motor::test(){
   }
   dumpOdoTicks(seconds);
   speedPWM(0, 0, 0);
-  CONSOLE.println("motor test done - please ignore any IMU/GPS errors");
+  CONSOLE.println(F("motor test done - please ignore any IMU/GPS errors"));
 }
 

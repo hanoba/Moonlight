@@ -58,9 +58,9 @@ void Point::setXY(float ax, float ay){
 }
 
 long Point::crc(){
-   //CONSOLE.print("CRC: ");
+   //CONSOLE.print(F("CRC: "));
    //CONSOLE.print(px);
-   //CONSOLE.print("   ");
+   //CONSOLE.print(F("   "));
    //CONSOLE.println(py);
    return (px + py);
 }
@@ -68,14 +68,14 @@ long Point::crc(){
 bool Point::read(File &file){
   byte marker = file.read();
   if (marker != 0xAA){
-    CONSOLE.println("ERROR reading point: invalid marker");
+    CONSOLE.println(F("ERROR reading point: invalid marker"));
     return false;
   }
   bool res = true;
   res &= (file.read((uint8_t*)&px, sizeof(px)) != 0);
   res &= (file.read((uint8_t*)&py, sizeof(py)) != 0);
   if (!res) {
-    CONSOLE.println("ERROR reading point");
+    CONSOLE.println(F("ERROR reading point"));
   }
   return res;
 }
@@ -86,7 +86,7 @@ bool Point::write(File &file){
   res &= (file.write((uint8_t*)&px, sizeof(px)) != 0);
   res &= (file.write((uint8_t*)&py, sizeof(py)) != 0);
   if (!res) {
-    CONSOLE.println("ERROR writing point");
+    CONSOLE.println(F("ERROR writing point"));
   }
   return res;
 }
@@ -115,12 +115,12 @@ Polygon::~Polygon(){
 bool Polygon::alloc(short aNumPoints){
   if (aNumPoints == numPoints) return true;
   if ((aNumPoints < 0) || (aNumPoints > 5000)) {
-    CONSOLE.println("ERROR Polygon::alloc invalid number");    
+    CONSOLE.println(F("ERROR Polygon::alloc invalid number"));    
     return false;
   }
   Point* newPoints = new Point[aNumPoints+CHECK_CORRUPT];    
   if (newPoints == NULL) {
-    CONSOLE.println("ERROR Polygon::alloc out of memory");
+    CONSOLE.println(F("ERROR Polygon::alloc out of memory"));
     memoryAllocErrors++;
     return false;
   }
@@ -169,12 +169,12 @@ long Polygon::crc(){
 bool Polygon::read(File &file){
   byte marker = file.read();
   if (marker != 0xBB){
-    CONSOLE.println("ERROR reading polygon: invalid marker");
+    CONSOLE.println(F("ERROR reading polygon: invalid marker"));
     return false;
   }
   short num = 0;
   file.read((uint8_t*)&num, sizeof(num));
-  //CONSOLE.print("reading points:");
+  //CONSOLE.print(F("reading points:"));
   //CONSOLE.println(num);
   if (!alloc(num)) return false;
   for (short i=0; i < num; i++){    
@@ -186,10 +186,10 @@ bool Polygon::read(File &file){
 bool Polygon::write(File &file){
   if (file.write(0xBB) == 0) return false;  
   if (file.write((uint8_t*)&numPoints, sizeof(numPoints)) == 0) {
-    CONSOLE.println("ERROR writing polygon");
+    CONSOLE.println(F("ERROR writing polygon"));
     return false; 
   }
-  //CONSOLE.print("writing points:");
+  //CONSOLE.print(F("writing points:"));
   //CONSOLE.println(numPoints);
   for (int i=0; i < numPoints; i++){    
     if (!points[i].write(file)) return false;
@@ -220,12 +220,12 @@ PolygonList::~PolygonList(){
 bool PolygonList::alloc(short aNumPolygons){  
   if (aNumPolygons == numPolygons) return true;
   if ((aNumPolygons < 0) || (aNumPolygons > 5000)) {
-    CONSOLE.println("ERROR PolygonList::alloc invalid number");    
+    CONSOLE.println(F("ERROR PolygonList::alloc invalid number"));    
     return false;
   }
   Polygon* newPolygons = new Polygon[aNumPolygons+CHECK_CORRUPT];  
   if (newPolygons == NULL){
-    CONSOLE.println("ERROR PolygonList::alloc out of memory");
+    CONSOLE.println(F("ERROR PolygonList::alloc out of memory"));
     memoryAllocErrors++;
     return false;
   }
@@ -284,12 +284,12 @@ long PolygonList::crc(){
 bool PolygonList::read(File &file){
   byte marker = file.read();
   if (marker != 0xCC){
-    CONSOLE.println("ERROR reading polygon list: invalid marker");
+    CONSOLE.println(F("ERROR reading polygon list: invalid marker"));
     return false;
   }
   short num = 0;
   file.read((uint8_t*)&num, sizeof(num)); 
-  //CONSOLE.print("reading polygon list:");
+  //CONSOLE.print(F("reading polygon list:"));
   //CONSOLE.println(num);
   if (!alloc(num)) return false;
   for (short i=0; i < num; i++){    
@@ -300,14 +300,14 @@ bool PolygonList::read(File &file){
 
 bool PolygonList::write(File &file){
   if (file.write(0xCC) == 0) {
-    CONSOLE.println("ERROR writing polygon list marker");
+    CONSOLE.println(F("ERROR writing polygon list marker"));
     return false;  
   } 
   if (file.write((uint8_t*)&numPolygons, sizeof(numPolygons)) == 0) {
-    CONSOLE.println("ERROR writing polygon list");
+    CONSOLE.println(F("ERROR writing polygon list"));
     return false; 
   }
-  //CONSOLE.print("writing polygon list:");
+  //CONSOLE.print(F("writing polygon list:"));
   //CONSOLE.println(numPolygons);
   for (int i=0; i < numPolygons; i++){    
     if (!polygons[i].write(file)) return false;
@@ -366,12 +366,12 @@ NodeList::~NodeList(){
 bool NodeList::alloc(short aNumNodes){  
   if (aNumNodes == numNodes) return true;
   if ((aNumNodes < 0) || (aNumNodes > 20000)) {
-    CONSOLE.println("ERROR NodeList::alloc invalid number");    
+    CONSOLE.println(F("ERROR NodeList::alloc invalid number"));    
     return false;
   }
   Node* newNodes = new Node[aNumNodes+CHECK_CORRUPT];  
   if (newNodes == NULL){
-    CONSOLE.println("ERROR NodeList::alloc");
+    CONSOLE.println(F("ERROR NodeList::alloc"));
     memoryAllocErrors++;
     return false;
   }
@@ -473,7 +473,7 @@ void Map::begin(){
   dockPointsIdx = 0;
   mapCRC = 0;  
   mapID = 3;
-  CONSOLE.print("sizeof Point=");
+  CONSOLE.print(F("sizeof Point="));
   CONSOLE.println(sizeof(Point));  
   load("map.bin");
   dump();
@@ -481,45 +481,45 @@ void Map::begin(){
 
 long Map::calcMapCRC(){   
   long crc = perimeterPoints.crc() + exclusions.crc() + dockPoints.crc() + mowPoints.crc();       
-  //CONSOLE.print("computed map crc=");  
+  //CONSOLE.print(F("computed map crc="));  
   //CONSOLE.println(crc);  
   return crc;
 }
 
 void Map::dump(){ 
-  CONSOLE.print("map dump - mapCRC=");
+  CONSOLE.print(F("map dump - mapCRC="));
   CONSOLE.println(mapCRC);
-  CONSOLE.print("points: ");
+  CONSOLE.print(F("points: "));
   points.dump();
-  CONSOLE.print("perimeter pts: ");
+  CONSOLE.print(F("perimeter pts: "));
   CONSOLE.println(perimeterPoints.numPoints);
   //perimeterPoints.dump();
-  CONSOLE.print("exclusion pts: ");
+  CONSOLE.print(F("exclusion pts: "));
   CONSOLE.println(exclusionPointsCount);  
-  CONSOLE.print("exclusions: ");  
+  CONSOLE.print(F("exclusions: "));  
   CONSOLE.println(exclusions.numPolygons);  
   //exclusions.dump();  
-  CONSOLE.print("dock pts: ");
+  CONSOLE.print(F("dock pts: "));
   CONSOLE.println(dockPoints.numPoints);
   //dockPoints.dump();
-  CONSOLE.print("mow pts: ");  
+  CONSOLE.print(F("mow pts: "));  
   CONSOLE.println(mowPoints.numPoints);  
   //mowPoints.dump();
   if (mowPoints.numPoints > 0){
-    CONSOLE.print("first mow point:");
+    CONSOLE.print(F("first mow point:"));
     CONSOLE.print(mowPoints.points[0].x());
     CONSOLE.print(",");
     CONSOLE.println(mowPoints.points[0].y());
   }
-  CONSOLE.print("free pts: ");
+  CONSOLE.print(F("free pts: "));
   CONSOLE.println(freePoints.numPoints);  
-  CONSOLE.print("mowPointsIdx=");
+  CONSOLE.print(F("mowPointsIdx="));
   CONSOLE.print(mowPointsIdx);
-  CONSOLE.print(" dockPointsIdx=");
+  CONSOLE.print(F(" dockPointsIdx="));
   CONSOLE.print(dockPointsIdx);
-  CONSOLE.print(" freePointsIdx=");
+  CONSOLE.print(F(" freePointsIdx="));
   CONSOLE.print(freePointsIdx);
-  CONSOLE.print(" wayMode=");
+  CONSOLE.print(F(" wayMode="));
   CONSOLE.println(wayMode);
   checkMemoryErrors();
 }
@@ -527,14 +527,14 @@ void Map::dump(){
 
 void Map::checkMemoryErrors(){
   if (memoryCorruptions != 0){
-    CONSOLE.print("********************* ERROR: memoryCorruptions=");
+    CONSOLE.print(F("********************* ERROR: memoryCorruptions="));
     CONSOLE.println(memoryCorruptions);
-    CONSOLE.print(" *********************");
+    CONSOLE.print(F(" *********************"));
   } 
   if (memoryAllocErrors != 0){
-    CONSOLE.print("********************* ERROR: memoryAllocErrors=");
+    CONSOLE.print(F("********************* ERROR: memoryAllocErrors="));
     CONSOLE.println(memoryAllocErrors);
-    CONSOLE.print(" *********************");
+    CONSOLE.print(F(" *********************"));
   } 
 }
 
@@ -684,7 +684,7 @@ bool Map::setPoint(int idx, float x, float y){
 // set number points for point type
 bool Map::setWayCount(WayType type, int count){
   if ((memoryCorruptions != 0) || (memoryAllocErrors != 0)){
-    CONSOLE.println("ERROR setWayCount: memory errors");
+    CONSOLE.println(F("ERROR setWayCount: memory errors"));
     return false; 
   }  
   switch (type){
@@ -731,10 +731,10 @@ bool Map::setWayCount(WayType type, int count){
 // set number exclusion points for exclusion
 bool Map::setExclusionLength(int idx, int len){  
   if ((memoryCorruptions != 0) || (memoryAllocErrors != 0)){
-    CONSOLE.println("ERROR setExclusionLength: memory errors");
+    CONSOLE.println(F("ERROR setExclusionLength: memory errors"));
     return false; 
   }  
-  /*CONSOLE.print("setExclusionLength ");
+  /*CONSOLE.print(F("setExclusionLength "));
   CONSOLE.print(idx);
   CONSOLE.print("=");
   CONSOLE.println(len);*/
@@ -751,9 +751,9 @@ bool Map::setExclusionLength(int idx, int len){
     exclusions.polygons[idx].points[j].assign( points.points[perimeterPoints.numPoints + ptIdx] );        
     ptIdx ++;
   }
-  CONSOLE.print("ptIdx=");
+  CONSOLE.print(F("ptIdx="));
   CONSOLE.print(ptIdx);
-  CONSOLE.print(" exclusionPointsCount=");
+  CONSOLE.print(F(" exclusionPointsCount="));
   CONSOLE.print(exclusionPointsCount);
   CONSOLE.println();
   if (ptIdx == exclusionPointsCount){
@@ -761,7 +761,7 @@ bool Map::setExclusionLength(int idx, int len){
     finishedUploadingMap();
   }
   
-  //CONSOLE.print("exclusion ");
+  //CONSOLE.print(F("exclusion "));
   //CONSOLE.print(idx);
   //CONSOLE.print(": ");
   //CONSOLE.println(exclusionLength[idx]);   
@@ -912,9 +912,9 @@ bool Map::isUndocking(){
 }
 
 bool Map::startDocking(float stateX, float stateY){
-  CONSOLE.println("Map::startDocking");
+  CONSOLE.println(F("Map::startDocking"));
   if ((memoryCorruptions != 0) || (memoryAllocErrors != 0)){
-    CONSOLE.println("ERROR startDocking: memory errors");
+    CONSOLE.println(F("ERROR startDocking: memory errors"));
     return false; 
   }  
   shouldDock = true;
@@ -970,22 +970,22 @@ bool Map::startMowing(float stateX, float stateY){
       if (findPath(src, dst)){        
         return true;
       } else {
-        CONSOLE.println("ERROR: no path");
+        CONSOLE.println(F("ERROR: no path"));
         return false;      
       }
     } else {
-      CONSOLE.println("ERROR: no safe start point");
+      CONSOLE.println(F("ERROR: no safe start point"));
       return false;
     }
   } else {
-    CONSOLE.println("ERROR: no points");
+    CONSOLE.println(F("ERROR: no points"));
     return false; 
   }
 }
 
 
 void Map::clearObstacles(){  
-  CONSOLE.println("clearObstacles");
+  CONSOLE.println(F("clearObstacles"));
   obstacles.dealloc();  
 }
 
@@ -999,12 +999,12 @@ bool Map::addObstacle(float stateX, float stateY){
   float x = stateX + cos(angleCurr) * r;
   float y = stateY + sin(angleCurr) * r;
   
-  CONSOLE.print("addObstacle ");
+  CONSOLE.print(F("addObstacle "));
   CONSOLE.print(x);
   CONSOLE.print(",");
   CONSOLE.println(y);
   if (obstacles.numPolygons > 50){
-    CONSOLE.println("error: too many obstacles");
+    CONSOLE.println(F("error: too many obstacles"));
     return false;
   }
   int idx = obstacles.numPolygons;
@@ -1031,7 +1031,7 @@ bool Map::findObstacleSafeMowPoint(Point &findPathToPoint){
   while (true){
     safe = true;  
     dst.assign(mowPoints.points[mowPointsIdx]);
-    CONSOLE.print("findObstacleSafeMowPoint checking ");    
+    CONSOLE.print(F("findObstacleSafeMowPoint checking "));    
     CONSOLE.print(dst.x());
     CONSOLE.print(",");
     CONSOLE.println(dst.y());
@@ -1071,7 +1071,7 @@ bool Map::findObstacleSafeMowPoint(Point &findPathToPoint){
     }    
     // try next mowing point
     if (mowPointsIdx >= mowPoints.numPoints-1){
-      CONSOLE.println("findObstacleSafeMowPoint error: no more mowing points reachable due to obstacles");
+      CONSOLE.println(F("findObstacleSafeMowPoint error: no more mowing points reachable due to obstacles"));
       return false;
     } 
     mowPointsIdx++;
@@ -1107,11 +1107,11 @@ bool Map::checkpoint(float x, float y){
 // find start point for path finder on line from src to dst
 // that is insider perimeter and outside exclusions
 void Map::findPathFinderSafeStartPoint(Point &src, Point &dst){
-  CONSOLE.print("findPathFinderSafePoint (");  
+  CONSOLE.print(F("findPathFinderSafePoint ("));  
   CONSOLE.print(src.x());
   CONSOLE.print(",");
   CONSOLE.print(src.y());
-  CONSOLE.print(") (");
+  CONSOLE.print(F(") ("));
   CONSOLE.print(dst.x());
   CONSOLE.print(",");
   CONSOLE.print(dst.y());
@@ -1120,7 +1120,7 @@ void Map::findPathFinderSafeStartPoint(Point &src, Point &dst){
   if (!pointIsInsidePolygon( perimeterPoints, src)){
     if (linePolygonIntersectPoint( src, dst, perimeterPoints, sect)){
       src.assign(sect);
-      CONSOLE.println("found safe point inside perimeter");
+      CONSOLE.println(F("found safe point inside perimeter"));
       return;
     }    
   }
@@ -1130,23 +1130,23 @@ void Map::findPathFinderSafeStartPoint(Point &src, Point &dst){
         // source point is not reachable      
         if (linePolygonIntersectPoint( src, dst, exclusions.polygons[i], sect)){    
           src.assign(sect);
-          CONSOLE.println("found safe point outside exclusion");
+          CONSOLE.println(F("found safe point outside exclusion"));
           return;
         }
       }
     }
   }  
   // point is inside perimeter and outside exclusions
-  CONSOLE.println("point is inside perimeter and outside exclusions");
+  CONSOLE.println(F("point is inside perimeter and outside exclusions"));
 }
 
 
 // go to next point
 // sim=true: only simulate (do not change data)
 bool Map::nextPoint(bool sim){
-  CONSOLE.print("nextPoint sim=");
+  CONSOLE.print(F("nextPoint sim="));
   CONSOLE.print(sim);
-  CONSOLE.print(" wayMode=");
+  CONSOLE.print(F(" wayMode="));
   CONSOLE.println(wayMode);
   if (wayMode == WAY_DOCK){
     return (nextDockPoint(sim));
@@ -1325,11 +1325,11 @@ bool Map::linePolygonIntersectPoint( Point &src, Point &dst, Polygon &poly, Poin
   Point p2;
   Point cp;
   float minDist = 9999;
-  //CONSOLE.print("linePolygonIntersectPoint (");
+  //CONSOLE.print(F("linePolygonIntersectPoint ("));
   //CONSOLE.print(src.x());  
   //CONSOLE.print(",");
   //CONSOLE.print(src.y());
-  //CONSOLE.print(") (");
+  //CONSOLE.print(F(") ("));
   //CONSOLE.print(dst.x());
   //CONSOLE.print(",");
   //CONSOLE.print(dst.y());
@@ -1348,13 +1348,13 @@ bool Map::linePolygonIntersectPoint( Point &src, Point &dst, Polygon &poly, Poin
     //CONSOLE.print(p2.y());
     //CONSOLE.print(") ");
     if (lineIntersects(p1, p2, src, dst)) {        
-      //CONSOLE.print(" intersect  ");
+      //CONSOLE.print(F(" intersect  "));
       if (lineLineIntersection(p1, p2, src, dst, cp)){        
         //CONSOLE.print(cp.x());
         //CONSOLE.print(",");
         //CONSOLE.print(cp.y());
         float dist = distance(src, cp);
-        //CONSOLE.print("  dist=");
+        //CONSOLE.print(F("  dist="));
         //CONSOLE.println(dist);
         if (dist < minDist){
           minDist = dist;
@@ -1402,7 +1402,7 @@ bool Map::pointIsInsidePolygon( Polygon &polygon, Point &pt)
     
   }
   //if (c != d){
-  //  CONSOLE.println("pointIsInsidePolygon bogus");
+  //  CONSOLE.println(F("pointIsInsidePolygon bogus"));
   //}
   return (c % 2 != 0);
 }      
@@ -1412,23 +1412,23 @@ bool Map::pointIsInsidePolygon( Polygon &polygon, Point &pt)
 // (p0,p1) 1st line
 // (p2,p3) 2nd line
 bool Map::lineIntersects (Point &p0, Point &p1, Point &p2, Point &p3) {
-  /*CONSOLE.print("lineIntersects ((");
+  /*CONSOLE.print(F("lineIntersects (("));
   CONSOLE.print(p0.x);  
   CONSOLE.print(",");
   CONSOLE.print(p0.y);
-  CONSOLE.print("),(");
+  CONSOLE.print(F("),("));
   CONSOLE.print(p1.x);
   CONSOLE.print(",");
   CONSOLE.print(p1.y);
-  CONSOLE.print("))   ((");   
+  CONSOLE.print(F("))   (("));   
   CONSOLE.print(p2.x);  
   CONSOLE.print(",");
   CONSOLE.print(p2.y);
-  CONSOLE.print("),(");
+  CONSOLE.print(F("),("));
   CONSOLE.print(p3.x);
   CONSOLE.print(",");
   CONSOLE.print(p3.y);
-  CONSOLE.print(")) ");*/  
+  CONSOLE.print(F(")) "));*/  
   int p0x = p0.px;
   int p0y = p0.py;
   int p1x = p1.px;
@@ -1462,7 +1462,7 @@ bool Map::lineIntersects (Point &p0, Point &p1, Point &p2, Point &p3) {
   return true;
   #endif
   //if (res1 != res2){
-  //  CONSOLE.println("lineIntersects bogus");
+  //  CONSOLE.println(F("lineIntersects bogus"));
   //}  
 }
 
@@ -1560,7 +1560,7 @@ float Map::calcHeuristic(Point &pos0, Point &pos1) {
   
   
 int Map::findNextNeighbor(NodeList &nodes, PolygonList &obstacles, Node &node, int startIdx) {
-  //CONSOLE.print("start=");
+  //CONSOLE.print(F("start="));
   //CONSOLE.print((*node.point).x());
   //CONSOLE.print(",");
   //CONSOLE.println((*node.point).y());
@@ -1574,7 +1574,7 @@ int Map::findNextNeighbor(NodeList &nodes, PolygonList &obstacles, Node &node, i
     //if (this.distance(pt, node.pos) > 10) continue;
     bool safe = true;            
     Point sectPt;
-    //CONSOLE.print("----check new path with all polygons---dest=");
+    //CONSOLE.print(F("----check new path with all polygons---dest="));
     //CONSOLE.print((*pt).x());
     //CONSOLE.print(",");
     //CONSOLE.println((*pt).y());  
@@ -1583,13 +1583,13 @@ int Map::findNextNeighbor(NodeList &nodes, PolygonList &obstacles, Node &node, i
     for (int idx3 = 0; idx3 < obstacles.numPolygons; idx3++){             
        bool isPeri = ((perimeterPoints.numPoints > 0) && (idx3 == 0));  // if first index, it's perimeter, otherwise exclusions                           
        if (isPeri){ // we check with the perimeter?         
-         //CONSOLE.println("we check with perimeter");
+         //CONSOLE.println(F("we check with perimeter"));
          bool insidePeri = pointIsInsidePolygon(obstacles.polygons[idx3], *node.point);
          if (!insidePeri) { // start point outside perimeter?                                                                                      
-             //CONSOLE.println("start point oustide perimeter");
+             //CONSOLE.println(F("start point oustide perimeter"));
              if (linePolygonIntersectPoint( *node.point, *pt, obstacles.polygons[idx3], sectPt)){
                float dist = distance(*node.point, sectPt);          
-               //CONSOLE.print("dist=");
+               //CONSOLE.print(F("dist="));
                //CONSOLE.println(dist);
                if (dist > ALLOW_ROUTE_OUTSIDE_PERI_METER){ safe = false; break; } // entering perimeter with long distance is not safe                             
                if (linePolygonIntersectionCount( *node.point, *pt, obstacles.polygons[idx3]) != 1){ safe = false; break; }
@@ -1597,13 +1597,13 @@ int Map::findNextNeighbor(NodeList &nodes, PolygonList &obstacles, Node &node, i
              } else { safe = false; break; }                                          
          }
        } else {
-         //CONSOLE.println("we check with exclusion");
+         //CONSOLE.println(F("we check with exclusion"));
          bool insideObstacle = pointIsInsidePolygon(obstacles.polygons[idx3], *node.point);
          if (insideObstacle) { // start point inside obstacle?                                                                         
-             //CONSOLE.println("start point inside exclusion");          
+             //CONSOLE.println(F("start point inside exclusion"));          
              if (linePolygonIntersectPoint( *node.point, *pt, obstacles.polygons[idx3], sectPt)){
                float dist = distance(*node.point, sectPt);          
-               //CONSOLE.print("dist=");
+               //CONSOLE.print(F("dist="));
                //CONSOLE.println(dist);
                if (dist > ALLOW_ROUTE_OUTSIDE_PERI_METER){ safe = false; break; } // exiting obstacle with long distance is not safe                             
                continue;           
@@ -1615,7 +1615,7 @@ int Map::findNextNeighbor(NodeList &nodes, PolygonList &obstacles, Node &node, i
          break;
        }             
     }
-    //CONSOLE.print("----check done---safe=");
+    //CONSOLE.print(F("----check done---safe="));
     //CONSOLE.println(safe);
     if (safe) {          
       //pt.visited = true;
@@ -1637,11 +1637,11 @@ bool Map::findPath(Point &src, Point &dst){
   }  
   
   unsigned long nextProgressTime = 0;
-  CONSOLE.print("findPath (");
+  CONSOLE.print(F("findPath ("));
   CONSOLE.print(src.x());
   CONSOLE.print(",");
   CONSOLE.print(src.y());
-  CONSOLE.print(") (");
+  CONSOLE.print(F(") ("));
   CONSOLE.print(dst.x());
   CONSOLE.print(",");
   CONSOLE.print(dst.y());
@@ -1672,13 +1672,13 @@ bool Map::findPath(Point &src, Point &dst){
       idx++;
     }  
     
-    //CONSOLE.println("perimeter");
+    //CONSOLE.println(F("perimeter"));
     //perimeterPoints.dump();
-    //CONSOLE.println("exclusions");
+    //CONSOLE.println(F("exclusions"));
     //exclusions.dump();
-    //CONSOLE.println("obstacles");
+    //CONSOLE.println(F("obstacles"));
     //obstacles.dump();
-    //CONSOLE.println("pathFinderObstacles");
+    //CONSOLE.println(F("pathFinderObstacles"));
     //pathFinderObstacles.dump();
     
     // create nodes
@@ -1715,13 +1715,13 @@ bool Map::findPath(Point &src, Point &dst){
     Node *end = &pathFinderNodes.nodes[idx];
     end->point = &dst;    
     idx++;
-    //CONSOLE.print("nodes=");
+    //CONSOLE.print(F("nodes="));
     //CONSOLE.print(nodes.numNodes);
-    //CONSOLE.print(" idx=");
+    //CONSOLE.print(F(" idx="));
     //CONSOLE.println(idx);
     
     
-    //CONSOLE.print("sz=");
+    //CONSOLE.print(F("sz="));
     //CONSOLE.println(sizeof(visitedPoints));
     
     int timeout = 1000;    
@@ -1730,7 +1730,7 @@ bool Map::findPath(Point &src, Point &dst){
     CONSOLE.print ("freem=");
     CONSOLE.println (freeMemory ());
     
-    CONSOLE.println("starting path-finder");
+    CONSOLE.println(F("starting path-finder"));
     while(true) {       
       if (millis() >= nextProgressTime){
         nextProgressTime = millis() + 4000;          
@@ -1739,7 +1739,7 @@ bool Map::findPath(Point &src, Point &dst){
       }
       timeout--;            
       if (timeout == 0){
-        CONSOLE.println("timeout");
+        CONSOLE.println(F("timeout"));
         break;
       }
       // Grab the lowest f(x) to process next
@@ -1747,7 +1747,7 @@ bool Map::findPath(Point &src, Point &dst){
       for(int i=0; i<pathFinderNodes.numNodes; i++) {
         if ((pathFinderNodes.nodes[i].opened) && ((lowInd == -1) || (pathFinderNodes.nodes[i].f < pathFinderNodes.nodes[lowInd].f))) { lowInd = i; }
       }
-      //CONSOLE.print("lowInd=");
+      //CONSOLE.print(F("lowInd="));
       //CONSOLE.println(lowInd);
       if (lowInd == -1) break;
       currentNode = &pathFinderNodes.nodes[lowInd]; 
@@ -1760,7 +1760,7 @@ bool Map::findPath(Point &src, Point &dst){
       //console.log('cn  pos'+currentNode.pos.X+','+currentNode.pos.Y);            
       //console.log('neighbors '+neighbors.length);      
       int neighborIdx = -1;
-      //CONSOLE.print("currentNode ");
+      //CONSOLE.print(F("currentNode "));
       //CONSOLE.print(currentNode->point->x);
       //CONSOLE.print(",");
       //CONSOLE.println(currentNode->point->y);      
@@ -1774,7 +1774,7 @@ bool Map::findPath(Point &src, Point &dst){
           CONSOLE.print("+");
           watchdogReset();     
         }
-        //CONSOLE.print("neighbor=");
+        //CONSOLE.print(F("neighbor="));
         //CONSOLE.print(neighborIdx);
         //CONSOLE.print(":");
         //CONSOLE.print(neighbor->point->x());

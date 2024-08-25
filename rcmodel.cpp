@@ -85,7 +85,7 @@ void RCModel::run()
       lastDataFlag = dataFlag;
       if (dataFlag)
       {
-         CONSOLE.print("[RC] ");
+         CONSOLE.print(F("[RC] "));
          CONSOLE.print(iLinear);
          CONSOLE.print(",");
          CONSOLE.println(iAngular);

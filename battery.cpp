@@ -83,7 +83,7 @@ void Battery::resetIdle(){
 }
 
 void Battery::switchOff(){
-  CONSOLE.println("=switching-off battery by operator...");
+  CONSOLE.println(F("=switching-off battery by operator..."));
   switchOffByOperator = true;
 }
 

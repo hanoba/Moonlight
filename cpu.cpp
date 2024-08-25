@@ -103,7 +103,7 @@ void logCPUHealth(){
   uint32_t valueRead;
   float voltage;
   
-  CONSOLE.print("CPU: ");
+  CONSOLE.print(F("CPU: "));
   
   // ------ cpu temperature --------
   // The voltage reference output is enabled/disabled by setting/clearing the Voltage Reference Output Enable bit in the
@@ -132,29 +132,29 @@ void logCPUHealth(){
   uint32_t ctat = readADC(CTAT);      
   SUPC->VREF.bit.TSEN = 0;    
     
-  CONSOLE.print("PTAT=");      
+  CONSOLE.print(F("PTAT="));      
   CONSOLE.print(ptat);      
-  CONSOLE.print(" CTAT=");        
+  CONSOLE.print(F(" CTAT="));        
   CONSOLE.print(ctat);     
   
   // cpu temperatures need translation by calibrated data
   float temp = calcTemperature(ptat, ctat);
-  CONSOLE.print(" deg=");     
+  CONSOLE.print(F(" deg="));     
   CONSOLE.print(temp);     
   
   // ------- cpu voltages -------
   //analogReference(AR_INTERNAL1V0);     // ref 1.0V
-  CONSOLE.print(" voltages: I/O=");  
+  CONSOLE.print(F(" voltages: I/O="));  
   valueRead = readADC(SCALEDIOVCC);  
   voltage  = (((float)valueRead) / 4095.0f) * 3.3f * 4.0f;    // 12 bit, ref 3.3 volt
   CONSOLE.print(voltage);                       
   
-  CONSOLE.print(" Core=");
+  CONSOLE.print(F(" Core="));
   valueRead = readADC(SCALEDCOREVCC);  
   voltage  = (((float)valueRead) / 4095.0f) * 3.3f * 4.0f;    // 12 bit, ref 3.3 volt
   CONSOLE.print(voltage);                       
   
-  CONSOLE.print(" VBAT=");
+  CONSOLE.print(F(" VBAT="));
   valueRead = readADC(SCALEDVBAT);  
   voltage  = (((float)valueRead) / 4095.0f) * 3.3f * 4.0f;    // 12 bit, ref 3.3 volt
   CONSOLE.print(voltage);                           

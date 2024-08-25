@@ -51,14 +51,14 @@ int get_turn_direction_preference() {
   circle.points[6].setXY(center_x + cos(deg2rad(270)) * r, center_y + sin(deg2rad(270)) * r);
   circle.points[7].setXY(center_x + cos(deg2rad(315)) * r, center_y + sin(deg2rad(315)) * r);
 
-  // CONSOLE.print("get_turn_direction_preference: ");
-  // CONSOLE.print(" pos: ");
+  // CONSOLE.print(F("get_turn_direction_preference: "));
+  // CONSOLE.print(F(" pos: "));
   // CONSOLE.print(stateX);
   // CONSOLE.print("/");
   // CONSOLE.print(stateY);
-  // CONSOLE.print(" stateDelta: ");
+  // CONSOLE.print(F(" stateDelta: "));
   // CONSOLE.print(stateDelta);
-  // CONSOLE.print(" targetDelta: ");
+  // CONSOLE.print(F(" targetDelta: "));
   // CONSOLE.println(targetDelta);
   int right = 0;
   int left = 0;
@@ -93,7 +93,7 @@ int get_turn_direction_preference() {
             }
     }
   }
-  // CONSOLE.print("left/right: ");
+  // CONSOLE.print(F("left/right: "));
   // CONSOLE.print(left);
   // CONSOLE.print("/");
   // CONSOLE.println(right);
@@ -138,7 +138,7 @@ void trackLine()
 
   if ( (last_rotation_target.x() != target.x() || last_rotation_target.y() != target.y()) &&
         (rotateLeft || rotateRight ) ) {
-    // CONSOLE.println("reset left / right rot (target point changed)");
+    // CONSOLE.println(F("reset left / right rot (target point changed)"));
     rotateLeft = false;
     rotateRight = false;
   }
@@ -176,12 +176,12 @@ void trackLine()
           }        
           
           if (r == 1) {
-            //CONSOLE.println("force turn right");
+            //CONSOLE.println(F("force turn right"));
             rotateLeft = false;
             rotateRight = true;
           }
           else if (r == -1) {
-            //CONSOLE.println("force turn left");
+            //CONSOLE.println(F("force turn left"));
             rotateLeft = true;
             rotateRight = false;
           }
@@ -196,7 +196,7 @@ void trackLine()
        trackerDiffDelta_positive = (trackerDiffDelta >= 0);
     }        
     if (trackerDiffDelta_positive != (trackerDiffDelta >= 0)) {
-      CONSOLE.println("reset left / right rotation - DiffDelta overflow");
+      CONSOLE.println(F("reset left / right rotation - DiffDelta overflow"));
       rotateLeft = false;
       rotateRight = false;
       // reverse rotation (*-1) - slowly rotate back
@@ -231,7 +231,7 @@ void trackLine()
     // slow down speed in case of overload and overwrite all prior speed 
     if ( (motor.motorLeftOverload) || (motor.motorRightOverload) || (motor.motorMowOverload) ){
       if (!printmotoroverload) {
-          CONSOLE.println("motor overload detected: reduce linear speed");
+          CONSOLE.println(F("motor overload detected: reduce linear speed"));
       }
       printmotoroverload = true;
       linear = maps.mapType != MT_NORMAL_U ? min(cfgSlowSpeedObstacleMap, setSpeed) : 0.1;  
@@ -281,7 +281,7 @@ void trackLine()
       if ((millis() > linearMotionStartTime + 5000) && (stateGroundSpeed < 0.03)){
         // if in linear motion and not enough ground speed => obstacle
         if (GPS_SPEED_DETECTION){
-          CONSOLE.println("gps no speed => obstacle!");
+          CONSOLE.println(F("gps no speed => obstacle!"));
           triggerObstacle();
           return;
         }
@@ -291,7 +291,7 @@ void trackLine()
     // no gps solution
     if (REQUIRE_VALID_GPS){
       if (!maps.isUndocking()) { 
-        //CONSOLE.println("no gps solution!");
+        //CONSOLE.println(F("no gps solution!"));
         stateSensor = SENS_GPS_INVALID;
         //setOperation(OP_ERROR);
         //buzzer.sound(SND_STUCK, true);          
@@ -314,9 +314,9 @@ void trackLine()
     resetLinearMotionMeasurement();
   }
   if (angleToTargetFits != langleToTargetFits) {
-      //CONSOLE.print("angleToTargetFits: ");
+      //CONSOLE.print(F("angleToTargetFits: "));
       //CONSOLE.print(angleToTargetFits);
-      //CONSOLE.print(" trackerDiffDelta: ");
+      //CONSOLE.print(F(" trackerDiffDelta: "));
       //CONSOLE.println(trackerDiffDelta);
       langleToTargetFits = angleToTargetFits;
   }

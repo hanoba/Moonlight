@@ -19,9 +19,9 @@
 #include "sim.h"
 
 //#ifdef SUNRAY_HB_NO_BT
-//String BLEConfig::read(){ String s;   CONSOLE.print("BLE: ");   return s; }
+//String BLEConfig::read(){ String s;   CONSOLE.print(F("BLE: "));   return s; }
 //String BLEConfig::exec(String cmd){ String s; return s; }
-//void BLEConfig::run(){ CONSOLE.print("trying to detect Bluetooth 4.0/BLE module (make sure your phone is NOT connected)"); }
+//void BLEConfig::run(){ CONSOLE.print(F("trying to detect Bluetooth 4.0/BLE module (make sure your phone is NOT connected)")); }
 //#else
 
 //extern bool simulationFlag;
@@ -35,7 +35,7 @@ void bleConsoleTest()
 
     if (simulationFlag) return;
 
-    Serial.println("Enter BT AT commands - Press ( to exit testmode");
+    Serial.println(F("Enter BT AT commands - Press ( to exit testmode"));
     
     while (true)
     {
@@ -81,7 +81,7 @@ String BLEConfig::exec(String cmd)
 {
    if (simulationFlag) return "";
 
-   CONSOLE.print("BLE: ");
+   CONSOLE.print(F("BLE: "));
    CONSOLE.println(cmd);
    //for (int i=0; i<cmd.length(); i++)
    //{
@@ -117,15 +117,15 @@ void BLEConfig::run()
         case 1: baud=9600; break;  
         default: continue;
       }
-      CONSOLE.print("trying to detect Bluetooth 4.0/BLE module (make sure your phone is NOT connected)");
+      CONSOLE.print(F("trying to detect Bluetooth 4.0/BLE module (make sure your phone is NOT connected)"));
       CONSOLE.print(baud);
-      CONSOLE.println("...");
+      CONSOLE.println(F("..."));
       BLE.begin(baud);    
       //BLE.flush();
       //HB String res = exec("AT\r\n");
       String res = exec("AT");
       if (res.indexOf("OK") != -1){
-        CONSOLE.println("Bluetooth 4.0/BLE module found!");
+        CONSOLE.println(F("Bluetooth 4.0/BLE module found!"));
         if (baud == BLE_BAUDRATE) {
           found = true;
           break;
@@ -133,7 +133,7 @@ void BLEConfig::run()
           if (BLE_BAUDRATE==9600)         exec("AT+BAUD0");  // 4
           else if (BLE_BAUDRATE==115200)  exec("AT+BAUD4");  // 8
           else {
-              CONSOLE.println("Illegal BLE baud rate");
+              CONSOLE.println(F("Illegal BLE baud rate"));
               while(true)
                   ;
           }

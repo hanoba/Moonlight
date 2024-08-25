@@ -31,17 +31,17 @@ UBLOX::UBLOX(HardwareSerial& bus,uint32_t baud)
 
 
 bool UBLOX::configure(){
-  CONSOLE.print("ublox f9p: connecting - ");
-  CONSOLE.print("trying baud ");
+  CONSOLE.print(F("ublox f9p: connecting - "));
+  CONSOLE.print(F("trying baud "));
   CONSOLE.print(_baud);
-  CONSOLE.print("...");
+  CONSOLE.print(F("..."));
   //configGPS.enableDebugging(CONSOLE, false);  
   if (configGPS.begin(*_bus) == false) {
 #if 1
       CONSOLE.println(F("ERROR: GPS receiver is not responding"));
       return false;         
 #else
-    CONSOLE.print("trying baud 38400...");    
+    CONSOLE.print(F("trying baud 38400..."));    
     _bus->begin(38400);
     if (configGPS.begin(*_bus) == false) {
       _bus->begin(_baud);
@@ -52,12 +52,12 @@ bool UBLOX::configure(){
     _bus->begin(_baud);          
 #endif
   }     
-  CONSOLE.println("GPS receiver found!");
+  CONSOLE.println(F("GPS receiver found!"));
   
    
   bool setValueSuccess = true;
   
-  CONSOLE.print("ublox f9p: sending GPS rover configuration...");
+  CONSOLE.print(F("ublox f9p: sending GPS rover configuration..."));
   
   // ---- uart2 messages (Xbee/NTRIP) -------------------
   setValueSuccess &= configGPS.newCfgValset8(0x209100a8, 0, VAL_LAYER_RAM); // CFG-MSGOUT-NMEA_ID_DTM_UART2  (off)
@@ -130,11 +130,11 @@ bool UBLOX::configure(){
   
   if (setValueSuccess == true)
   {
-    CONSOLE.println("config sent successfully");
+    CONSOLE.println(F("config sent successfully"));
     return true;
   }
   else {
-    CONSOLE.println("ERROR: config sending failed");
+    CONSOLE.println(F("ERROR: config sending failed"));
     return false;
   }    
 }
@@ -161,7 +161,7 @@ bool UBLOX::SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0)
     }
     else 
     {
-        CONSOLE.println("=Set GPS Filter ... ERROR");
+        CONSOLE.println(F("=Set GPS Filter ... ERROR"));
         return false;
     }
 }
@@ -195,7 +195,7 @@ void UBLOX::begin()
 }
 
 void UBLOX::WarmRestart(){
-  //CONSOLE.println("rebooting GPS receiver...");
+  //CONSOLE.println(F("rebooting GPS receiver..."));
   //configGPS.hardReset();
   configGPS.GnssWarmRestart();
 
@@ -206,7 +206,7 @@ void UBLOX::WarmRestart(){
 }
 
 void UBLOX::ColdRestart(){
-  //CONSOLE.println("Hard reset of GPS receiver...");
+  //CONSOLE.println(F("Hard reset of GPS receiver..."));
   configGPS.GnssColdRestart();
 
   ttffFlag = false;
@@ -258,7 +258,7 @@ void UBLOX::parse(int b)
       this->state = GOT_LENGTH2;
       this->msglen += (b << 8);
       if (debug) {
-        CONSOLE.print("payload size ");
+        CONSOLE.print(F("payload size "));
         CONSOLE.print(this->msglen, HEX);
         CONSOLE.print(",");
       }
@@ -285,11 +285,11 @@ void UBLOX::parse(int b)
       if (b == this->chka){
         this->state = GOT_CHKA;
       } else {        
-        CONSOLE.print("ublox chka error, msgclass=");
+        CONSOLE.print(F("ublox chka error, msgclass="));
         CONSOLE.print(this->msgclass, HEX);
-        CONSOLE.print(", msgid=");
+        CONSOLE.print(F(", msgid="));
         CONSOLE.print(this->msgid, HEX);
-        CONSOLE.print(", msglen=");
+        CONSOLE.print(F(", msglen="));
         CONSOLE.print(this->msglen, HEX);        
         CONSOLE.print(": ");
         CONSOLE.print(b, HEX);
@@ -308,11 +308,11 @@ void UBLOX::parse(int b)
       }
 
       else {
-          CONSOLE.print("ublox chkb error, msgclass=");
+          CONSOLE.print(F("ublox chkb error, msgclass="));
           CONSOLE.print(this->msgclass, HEX);
-          CONSOLE.print(", msgid=");
+          CONSOLE.print(F(", msgid="));
           CONSOLE.print(this->msgid, HEX);
-          CONSOLE.print(", msglen=");
+          CONSOLE.print(F(", msglen="));
           CONSOLE.print(this->msglen, HEX);        
           CONSOLE.print(": ");
           CONSOLE.print(b, HEX);
@@ -340,7 +340,7 @@ void UBLOX::dispatchMessage() {
             { // UBX-NAV-PVT
               iTOW = (unsigned long)this->unpack_int32(0);
               //numSV = this->unpack_int8(23);               
-              if (verbose) CONSOLE.println("UBX-NAV-PVT");
+              if (verbose) CONSOLE.println(F("UBX-NAV-PVT"));
             }
             break;
           case 0x12:
@@ -348,13 +348,13 @@ void UBLOX::dispatchMessage() {
               iTOW = (unsigned long)this->unpack_int32(0);
               groundSpeed = ((double)((unsigned long)this->unpack_int32(20))) / 100.0;
               heading = ((double)this->unpack_int32(24)) * 1e-5 / 180.0 * PI;
-              //CONSOLE.print("heading:");
+              //CONSOLE.print(F("heading:"));
               //CONSOLE.println(heading);
               if (verbose) {
-                CONSOLE.print("UBX-NAV-VELNED ");
-                CONSOLE.print("groundSpeed=");
+                CONSOLE.print(F("UBX-NAV-VELNED "));
+                CONSOLE.print(F("groundSpeed="));
                 CONSOLE.print(groundSpeed);
-                CONSOLE.print("  heading=");
+                CONSOLE.print(F("  heading="));
                 CONSOLE.println(heading);                
               }
             }
@@ -373,17 +373,17 @@ void UBLOX::dispatchMessage() {
               //unsigned long hAcc = (unsigned long)this->unpack_int32(20);
               //unsigned long vAcc = (unsigned long)this->unpack_int32(24);                            
               if (verbose) {
-                CONSOLE.print("UBX-NAV-HPPOSLLH ");
-                CONSOLE.print("lon=");
+                CONSOLE.print(F("UBX-NAV-HPPOSLLH "));
+                CONSOLE.print(F("lon="));
                 CONSOLE.print(lon,8);
-                CONSOLE.print("  lat=");
+                CONSOLE.print(F("  lat="));
                 CONSOLE.println(lat,8);                      
               }
             }
             break;            
           case 0x43:
             { // UBX-NAV-SIG
-              if (verbose) CONSOLE.print("UBX-NAV-SIG ");
+              if (verbose) CONSOLE.print(F("UBX-NAV-SIG "));
               iTOW = (unsigned long)this->unpack_int32(0);
               int numSigs = this->unpack_int8(5);              
               float ravg = 0;
@@ -429,28 +429,28 @@ void UBLOX::dispatchMessage() {
               numSVdgps = crcnt;
               numSV = healthycnt;                            
               if (verbose){
-                CONSOLE.print("sol=");
+                CONSOLE.print(F("sol="));
                 CONSOLE.print(solution);              
                 CONSOLE.print("\t");
-                CONSOLE.print("hAcc=");
+                CONSOLE.print(F("hAcc="));
                 CONSOLE.print(hAccuracy);
-                CONSOLE.print("\tvAcc=");
+                CONSOLE.print(F("\tvAcc="));
                 CONSOLE.print(vAccuracy);
-                CONSOLE.print("\t#");
+                CONSOLE.print(F("\t#"));
                 CONSOLE.print(crcnt);
                 CONSOLE.print("/");
                 CONSOLE.print(numSigs);
                 CONSOLE.print("\t");
-                CONSOLE.print("rsum=");
+                CONSOLE.print(F("rsum="));
                 CONSOLE.print(rsum);
                 CONSOLE.print("\t");
-                CONSOLE.print("ravg=");
+                CONSOLE.print(F("ravg="));
                 CONSOLE.print(ravg);
                 CONSOLE.print("\t");
-                CONSOLE.print("rmin=");
+                CONSOLE.print(F("rmin="));
                 CONSOLE.print(rmin);
                 CONSOLE.print("\t");
-                CONSOLE.print("rmax=");
+                CONSOLE.print(F("rmax="));
                 CONSOLE.println(rmax); 
               }              
             }
@@ -478,26 +478,26 @@ void UBLOX::dispatchMessage() {
 #endif
               solutionAvail = true;
               if (verbose){
-                CONSOLE.print("UBX-NAV-RELPOSNED ");
+                CONSOLE.print(F("UBX-NAV-RELPOSNED "));
                 CONSOLE.print("n=");
                 CONSOLE.print(relPosN,2);
-                CONSOLE.print("  e=");
+                CONSOLE.print(F("  e="));
                 CONSOLE.print(relPosE,2);                       
-                CONSOLE.print("  sol=");                       
+                CONSOLE.print(F("  sol="));                       
                 CONSOLE.print(solution);                       
                 CONSOLE.print(" ");                       
                 switch(solution){
                   case 0: 
-                    CONSOLE.print("invalid");                       
+                    CONSOLE.print(F("invalid"));                       
                     break;
                   case 1: 
-                    CONSOLE.print("float");                       
+                    CONSOLE.print(F("float"));                       
                     break;
                   case 2: 
-                    CONSOLE.print("fix");                       
+                    CONSOLE.print(F("fix"));                       
                     break;                  
                   default:
-                    CONSOLE.print("unknown");                       
+                    CONSOLE.print(F("unknown"));                       
                     break;
                 }
                 CONSOLE.println();
@@ -510,7 +510,7 @@ void UBLOX::dispatchMessage() {
         switch (this->msgid) {
           case 0x32: 
             { // UBX-RXM-RTCM              
-              if (verbose) CONSOLE.println("UBX-RXM-RTCM");
+              if (verbose) CONSOLE.println(F("UBX-RXM-RTCM"));
               byte flags = (byte)this->unpack_int8(1);
               if ((flags & 1) != 0) dgpsChecksumErrorCounter++;
               dgpsPacketCounter++;

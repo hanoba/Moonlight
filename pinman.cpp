@@ -260,7 +260,7 @@ void PinManager::analogWrite(uint32_t ulPin, uint32_t ulValue) {
 #ifdef DAC
 	  if ((attr & PIN_ATTR_ANALOG) == PIN_ATTR_ANALOG)
 	  {
-      //CONSOLE.println("DAC pin");
+      //CONSOLE.println(F("DAC pin"));
 	    // DAC handling code
 #if defined(__SAMD51__)
 		if (ulPin == PIN_DAC0 || ulPin == PIN_DAC1) { // 2 DACs on A0 (PA02) and A1 (PA05)
@@ -318,7 +318,7 @@ void PinManager::analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 #if defined(__SAMD51__)
 	if(attr & (PIN_ATTR_PWM_E|PIN_ATTR_PWM_F|PIN_ATTR_PWM_G)){
-		//CONSOLE.println("PWM pin");
+		//CONSOLE.println(F("PWM pin"));
     uint32_t tcNum = GetTCNumber(pinDesc.ulPWMChannel);
 		uint8_t tcChannel = GetTCChannelNumber(pinDesc.ulPWMChannel);
 		static bool tcEnabled[TCC_INST_NUM+TC_INST_NUM];

@@ -270,8 +270,8 @@ void AmBatteryDriver::raspiShutdown()
         if (digitalRead(RASPI_SHUTDOWN_ACK_N) == LOW) break;
         delay(100);       // ms
     }
-    //if (digitalRead(RASPI_SHUTDOWN_ACK_N) == HIGH) CONSOLE.println("ERROR: Raspi shutdown failed");
-    //else CONSOLE.println("Raspi shutdown successful");
+    //if (digitalRead(RASPI_SHUTDOWN_ACK_N) == HIGH) CONSOLE.println(F("ERROR: Raspi shutdown failed"));
+    //else CONSOLE.println(F("Raspi shutdown successful"));
     digitalWrite(RASPI_SHUTDOWN_REQ_N, HIGH);
 #endif
 }

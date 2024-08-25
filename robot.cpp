@@ -195,36 +195,36 @@ void resetGPSMotionMeasurement(){
 
 
 void dumpState(){
-  CONSOLE.print("dumpState: ");
-  CONSOLE.print(" X=");
+  CONSOLE.print(F("dumpState: "));
+  CONSOLE.print(F(" X="));
   CONSOLE.print(stateX);
-  CONSOLE.print(" Y=");
+  CONSOLE.print(F(" Y="));
   CONSOLE.print(stateY);
-  CONSOLE.print(" delta=");
+  CONSOLE.print(F(" delta="));
   CONSOLE.print(stateDelta);
-  CONSOLE.print(" mapCRC=");
+  CONSOLE.print(F(" mapCRC="));
   CONSOLE.print(maps.mapCRC);
-  CONSOLE.print(" mowPointsIdx=");
+  CONSOLE.print(F(" mowPointsIdx="));
   CONSOLE.print(maps.mowPointsIdx);
-  CONSOLE.print(" dockPointsIdx=");
+  CONSOLE.print(F(" dockPointsIdx="));
   CONSOLE.print(maps.freePointsIdx);
-  CONSOLE.print(" freePointsIdx=");
+  CONSOLE.print(F(" freePointsIdx="));
   CONSOLE.print(maps.freePointsIdx);
-  CONSOLE.print(" wayMode=");
+  CONSOLE.print(F(" wayMode="));
   CONSOLE.print(maps.wayMode);
-  CONSOLE.print(" op=");
+  CONSOLE.print(F(" op="));
   CONSOLE.print(stateOp);
-  CONSOLE.print(" sensor=");
+  CONSOLE.print(F(" sensor="));
   CONSOLE.print(stateSensor);
-  CONSOLE.print(" sonar.enabled=");
+  CONSOLE.print(F(" sonar.enabled="));
   CONSOLE.print(sonar.enabled);
-  CONSOLE.print(" fixTimeout=");
+  CONSOLE.print(F(" fixTimeout="));
   CONSOLE.print(fixTimeout);
-  CONSOLE.print(" absolutePosSource=");
+  CONSOLE.print(F(" absolutePosSource="));
   CONSOLE.print(absolutePosSource);
-  CONSOLE.print(" lon=");
+  CONSOLE.print(F(" lon="));
   CONSOLE.print(absolutePosSourceLon);
-  CONSOLE.print(" lat=");
+  CONSOLE.print(F(" lat="));
   CONSOLE.println(absolutePosSourceLat);
 }
 
@@ -236,15 +236,15 @@ double calcStateCRC(){
 
 bool loadState(){
 #if defined(ENABLE_SD_RESUME)
-  CONSOLE.println("resuming is activated");
-  CONSOLE.print("state load... ");
+  CONSOLE.println(F("resuming is activated"));
+  CONSOLE.print(F("state load... "));
   if (!SD.exists("state.bin")) {
-    CONSOLE.println("no state file!");
+    CONSOLE.println(F("no state file!"));
     return false;
   }
   stateFile = SD.open("state.bin", FILE_READ);
   if (!stateFile){        
-    CONSOLE.println("ERROR opening file for reading");
+    CONSOLE.println(F("ERROR opening file for reading"));
     return false;
   }
   uint32_t marker = 0;
@@ -253,16 +253,16 @@ bool loadState(){
   if (maps.mapID==0 || maps.mapID > MAX_MAP_ID) maps.mapID==3;
   if ((marker & 0xFFFFffE0) != 0x10001000)
   {
-    CONSOLE.print("ERROR: invalid marker: ");
+    CONSOLE.print(F("ERROR: invalid marker: "));
     CONSOLE.println(marker, HEX);
     return false;
   }
   long crc = 0;
   stateFile.read((uint8_t*)&crc, sizeof(crc));
   if (crc != maps.mapCRC){
-    CONSOLE.print("ERROR: non-matching map CRC:");
+    CONSOLE.print(F("ERROR: non-matching map CRC:"));
     CONSOLE.print(crc);
-    CONSOLE.print(" expected: ");
+    CONSOLE.print(F(" expected: "));
     CONSOLE.println(maps.mapCRC);
     return false;
   }
@@ -288,7 +288,7 @@ bool loadState(){
   stateCRC = calcStateCRC();
   dumpState();
   if (getResetCause() == RST_WATCHDOG){
-    CONSOLE.println("resuming operation due to watchdog trigger");
+    CONSOLE.println(F("resuming operation due to watchdog trigger"));
     stateOp = savedOp;
     setOperation(stateOp, true, true);
   }
@@ -301,17 +301,17 @@ bool saveState(){
   bool res = true;
 #if defined(ENABLE_SD_RESUME)
   double crc = calcStateCRC();
-  //CONSOLE.print("stateCRC=");
+  //CONSOLE.print(F("stateCRC="));
   //CONSOLE.print(stateCRC);
-  //CONSOLE.print(" crc=");
+  //CONSOLE.print(F(" crc="));
   //CONSOLE.println(crc);
   if (crc == stateCRC) return true;
   stateCRC = crc;
   dumpState();
-  CONSOLE.print("save state... ");
+  CONSOLE.print(F("save state... "));
   stateFile = SD.open("state.bin",  O_WRITE | O_CREAT);
   if (!stateFile){        
-    CONSOLE.println("ERROR opening file for writing");
+    CONSOLE.println(F("ERROR opening file for writing"));
     return false;
   }
   if (maps.mapID==0 || maps.mapID > MAX_MAP_ID) maps.mapID==3;
@@ -337,7 +337,7 @@ bool saveState(){
   if (res){
     CONSOLE.println("ok");
   } else {
-    CONSOLE.println("ERROR saving state");
+    CONSOLE.println(F("ERROR saving state"));
   }
   stateFile.flush();
   stateFile.close();
@@ -347,7 +347,7 @@ bool saveState(){
 
 
 void sensorTest(){
-  CONSOLE.println("testing sensors for 60 seconds...");
+  CONSOLE.println(F("testing sensors for 60 seconds..."));
   unsigned long stopTime = millis() + 60000;  
   unsigned long nextMeasureTime = 0;
   while (millis() < stopTime){
@@ -356,7 +356,7 @@ void sensorTest(){
     if (millis() > nextMeasureTime){
       nextMeasureTime = millis() + 1000;      
       if (SONAR_ENABLE){
-        CONSOLE.print("sonar (enabled,left,center,right,triggered): ");
+        CONSOLE.print(F("sonar (enabled,left,center,right,triggered): "));
         CONSOLE.print(sonar.enabled);
         CONSOLE.print("\t");
         CONSOLE.print(sonar.distanceLeft);
@@ -369,7 +369,7 @@ void sensorTest(){
         CONSOLE.print("\t");
       }
       if (TOF_ENABLE){   
-        CONSOLE.print("ToF (dist): ");
+        CONSOLE.print(F("ToF (dist): "));
         int v = tof.readRangeContinuousMillimeters();        
         if (!tof.timeoutOccurred()) {     
           CONSOLE.print(v/10);
@@ -377,7 +377,7 @@ void sensorTest(){
         CONSOLE.print("\t");
       }    
       if (cfgBumperEnable){
-        CONSOLE.print("bumper (triggered): ");
+        CONSOLE.print(F("bumper (triggered): "));
         CONSOLE.print(((int)bumper.obstacle()));
         CONSOLE.print("\t");
        
@@ -387,15 +387,15 @@ void sensorTest(){
       robotDriver.run();   
     }
   }
-  CONSOLE.println("end of sensor test - please ignore any IMU/GPS errors");
+  CONSOLE.println(F("end of sensor test - please ignore any IMU/GPS errors"));
 }
 
 #if 0
 static void checkWiFi(int baud)
 {
-  CONSOLE.print("Trying WIFI Baudrate:"); CONSOLE.println(baud);
+  CONSOLE.print(F("Trying WIFI Baudrate:")); CONSOLE.println(baud);
   WIFI.begin(baud); 
-  WIFI.print("AT\r\n");  
+  WIFI.print(F("AT\r\n"));  
   delay(1000);  //HB 500
   String res = "";  
   while (WIFI.available()){
@@ -403,10 +403,10 @@ static void checkWiFi(int baud)
     res += ch;
   }
   if (res.indexOf("OK") == -1){
-    CONSOLE.print("WIFI (ESP8266) not found! If the problem persist, you may need to flash your ESP to firmware 2.2.1  RESULT:"); CONSOLE.println(res);
+    CONSOLE.print(F("WIFI (ESP8266) not found! If the problem persist, you may need to flash your ESP to firmware 2.2.1  RESULT:")); CONSOLE.println(res);
     return;
   }    
-  CONSOLE.println("Wifi Found!");
+  CONSOLE.println(F("Wifi Found!"));
 }
 #endif
 
@@ -417,7 +417,7 @@ void startWIFI()
    bool tryHomeFirstFlag = simulationFlag;
 
    WIFI.begin(WIFI_BAUDRATE); 
-   WIFI.print("AT\r\n");  
+   WIFI.print(F("AT\r\n"));  
    delay(500);
    String res = "";  
    while (WIFI.available())
@@ -442,7 +442,7 @@ void startWIFI()
       CONSOLE.println(F("WiFi found!"));       
       if (START_AP)
       {
-         CONSOLE.print("Attempting to start AP ");  
+         CONSOLE.print(F("Attempting to start AP "));  
          CONSOLE.println(ssid);
          // uncomment these two lines if you want to set the IP address of the AP
          #ifdef WIFI_IP  
@@ -520,18 +520,18 @@ bool startIMU(bool forceIMU){
      CONSOLE.println(data, HEX);     
      #if defined MPU6050 || defined MPU9150      
        if (data == 0x68) {
-         CONSOLE.println("MPU6050/9150 found");
+         CONSOLE.println(F("MPU6050/9150 found"));
          imuFound = true;
          break;
        }
      #endif
      #if defined MPU9250 
        if (data == 0x73) {
-         CONSOLE.println("MPU9255 found");
+         CONSOLE.println(F("MPU9255 found"));
          imuFound = true;
          break;
        } else if (data == 0x71) {
-         CONSOLE.println("MPU9250 found");
+         CONSOLE.println(F("MPU9250 found"));
          imuFound = true;
          break;
        }
@@ -545,7 +545,7 @@ bool startIMU(bool forceIMU){
      counter++;
      if (counter > 5){    
        // no I2C recovery possible - this should not happen (I2C module error)
-       CONSOLE.println("ERROR IMU not found");
+       CONSOLE.println(F("ERROR IMU not found"));
        stateSensor = SENS_IMU_TIMEOUT;
        setOperation(OP_ERROR);      
        //buzzer.sound(SND_STUCK, true);            
@@ -557,8 +557,8 @@ bool startIMU(bool forceIMU){
   counter = 0;  
   while (true){    
     if (imu.begin() == INV_SUCCESS) break;
-    CONSOLE.print("Unable to communicate with IMU.");
-    CONSOLE.print("Check connections, and try again.");
+    CONSOLE.print(F("Unable to communicate with IMU."));
+    CONSOLE.print(F("Check connections, and try again."));
     CONSOLE.println();
     delay(1000);    
     counter++;
@@ -600,14 +600,14 @@ void readIMU(){
   bool avail = (imu.fifoAvailable() > 0);
   // check time for I2C access : if too long, there's an I2C issue and we need to restart I2C bus...
   unsigned long duration = millis() - startTime;    
-  //CONSOLE.print("duration:");
+  //CONSOLE.print(F("duration:"));
   //CONSOLE.println(duration);  
   if ((duration > 10) || (millis() > imuDataTimeout)) {
     setOperation(OP_ERROR);
     if (millis() > imuDataTimeout){
-      CONSOLE.println("=ERROR IMU data timeout");  
+      CONSOLE.println(F("=ERROR IMU data timeout"));  
     } else {
-      CONSOLE.print("=ERROR IMU timeout: ");
+      CONSOLE.print(F("=ERROR IMU timeout: "));
       CONSOLE.println(duration);          
     }
     stateSensor = SENS_IMU_TIMEOUT;
@@ -620,7 +620,7 @@ void readIMU(){
   } 
   
   if (avail) {        
-    //CONSOLE.println("fifoAvailable");
+    //CONSOLE.println(F("fifoAvailable"));
     // Use dmpUpdateFifo to update the ax, gx, mx, etc. values
     if ( imu.dmpUpdateFifo() == INV_SUCCESS)
     {      
@@ -646,7 +646,7 @@ void readIMU(){
       pitchSum += (int) (scalePI(imu.pitch)*180.0/PI);
       if (++pitchCnt == maxPitchCnt)
       {
-         CONSOLE.print("Steigung: ");
+         CONSOLE.print(F("Steigung: "));
          CONSOLE.print(pitchSum/maxPitchCnt);
          CONSOLE.println("°");
          pitchCnt = 0;
@@ -667,16 +667,16 @@ void readIMU(){
          if ( (fabs(scalePI(imu.roll)) > 60.0/180.0*PI) || (fabs(scalePI(imu.pitch)) > 100.0/180.0*PI)
               || (fabs(rollChange) > 30.0/180.0*PI) || (fabs(pitchChange) > 60.0/180.0*PI)   )  
          {
-            CONSOLE.println("=ERROR IMU tilt");
-            CONSOLE.print("imu ypr=");
+            CONSOLE.println(F("=ERROR IMU tilt"));
+            CONSOLE.print(F("imu ypr="));
             CONSOLE.print(imu.yaw/PI*180.0);
             CONSOLE.print(",");
             CONSOLE.print(imu.pitch/PI*180.0);
             CONSOLE.print(",");
             CONSOLE.print(imu.roll/PI*180.0);
-            CONSOLE.print(" rollChange=");
+            CONSOLE.print(F(" rollChange="));
             CONSOLE.print(rollChange/PI*180.0);
-            CONSOLE.print(" pitchChange=");
+            CONSOLE.print(F(" pitchChange="));
             CONSOLE.println(pitchChange/PI*180.0);
             stateSensor = SENS_IMU_TILT;
             setOperation(OP_ERROR);
@@ -692,7 +692,7 @@ void readIMU(){
          upHillFlag = motor.robotPitch > (upHillFlag ? pitchLoThreshold : pitchHiThreshold);    //HB Hysterese
          if (lastupHillFlag != upHillFlag) 
          {
-            CONSOLE.print("=Steigung=");
+            CONSOLE.print(F("=Steigung="));
             CONSOLE.println(upHillFlag);
          }
       }
@@ -750,7 +750,7 @@ void start()
   CONSOLE.println(VER);
 
 #if defined(ENABLE_RASPI_SHUTDOWN)
-    CONSOLE.println("RASPI_SHUTDOWN enabled");
+    CONSOLE.println(F("RASPI_SHUTDOWN enabled"));
     pinMode(RASPI_SHUTDOWN_REQ_N, OUTPUT);    
     pinMode(RASPI_SHUTDOWN_ACK_N, INPUT_PULLUP);
     digitalWrite(RASPI_SHUTDOWN_REQ_N, HIGH);         
@@ -801,7 +801,7 @@ void start()
   logResetCause();
   
   CONSOLE.println(VER);          
-  CONSOLE.print("compiled for: ");
+  CONSOLE.print(F("compiled for: "));
   CONSOLE.println(BOARD);
   
   batteryDriver.begin();
@@ -961,7 +961,7 @@ void computeRobotState()
          if (distGPS > DIST_GPS_JUMP) {
             gpsJump = true;
             statGPSJumps++;
-            CONSOLE.print("GPS jump: ");
+            CONSOLE.print(F("GPS jump: "));
             CONSOLE.println(distGPS);
          }
 #endif
@@ -1053,7 +1053,7 @@ void triggerObstacle()
 void detectSensorMalfunction(){  
   if (ENABLE_ODOMETRY_ERROR_DETECTION){
     if (motor.odometryError){
-      CONSOLE.println("odometry error!");    
+      CONSOLE.println(F("odometry error!"));    
       stateSensor = SENS_ODOMETRY_ERROR;
       setOperation(OP_ERROR);
       buzzer.sound(SND_ERROR, true); 
@@ -1062,7 +1062,7 @@ void detectSensorMalfunction(){
   }
   if (ENABLE_OVERLOAD_DETECTION){
     if (motor.motorOverloadDuration > 20000){
-      CONSOLE.println("overload!");    
+      CONSOLE.println(F("overload!"));    
       stateSensor = SENS_OVERLOAD;
       setOperation(OP_ERROR);
       buzzer.sound(SND_ERROR, true);        
@@ -1072,7 +1072,7 @@ void detectSensorMalfunction(){
   if (ENABLE_FAULT_DETECTION){
     if (motor.motorError){
       motor.motorError = false;
-      CONSOLE.println("motor error!");
+      CONSOLE.println(F("motor error!"));
       stateSensor = SENS_MOTOR_ERROR;
       setOperation(OP_ERROR);
       buzzer.sound(SND_ERROR, true);       
@@ -1197,9 +1197,9 @@ void run()
       }
  	   statTempMin = min(statTempMin, stateTemp);
  	   statTempMax = max(statTempMax, stateTemp);
-      //CONSOLE.print("temp=");
+      //CONSOLE.print(F("temp="));
       //CONSOLE.print(stateTemp,1);
-      //CONSOLE.print("  humidity=");
+      //CONSOLE.print(F("  humidity="));
       //CONSOLE.print(stateHumidity,0);    
       //CONSOLE.print(" ");    
       //logCPUHealth();    
@@ -1217,7 +1217,7 @@ void run()
         if (millis() > nextImuCalibrationSecond){
           nextImuCalibrationSecond = millis() + 1000;  
           imuCalibrationSeconds++;
-          CONSOLE.print("IMU gyro calibration (robot must be static)... ");        
+          CONSOLE.print(F("IMU gyro calibration (robot must be static)... "));        
           CONSOLE.println(imuCalibrationSeconds);        
           buzzer.sound(SND_PROGRESS, true);        
           if (imuCalibrationSeconds >= 9){
@@ -1252,7 +1252,7 @@ void run()
       //if (gpsJump)
       //{
       //   // gps jump: restart current operation from new position
-      //   CONSOLE.println("restarting due to gps jump");
+      //   CONSOLE.println(F("restarting due to gps jump"));
       //   gpsJump = false;
       //   motor.stopImmediately(true);
       //   setOperation(stateOp, true);    // restart current operation
@@ -1261,7 +1261,7 @@ void run()
       // MOONLIGHT extension: Stop docking immediately in case there is no FIX
       //if (stateOp == OP_DOCK && gps.solution != UBLOX::SOL_FIXED)
       //{
-      //   CONSOLE.println("Stop docking due to missing FIX");
+      //   CONSOLE.println(F("Stop docking due to missing FIX"));
       //   motor.stopImmediately(true);
       //   setOperation(OP_ERROR);    // restart current operation
       //}
@@ -1311,7 +1311,7 @@ void run()
                motor.setLinearAngularSpeed(-0.2,0);
                if (millis() > driveReverseStopTime)
                {
-                  CONSOLE.println("=undock complete");
+                  CONSOLE.println(F("=undock complete"));
                   //motor.stopImmediately(false);
                   motor.setLinearAngularSpeed(0.,0.);
                   driveReverseStopTime = 0;
@@ -1422,12 +1422,12 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
   static bool SMOOTH_CURVES_saved = SMOOTH_CURVES_DEFAULT;
   if ((stateOp == op) && (!allowRepeat)) return;  
   if (stateOp == OP_DOCK && op != OP_DOCK) cfgSmoothCurves = SMOOTH_CURVES_saved;
-  CONSOLE.print("setOperation op=");
+  CONSOLE.print(F("setOperation op="));
   CONSOLE.print(op);
   bool error = false;
   switch (op){
     case OP_IDLE:
-      CONSOLE.println(" OP_IDLE");
+      CONSOLE.println(F(" OP_IDLE"));
       dockingInitiatedByOperator = true;
       motor.setLinearAngularSpeed(0,0);
       motor.setMowState(false);
@@ -1435,7 +1435,7 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       motorDriver.reverseDrive = false;
       break;
     case OP_UNDOCK:
-      CONSOLE.println(" OP_UNDOCK");
+      CONSOLE.println(F(" OP_UNDOCK"));
       // drive 6 seconds backwards to undock from charging station
       driveReverseStopTime = millis()+6000;
       break;
@@ -1443,7 +1443,7 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       // cfgSmoothCurves==false during docking and it is restored after docking is complete
       if (stateOp != OP_DOCK) SMOOTH_CURVES_saved = cfgSmoothCurves;
       cfgSmoothCurves = false;
-      CONSOLE.println(" OP_DOCK");
+      CONSOLE.println(F(" OP_DOCK"));
       if (initiatedbyOperator) maps.clearObstacles();
       dockingInitiatedByOperator = initiatedbyOperator;      
       motor.setLinearAngularSpeed(0,0);
@@ -1457,7 +1457,7 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
           stateSensor = SENS_NONE;                  
         } else {
           error = true;
-          CONSOLE.println("error: no waypoints!");
+          CONSOLE.println(F("error: no waypoints!"));
           //op = stateOp;                
         }
       } else error = true;
@@ -1468,7 +1468,7 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       }
       break;
     case OP_MOW:      
-      CONSOLE.println(" OP_MOW");      
+      CONSOLE.println(F(" OP_MOW"));      
       if (initiatedbyOperator) maps.clearObstacles();
       motor.setLinearAngularSpeed(0,0);
       if (maps.startMowing(stateX, stateY))
@@ -1482,7 +1482,7 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
             motor.setMowState(true);     
          } else {
             error = true;
-            CONSOLE.println("error: no waypoints!");
+            CONSOLE.println(F("error: no waypoints!"));
             //op = stateOp;                
          }
       } else error = true;
@@ -1493,13 +1493,13 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       }
       break;
     case OP_CHARGE:
-      CONSOLE.println(" OP_CHARGE");
+      CONSOLE.println(F(" OP_CHARGE"));
       motor.stopImmediately(true); // do not use PID to get to stop 
       //motor.setLinearAngularSpeed(0,0, false);
       //motor.setMowState(false);     
       break;
     case OP_ERROR:            
-      CONSOLE.println(" OP_ERROR"); 
+      CONSOLE.println(F(" OP_ERROR")); 
       motor.setLinearAngularSpeed(0,0);
       motor.setMowState(false);      
       break;

@@ -183,9 +183,9 @@ byte HTU21D::checkCRC(uint16_t message_from_sensor, uint8_t check_value_from_sen
 
   for (int i = 0 ; i < 16 ; i++) //Operate on only 16 positions of max 24. The remaining 8 are our remainder and should be zero when we're done.
   {
-    //Serial.print("remainder: ");
+    //Serial.print(F("remainder: "));
     //Serial.println(remainder, BIN);
-    //Serial.print("divsor:    ");
+    //Serial.print(F("divsor:    "));
     //Serial.println(divsor, BIN);
     //Serial.println();
 

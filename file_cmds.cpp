@@ -45,12 +45,12 @@ static void FileSystemCmd_tree_Serial()
    SdVolume volume;
    if (!card.init(SPI_HALF_SPEED, SDCARD_SS_PIN))
    {
-      CONSOLE.println("SD Card Error");
+      CONSOLE.println(F("SD Card Error"));
       return;
    }
    if (!volume.init(card))
    {
-      CONSOLE.println("SD Card Error");
+      CONSOLE.println(F("SD Card Error"));
       return;
    }
    root.openRoot(volume);
@@ -77,12 +77,12 @@ static void FileSystemCmd_ls(String pattern)
          CONSOLE.print(entry.name());
          if (!entry.isDirectory())
          {
-            CONSOLE.print("\t\t");
+            CONSOLE.print(F("\t\t"));
             CONSOLE.println(entry.size(), DEC);
          }
          else
          {
-            CONSOLE.println("\t\t[DIR]");
+            CONSOLE.println(F("\t\t[DIR]"));
          }
 
       }
@@ -114,11 +114,11 @@ static void FileSystemCmd_rm(String pattern)
             CONSOLE.print(entry.name());
             if (SD.remove(entry.name()))
             {
-               CONSOLE.println(" removed");
+               CONSOLE.println(F(" removed"));
             }
             else
             {
-               CONSOLE.println(" cannot be removed");
+               CONSOLE.println(F(" cannot be removed"));
             }
          }
 
@@ -171,7 +171,8 @@ static void FileSystemCmd_cat(String fileName)
    }
    else 
    {
-      CONSOLE.println("error opening file" + fileName);
+      CONSOLE.print(F("error opening file "));
+      CONSOLE.println(fileName);
    }
    dataFile.close();
 }

@@ -66,7 +66,7 @@ void cmdAnswer(String s)
 //
 //   if (cmd == "")
 //   {
-//      CONSOLE.print("Create map file ");
+//      CONSOLE.print(F("Create map file "));
 //      CONSOLE.println(mapFileName);
 //      SD.remove(mapFileName);
 //      return;
@@ -90,7 +90,7 @@ void cmdAnswer(String s)
 //         return;
 //      }
 //   }
-//   CONSOLE.println("=ERROR opening map file for writing");
+//   CONSOLE.println(F("=ERROR opening map file for writing"));
 //}
 
 // Get/set data/time of the RTC
@@ -103,7 +103,7 @@ void cmdRtc(String cmd)
    {
       GetDateTime(dateTime);
       String dateTimeText = DateTime2String(dateTime);
-      CONSOLE.print("Current date and time: ");
+      CONSOLE.print(F("Current date and time: "));
       CONSOLE.println(dateTimeText);
       s += dateTimeText;
    }
@@ -144,13 +144,13 @@ void cmdRtc(String cmd)
 
          GetDateTime(newDateTime);
          String dateTimeText = DateTime2String(newDateTime);
-         CONSOLE.print("New date and time: ");
+         CONSOLE.print(F("New date and time: "));
          CONSOLE.println(dateTimeText);
          s += dateTimeText;
       }
       else
       {
-         CONSOLE.print("Illegal date/time: ");
+         CONSOLE.print(F("Illegal date/time: "));
          CONSOLE.println(cmd);
          s += F("ERROR");
       }
@@ -164,7 +164,7 @@ static void cmdReadMapFile(String cmd)
    int mapId = cmd.substring(5).toInt();
    if (mapId<1 || mapId>MAX_MAP_ID)
    {
-      CONSOLE.print("=Illegal MapId: ");
+      CONSOLE.print(F("=Illegal MapId: "));
       CONSOLE.println(mapId);
    }
    else
@@ -174,7 +174,7 @@ static void cmdReadMapFile(String cmd)
       maps.mapID = mapId;
       maps.load(fileName);
       mapCheckSum = maps.mapCRC;
-      //HB CONSOLE.print("=Loading map from file ");
+      //HB CONSOLE.print(F("=Loading map from file "));
       //HB CONSOLE.println(fileName);
       //HB 
       //HB udpSerial.DisableLogging();
@@ -216,7 +216,7 @@ static void cmdReadMapFile(String cmd)
       //HB }
       //HB else 
       //HB {
-      //HB    CONSOLE.print("=error opening file ");
+      //HB    CONSOLE.print(F("=error opening file "));
       //HB    CONSOLE.println(fileName);
       //HB }
       //HB dataFile.close();
@@ -238,7 +238,7 @@ void cmdControl(String cmd)
   float wayPerc = -1;
   for (int idx=0; idx < cmd.length(); idx++){
     char ch = cmd[idx];
-    //Serial.print("ch=");
+    //Serial.print(F("ch="));
     //Serial.println(ch);
     if ((ch == ',') || (idx == cmd.length()-1)){
       int intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
@@ -298,9 +298,9 @@ void cmdControl(String cmd)
       lastCommaIdx = idx;
     }
   }
-  /*CONSOLE.print("linear=");
+  /*CONSOLE.print(F("linear="));
   CONSOLE.print(linear);
-  CONSOLE.print(" angular=");
+  CONSOLE.print(F(" angular="));
   CONSOLE.println(angular);*/
   if (op >= 0) setOperation((OperationType)op, false, true);
   String s = F("C");
@@ -374,7 +374,7 @@ void cmdMotor(String cmd)
   float angular=0;
   for (int idx=0; idx < cmd.length(); idx++){
     char ch = cmd[idx];
-    //Serial.print("ch=");
+    //Serial.print(F("ch="));
     //Serial.println(ch);
     if ((ch == ',') || (idx == cmd.length()-1)){
       float value = cmd.substring(lastCommaIdx+1, idx+1).toFloat();
@@ -387,9 +387,9 @@ void cmdMotor(String cmd)
       lastCommaIdx = idx;
     }
   }
-  /*CONSOLE.print("linear=");
+  /*CONSOLE.print(F("linear="));
   CONSOLE.print(linear);
-  CONSOLE.print(" angular=");
+  CONSOLE.print(F(" angular="));
   CONSOLE.println(angular);*/
   motor.setLinearAngularSpeed(linear, angular, false);
   String s = F("M");
@@ -421,7 +421,7 @@ void cmdWaypoint(String cmd)
   bool success = true;
   for (int idx=0; idx < cmd.length(); idx++){
     char ch = cmd[idx];
-    //Serial.print("ch=");
+    //Serial.print(F("ch="));
     //Serial.println(ch);
     if ((ch == ',') || (idx == cmd.length()-1)){
       float intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
@@ -443,7 +443,7 @@ void cmdWaypoint(String cmd)
       lastCommaIdx = idx;
     }
   }
-  /*CONSOLE.print("waypoint (");
+  /*CONSOLE.print(F("waypoint ("));
   CONSOLE.print(widx);
   CONSOLE.print("/");
   CONSOLE.print(count);
@@ -471,7 +471,7 @@ void cmdWayCount(String cmd)
   int lastCommaIdx = 0;
   for (int idx=0; idx < cmd.length(); idx++){
     char ch = cmd[idx];
-    //Serial.print("ch=");
+    //Serial.print(F("ch="));
     //Serial.println(ch);
     if ((ch == ',') || (idx == cmd.length()-1)){
       float intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
@@ -507,7 +507,7 @@ void cmdExclusionCount(String cmd)
   int widx=0;
   for (int idx=0; idx < cmd.length(); idx++){
     char ch = cmd[idx];
-    //Serial.print("ch=");
+    //Serial.print(F("ch="));
     //Serial.println(ch);
     if ((ch == ',') || (idx == cmd.length()-1)){
       float intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
@@ -536,7 +536,7 @@ void cmdPosMode(String cmd)
   int lastCommaIdx = 0;
   for (int idx=0; idx < cmd.length(); idx++){
     char ch = cmd[idx];
-    //Serial.print("ch=");
+    //Serial.print(F("ch="));
     //Serial.println(ch);
     if ((ch == ',') || (idx == cmd.length()-1)){
       int intValue = cmd.substring(lastCommaIdx+1, idx+1).toInt();
@@ -552,11 +552,11 @@ void cmdPosMode(String cmd)
       lastCommaIdx = idx;
     }
   }
-  CONSOLE.print("absolutePosSource=");
+  CONSOLE.print(F("absolutePosSource="));
   CONSOLE.print(absolutePosSource);
-  CONSOLE.print(" lon=");
+  CONSOLE.print(F(" lon="));
   CONSOLE.print(absolutePosSourceLon, 8);
-  CONSOLE.print(" lat=");
+  CONSOLE.print(F(" lat="));
   CONSOLE.println(absolutePosSourceLat, 8);
   String s = F("P");
   cmdAnswer(s);
@@ -564,7 +564,7 @@ void cmdPosMode(String cmd)
 
 // request version
 void cmdVersion(){
-   Serial.println("cmdVersion");
+   Serial.println(F("cmdVersion"));
   String s = F("V,");
   s += F(VER);
   cmdAnswer(s);
@@ -596,7 +596,7 @@ void cmdTriggerWatchdog(){
 void cmdGnssWarmRestart(){
   String s = F("Y2");
   cmdAnswer(s);
-  CONSOLE.println("=GNSS Warm Restart");
+  CONSOLE.println(F("=GNSS Warm Restart"));
   gps.WarmRestart();
 }
 
@@ -605,7 +605,7 @@ void cmdGnssColdRestart()
 {
   String s = F("YR");
   cmdAnswer(s);
-  CONSOLE.println("=GNSS Cold Restart");
+  CONSOLE.println(F("=GNSS Cold Restart"));
   gps.ColdRestart();
 }
 
@@ -621,7 +621,7 @@ void cmdSwitchOffRobot(){
 void cmdKidnap(){
   String s = F("K");
   cmdAnswer(s);
-  CONSOLE.println("=kidnapping robot - kidnap detection should trigger");
+  CONSOLE.println(F("=kidnapping robot - kidnap detection should trigger"));
   stateX = 0;
   stateY = 0;
 }
@@ -630,7 +630,7 @@ void cmdTriggerRaspiShutdown()
 {
     String s = F("Y4");
     cmdAnswer(s);
-    CONSOLE.println("=Trigger raspi shutdown");
+    CONSOLE.println(F("=Trigger raspi shutdown"));
     batteryDriver.raspiShutdown();
 }
 
@@ -644,7 +644,7 @@ void cmdStartUploadMap(String cmd)
       if ((ch == ',') || (idx == cmd.length() - 1)) 
       {
          maps.mapID = cmd.substring(lastCommaIdx + 1, idx + 1).toInt();
-         CONSOLE.print("MapID=");
+         CONSOLE.print(F("MapID="));
          CONSOLE.println(maps.mapID);
          //HB writeMapFlag = true;
          //HB WriteMap("");
@@ -660,7 +660,7 @@ void cmdToggleUseIMU()
     String s = F("YI");
     cmdAnswer(s);
     USE_IMU = !USE_IMU;
-    CONSOLE.print("=USE_IMU = ");
+    CONSOLE.print(F("=USE_IMU = "));
     CONSOLE.println(USE_IMU);
 }
 
@@ -669,7 +669,7 @@ void cmdToggleSmoothCurves()
     String s = F("YS");
     cmdAnswer(s);
     cfgSmoothCurves = !cfgSmoothCurves;
-    CONSOLE.print("=cfgSmoothCurves = ");
+    CONSOLE.print(F("=cfgSmoothCurves = "));
     CONSOLE.println(cfgSmoothCurves);
 }
 
@@ -678,7 +678,7 @@ void cmdToggleEnablePathFinder()
     String s = F("YF");
     cmdAnswer(s);
     cfgEnablePathFinder = !cfgEnablePathFinder;
-    CONSOLE.print("=cfgEnablePathFinder = ");
+    CONSOLE.print(F("=cfgEnablePathFinder = "));
     CONSOLE.println(cfgEnablePathFinder);
 }
 
@@ -687,7 +687,7 @@ void cmdToggleUseGPSfloatForPosEstimation()
     String s = F("YP");
     cmdAnswer(s);
     maps.useGPSfloatForPosEstimation = !maps.useGPSfloatForPosEstimation;    
-    CONSOLE.print("=useGPSfloatForPosEstimation = ");
+    CONSOLE.print(F("=useGPSfloatForPosEstimation = "));
     CONSOLE.println(maps.useGPSfloatForPosEstimation);
 }
 
@@ -696,7 +696,7 @@ void cmdToggleUseGPSfloatForDeltaEstimationEstimation()
     String s = F("YD");
     cmdAnswer(s);
     maps.useGPSfloatForDeltaEstimation = !maps.useGPSfloatForDeltaEstimation;
-    CONSOLE.print("=USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = ");
+    CONSOLE.print(F("=USE_GPS_FLOAT_FOR_DELTA_ESTIMATION = "));
     CONSOLE.println(maps.useGPSfloatForDeltaEstimation);
 }
 
@@ -705,7 +705,7 @@ void cmdToggleGpsLogging()    //HB disabled
     String s = F("YG");
     cmdAnswer(s);
     gps.verbose = !gps.verbose;
-    CONSOLE.print("gps.verbose = ");
+    CONSOLE.print(F("gps.verbose = "));
     CONSOLE.println(gps.verbose);
 }
 
@@ -714,7 +714,7 @@ void cmdToggleUpHillDetectionFlag()
     String s = F("YG");
     cmdAnswer(s);
     upHillDetectionFlag = !upHillDetectionFlag;
-    CONSOLE.print("=upHillDetectionFlag = ");
+    CONSOLE.print(F("=upHillDetectionFlag = "));
     CONSOLE.println(upHillDetectionFlag);
 }
 
@@ -722,7 +722,7 @@ void cmdToggleUpHillDetectionFlag()
 void cmdToggleGPSSolution(){
   String s = F("G");
   cmdAnswer(s);
-  CONSOLE.println("toggle GPS solution");
+  CONSOLE.println(F("toggle GPS solution"));
   switch (gps.solution){
     case UBLOX::SOL_INVALID:
       gps.solutionAvail = true;
@@ -886,7 +886,7 @@ static void cmdToggleBluetoothLoggingFlag()
    String s = F("Y2");
    cmdAnswer(s);
    bluetoothLoggingFlag = !bluetoothLoggingFlag;
-   CONSOLE.print("=Bluetooth logging is ");
+   CONSOLE.print(F("=Bluetooth logging is "));
    CONSOLE.println(bluetoothLoggingFlag ? "enabled" : "disabled");
 }
 
@@ -901,7 +901,7 @@ void processCmd(bool checkCrc, String cmd)
   {
     if (checkCrc)
     {
-      CONSOLE.println("CRC ERROR ");
+      CONSOLE.println(F("CRC ERROR "));
       return;
     }
   } 
@@ -914,9 +914,9 @@ void processCmd(bool checkCrc, String cmd)
     {
       if (checkCrc)
       {
-        CONSOLE.print("CRC ERROR  received: 0x");
+        CONSOLE.print(F("CRC ERROR  received: 0x"));
         CONSOLE.print(crc,HEX);
-        CONSOLE.print(", expected: 0x");
+        CONSOLE.print(F(", expected: 0x"));
         CONSOLE.print(expectedCrc,HEX);
         CONSOLE.println();
         return;
@@ -929,7 +929,7 @@ void processCmd(bool checkCrc, String cmd)
       //CONSOLE.println(cmd);
     }
   }
-  //CONSOLE.print("ProcessCmd : ");
+  //CONSOLE.print(F("ProcessCmd : "));
   //cONSOLE.println(cmd[3]);
   if (cmd[0] != 'A') return;
   if (cmd[1] != 'T') return;
@@ -982,7 +982,7 @@ void processCmd(bool checkCrc, String cmd)
   }
   else
   {
-     CONSOLE.println("Illegal command");
+     CONSOLE.println(F("Illegal command"));
   }
 }
 
@@ -1025,7 +1025,7 @@ void processBLE()
                processCmd(true, cmd);
                if (cmdResponse.length() > 0) 
                {
-                  if (bluetoothLoggingFlag) CONSOLE.print("BLE:"); // HB
+                  if (bluetoothLoggingFlag) CONSOLE.print(F("BLE:")); // HB
                   if (bluetoothLoggingFlag) CONSOLE.print(cmdResponse); // HB
                   BLE.print(cmdResponse);
                }
@@ -1061,7 +1061,7 @@ void processWifi()
   client = server.available();
   if (client != NULL) {                               // if you get a client,
     battery.resetIdle();
-    //CONSOLE.println("New client");             // print a message out the serial port
+    //CONSOLE.println(F("New client"));             // print a message out the serial port
     buf.init();                               // initialize the circular buffer
     unsigned long timeout = millis() + 50;
     while ( (client.connected()) && (millis() < timeout) ) {              // loop while the client's connected
@@ -1091,9 +1091,9 @@ void processWifi()
                  "Connection: close\r\n"  // the connection will be closed after completion of the response
                  // "Refresh: 1\r\n"        // refresh the page automatically every 20 sec
                  );
-               client.print("Content-length: ");
+               client.print(F("Content-length: "));
                client.print(cmdResponse.length());
-               client.print("\r\n\r\n");
+               client.print(F("\r\n\r\n"));
                client.print(cmdResponse);
             }
           }
@@ -1107,7 +1107,7 @@ void processWifi()
     //delay(10);
     // close the connection
     //client.stop();
-    //CONSOLE.println("Client disconnected");
+    //CONSOLE.println(F("Client disconnected"));
   }
 }
 
@@ -1118,7 +1118,7 @@ void processUdp()
       int len = udpSerial.readPacket(packetBuf, SIZE);
       if (len > 0)
       {
-         //CONSOLE.print("Packet received: ");
+         //CONSOLE.print(F("Packet received: "));
          //CONSOLE.println(packetBuf);
          const bool USE_CHECKSUM = true;
          processCmd(USE_CHECKSUM, packetBuf);
@@ -1135,7 +1135,7 @@ void processComm(){
   processUdp();
 #endif
   if (triggerWatchdog) {
-    CONSOLE.println("=hang test - watchdog should trigger and perform a reset");
+    CONSOLE.println(F("=hang test - watchdog should trigger and perform a reset"));
     while (true){
       // do nothing, just hang
     }
@@ -1177,43 +1177,43 @@ void outputConsole(){
     uint32_t *spReg = (uint32_t*)__get_MSP();   // stack pointer
     CONSOLE.print (" sp=");
     CONSOLE.print (*spReg, HEX);
-    CONSOLE.print(" volt=");
+    CONSOLE.print(F(" volt="));
     CONSOLE.print(battery.batteryVoltage);
-    CONSOLE.print(" chg=");
+    CONSOLE.print(F(" chg="));
     CONSOLE.print(battery.chargingCurrent);
-    CONSOLE.print(" tg=");
+    CONSOLE.print(F(" tg="));
     CONSOLE.print(maps.targetPoint.x());
     CONSOLE.print(",");
     CONSOLE.print(maps.targetPoint.y());
-    CONSOLE.print(" x=");
+    CONSOLE.print(F(" x="));
     CONSOLE.print(stateX);
-    CONSOLE.print(" y=");
+    CONSOLE.print(F(" y="));
     CONSOLE.print(stateY);
-    CONSOLE.print(" delta=");
+    CONSOLE.print(F(" delta="));
     CONSOLE.print(stateDelta);
-    CONSOLE.print(" tow=");
+    CONSOLE.print(F(" tow="));
     CONSOLE.print(gps.iTOW);
-    CONSOLE.print(" lon=");
+    CONSOLE.print(F(" lon="));
     CONSOLE.print(gps.lon,8);
-    CONSOLE.print(" lat=");
+    CONSOLE.print(F(" lat="));
     CONSOLE.print(gps.lat,8);
-    CONSOLE.print(" h=");
+    CONSOLE.print(F(" h="));
     //HB CONSOLE.print(gps.height,1);
     CONSOLE.print(gps.height,2);    //HB
-    CONSOLE.print(" n=");
+    CONSOLE.print(F(" n="));
     CONSOLE.print(gps.relPosN);
-    CONSOLE.print(" e=");
+    CONSOLE.print(F(" e="));
     CONSOLE.print(gps.relPosE);
-    CONSOLE.print(" d=");
+    CONSOLE.print(F(" d="));
     CONSOLE.print(gps.relPosD);
-    CONSOLE.print(" sol=");
+    CONSOLE.print(F(" sol="));
     CONSOLE.print(gps.solution);
-    CONSOLE.print(" age=");
+    CONSOLE.print(F(" age="));
     CONSOLE.print((millis()-gps.dgpsAge)/1000.0);
 
     //float leftCurrent, rightCurrent, mowCurrent;
     //motorDriver.getMotorCurrent(leftCurrent, rightCurrent, mowCurrent);
-    CONSOLE.print(" Imot_mA=");    //HB
+    CONSOLE.print(F(" Imot_mA="));    //HB
     CONSOLE.print(motor.motorLeftSenseLP*1000.,0);
     CONSOLE.print(",");
     CONSOLE.print(motor.motorRightSenseLP*1000.,0);
@@ -1274,13 +1274,13 @@ void outputConsole()
     controlLoops=0;
     PRINT("%4.2f", statControlCycleTime);
     
-    if (stateOp == OP_IDLE)        CONSOLE.print("  IDLE ");
-    else if (stateOp == OP_MOW)    CONSOLE.print("  MOW  ");
-    else if (stateOp == OP_CHARGE) CONSOLE.print(" CHARGE");
-    else if (stateOp == OP_ERROR)  CONSOLE.print("  ERROR");
-    else if (stateOp == OP_DOCK)   CONSOLE.print("  DOCK ");
-    else if (stateOp == OP_UNDOCK) CONSOLE.print(" UNDOCK");
-    else                           CONSOLE.print("  ???  ");
+    if (stateOp == OP_IDLE)        CONSOLE.print(F("  IDLE "));
+    else if (stateOp == OP_MOW)    CONSOLE.print(F("  MOW  "));
+    else if (stateOp == OP_CHARGE) CONSOLE.print(F(" CHARGE"));
+    else if (stateOp == OP_ERROR)  CONSOLE.print(F("  ERROR"));
+    else if (stateOp == OP_DOCK)   CONSOLE.print(F("  DOCK "));
+    else if (stateOp == OP_UNDOCK) CONSOLE.print(F(" UNDOCK"));
+    else                           CONSOLE.print(F("  ???  "));
 
 
     //PRINT(" %6d", freeMemory());
@@ -1345,10 +1345,10 @@ void outputConsole()
 	 gps_height = max(gps_height,-99.99);
 	 PRINT(" %6.2f", gps_height);
     
-         if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(" INVAL"); }
-	 else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(" FLOAT"); }
-	 else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(" FIX  "); }
-    else                                         { CONSOLE.print(" ???  "); }
+         if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(F(" INVAL")); }
+	 else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(F(" FLOAT")); }
+	 else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(F(" FIX  ")); }
+    else                                         { CONSOLE.print(F(" ???  ")); }
 
     float age = (millis() - gps.dgpsAge) / 1000.0;
     age = min(age, 999.00);
