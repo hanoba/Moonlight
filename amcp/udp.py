@@ -85,7 +85,7 @@ hostName = socket.gethostname()
 if hostName=="AZ-KENKO" or hostName=="magic-mirror":
    clientAddr = ('192.168.178.71', 4211)
 else:
-   clientAddr = ('192.168.20.100', 4211)
+   clientAddr = ('192.168.20.102', 4211)
 print(f"Client IP address: {clientAddr}")
 
 # Receive message if available
