@@ -653,13 +653,14 @@ void readIMU(){
          pitchSum = 0;
       }
 #endif
+      float deltaPitch = imu.pitch - statePitch;
+      statePitch = imu.pitch;
       if (cfgEnableTiltDetection)
       {
          rollChange += (imu.roll-stateRoll);
-         pitchChange += (imu.pitch-statePitch);               
+         pitchChange += deltaPitch;
          rollChange = 0.95 * rollChange;
          pitchChange = 0.95 * pitchChange;
-         statePitch = imu.pitch;
          stateRoll = imu.roll;        
          //CONSOLE.print(rollChange/PI*180.0);
          //CONSOLE.print(",");
@@ -684,19 +685,25 @@ void readIMU(){
       }
       motor.robotPitch = scalePI(imu.pitch);
       maxPitch = max(maxPitch, motor.robotPitch);
-      if (upHillDetectionFlag)
-      {
-         static const float pitchHiThreshold = 10.0 / 180.0 *PI;
-         static const float pitchLoThreshold =  5.0 / 180.0 *PI;
-         bool lastupHillFlag = upHillFlag;
-         upHillFlag = motor.robotPitch > (upHillFlag ? pitchLoThreshold : pitchHiThreshold);    //HB Hysterese
-         if (lastupHillFlag != upHillFlag) 
-         {
-            CONSOLE.print(F("=Steigung="));
-            CONSOLE.println(upHillFlag);
-         }
-      }
-      else upHillFlag = false;
+      //if (upHillDetectionFlag)
+      //{
+      //   static const float pitchHiThreshold = 10.0 / 180.0 *PI;
+      //   static const float pitchLoThreshold =  5.0 / 180.0 *PI;
+      //   bool lastupHillFlag = upHillFlag;
+      //   upHillFlag = motor.robotPitch > (upHillFlag ? pitchLoThreshold : pitchHiThreshold);    //HB Hysterese
+      //   if (lastupHillFlag != upHillFlag) 
+      //   {
+      //      CONSOLE.print(F("=Steigung="));
+      //      CONSOLE.println(upHillFlag);
+      //   }
+      //}
+      //else upHillFlag = false;
+
+      // Kippschutz
+      static const float pitchThreshold = 0;  // 2. / 180. * PI;	// 2 degrees
+      bool frontFlag = motorDriver.reverseDrive ? !motorDriver.frontWheelDrive : motorDriver.frontWheelDrive;
+      motor.deltaPwm = deltaPitch < 0 || imu.pitch < pitchThreshold || frontFlag ? 0 : deltaPitch * cfgPitchPwmFactor;
+
       imu.yaw = scalePI(imu.yaw);
       //CONSOLE.println(imu.yaw / PI * 180.0);
       lastIMUYaw = scalePI(lastIMUYaw);
@@ -1162,7 +1169,35 @@ void run()
    battery.run();
    batteryDriver.run();
    motorDriver.run();
-   motor.run();
+   //------------------------------------------------------------------------------------------------- 
+   // Handle IMU & motor
+   //------------------------------------------------------------------------------------------------- 
+   if (millis() > nextImuTime)
+   {
+       nextImuTime = millis() + 50;   //HB was 150;
+       //imu.resetFifo();    
+       if (imuIsCalibrating) {
+           motor.stopImmediately(true);
+           if (millis() > nextImuCalibrationSecond) {
+               nextImuCalibrationSecond = millis() + 1000;
+               imuCalibrationSeconds++;
+               CONSOLE.print(F("IMU gyro calibration (robot must be static)... "));
+               CONSOLE.println(imuCalibrationSeconds);
+               buzzer.sound(SND_PROGRESS, true);
+               if (imuCalibrationSeconds >= 9) {
+                   imuIsCalibrating = false;
+                   CONSOLE.println();
+                   lastIMUYaw = 0;
+                   imu.resetFifo();
+                   imuDataTimeout = millis() + 10000;
+               }
+           }
+       }
+       else {
+           readIMU();
+       }
+       motor.run();
+   }
    sonar.run();
    maps.run();  
 #ifdef MOONLIGHT_ENABLE_FIX_DISPLAY
@@ -1205,33 +1240,6 @@ void run()
       //logCPUHealth();    
    }
 
-   //------------------------------------------------------------------------------------------------- 
-   // Handle IMU
-   //------------------------------------------------------------------------------------------------- 
-   if (millis() > nextImuTime)
-   {
-      nextImuTime = millis() + 150;        
-      //imu.resetFifo();    
-      if (imuIsCalibrating) {
-        motor.stopImmediately(true);   
-        if (millis() > nextImuCalibrationSecond){
-          nextImuCalibrationSecond = millis() + 1000;  
-          imuCalibrationSeconds++;
-          CONSOLE.print(F("IMU gyro calibration (robot must be static)... "));        
-          CONSOLE.println(imuCalibrationSeconds);        
-          buzzer.sound(SND_PROGRESS, true);        
-          if (imuCalibrationSeconds >= 9){
-            imuIsCalibrating = false;
-            CONSOLE.println();                
-            lastIMUYaw = 0;          
-            imu.resetFifo();
-            imuDataTimeout = millis() + 10000;
-          }
-        }       
-      } else {
-        readIMU();    
-      }
-   }
    
    //-------------------------------------------------------------------------------------------------
    // Handle GPS and compute Statistics

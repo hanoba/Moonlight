@@ -149,6 +149,9 @@
     <ClInclude Include="SparkFunHTU21D.h" />
     <ClInclude Include="src\driver\AmRobotDriver.h" />
     <ClInclude Include="src\due\DueTimer.h" />
+    <ClInclude Include="src\mpu\dmpmap.h" />
+    <ClInclude Include="src\mpu\inv_mpu.h" />
+    <ClInclude Include="src\mpu\inv_mpu_dmp_motion_driver.h" />
     <ClInclude Include="src\mpu\SparkFunMPU9250-DMP.h" />
     <ClInclude Include="src\ublox\SparkFun_Ublox_Arduino_Library.h" />
     <ClInclude Include="src\ublox\ublox.h" />
@@ -179,6 +182,8 @@
     <ClCompile Include="sonar.cpp" />
     <ClCompile Include="SparkFunHTU21D.cpp" />
     <ClCompile Include="src\driver\AmRobotDriver.cpp" />
+    <ClCompile Include="src\mpu\inv_mpu.c" />
+    <ClCompile Include="src\mpu\inv_mpu_dmp_motion_driver.c" />
     <ClCompile Include="src\mpu\SparkFunMPU9250-DMP.cpp" />
     <ClCompile Include="src\ublox\SparkFun_Ublox_Arduino_Library.cpp" />
     <ClCompile Include="src\ublox\ublox.cpp" />

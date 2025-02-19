@@ -137,6 +137,15 @@
     <ClInclude Include="..\..\..\..\..\..\Users\Harald\AppData\Local\Arduino15\packages\arduino\hardware\sam\1.6.12\cores\arduino\RingBuffer.h">
       <Filter>ArduinoLib</Filter>
     </ClInclude>
+    <ClInclude Include="src\mpu\dmpmap.h">
+      <Filter>src\mpu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpu\inv_mpu.h">
+      <Filter>src\mpu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpu\inv_mpu_dmp_motion_driver.h">
+      <Filter>src\mpu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="battery.cpp">
@@ -222,6 +231,12 @@
     </ClCompile>
     <ClCompile Include="LineTracker.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpu\inv_mpu_dmp_motion_driver.c">
+      <Filter>src\mpu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpu\inv_mpu.c">
+      <Filter>src\mpu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

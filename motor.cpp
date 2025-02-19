@@ -81,6 +81,8 @@ void Motor::begin() {
   setLinearAngularSpeedTimeoutActive = false;  
   setLinearAngularSpeedTimeout = 0;
   motorMowSpinUpTime = 0;
+
+  deltaPwm = 0.0;       //HB für Kippschutz
 }
 
 
@@ -162,7 +164,8 @@ void Motor::stopImmediately(bool includeMowerMotor){
 
 
 void Motor::run() {
-  if (millis() < lastControlTime + 50) return;
+  //HB The following "if" is now handled in robot.cpp
+  // if (millis() < lastControlTime + 50) return;
   
   if (setLinearAngularSpeedTimeoutActive){
     if (millis() > setLinearAngularSpeedTimeout){
@@ -371,7 +374,7 @@ void Motor::control(){
   motorLeftPID.y_max = pwmMax;
   motorLeftPID.max_output = pwmMax;
   motorLeftPID.compute();
-  motorLeftPWMCurr = motorLeftPWMCurr + motorLeftPID.y;
+  motorLeftPWMCurr = motorLeftPWMCurr + motorLeftPID.y - deltaPwm;
   if (motorLeftRpmSet >= 0) motorLeftPWMCurr = min( max(0, (int)motorLeftPWMCurr), pwmMax); // 0.. pwmMax
   if (motorLeftRpmSet < 0) motorLeftPWMCurr = max(-pwmMax, min(0, (int)motorLeftPWMCurr));  // -pwmMax..0
   
@@ -381,7 +384,7 @@ void Motor::control(){
   motorRightPID.y_max = pwmMax;
   motorRightPID.max_output = pwmMax;
   motorRightPID.compute();
-  motorRightPWMCurr = motorRightPWMCurr + motorRightPID.y;
+  motorRightPWMCurr = motorRightPWMCurr + motorRightPID.y - deltaPwm;
   if (motorRightRpmSet >= 0) motorRightPWMCurr = min( max(0, (int)motorRightPWMCurr), pwmMax);  // 0.. pwmMax
   if (motorRightRpmSet < 0) motorRightPWMCurr = max(-pwmMax, min(0, (int)motorRightPWMCurr));   // -pwmMax..0  
 

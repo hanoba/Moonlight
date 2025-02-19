@@ -35,6 +35,7 @@ bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
 int cfgSonarObstacleDist = 10;  //HB cm (0=disabled)
 int cfgSonarNearDist = 60;      //HB cm (0=disabled)
 float cfgSonarNearSpeed = 0.2;
+float cfgPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
 float cfgAngularSpeed = 0.5;
 float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
 const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
@@ -292,7 +293,7 @@ void cmdControl(String cmd)
       } else if (counter == 18) {
           if (intValue >= 0) cfgSonarNearDist = intValue;
       } else if (counter == 19) {
-          if (floatValue >= 0) cfgSonarNearSpeed = floatValue;
+          if (floatValue >= 0) cfgPitchPwmFactor = floatValue;
       }
       counter++;
       lastCommaIdx = idx;

@@ -222,17 +222,22 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    # 12: iMowingPoint                  #
    # 13: iEnableTiltDetetction         # 0 or 1
    # 14: fAngular                      # 
-   # 15: iUseFloat                     # 0 or 1
-   # 16: iObstacleMap                  # 0 or 1
+   # 15: bUseFloat                     # 0 or 1
+   # 16: iMapType                      # 0 or 1
+   # 17: iSonarObstacleDist            # in cm
+   # 18: iSonarNearDist                # in cm
+   # 19: fPitchPwmFactor               # factor to convert from pitch (in rad) to duty cycle (255=100%)
+
    # Note: -1 means no change, keep current value
 
    #cmd = str.format('AT+C,-1,1,{:.2f},0,0,-1,-1,0', fSpeed)
-   if iOpType == OP_MOW: iEnableMowMotor = 1
+   if iOpType == OP_MOW: iEnableMowMotor = config.enableMowMotor
    else: iEnableMowMotor = 0
    
    cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:d},{:d},{:.2f}', 
       iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
-      iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.sonarNearSpeed)     
+      iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.pitchPwmFactor)     
+   #  iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.sonarNearSpeed)     
    udp.ExecCmd(cmd)
 
 def StartMowing(fSpeed=0.5, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
