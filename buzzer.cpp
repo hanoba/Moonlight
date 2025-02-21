@@ -113,7 +113,8 @@ void Buzzer::begin()
    pinMode(pinBuzzer, OUTPUT);                
    digitalWrite(pinBuzzer, LOW);
    toneIdx=0;
-   nextToneTime=0;   
+   nextToneTime=0;  
+   beep();
 }
 
 
@@ -158,3 +159,10 @@ void Buzzer::noTone(){
 #endif     
 }
 
+// simple creation of a single beep 
+void Buzzer::beep()
+{
+    tone(4200);
+    delay(500);
+    noTone();
+}

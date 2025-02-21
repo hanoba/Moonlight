@@ -162,7 +162,7 @@ int freeMemory();
 void start();
 void run();
 void setOperation(OperationType op, bool allowRepeat = false, bool initiatedbyOperator = false);
-void triggerObstacle();
+void triggerObstacle(bool isBumperWithSwitch=false);
 void sensorTest();
 void resetLinearMotionMeasurement();
 

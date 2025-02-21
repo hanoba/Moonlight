@@ -19,6 +19,7 @@ class Buzzer {
       void sound(SoundSelect idx, bool async = true);
       void run();
       bool isPlaying();
+      void beep();
     protected:     
       void tone(uint16_t freq);
       void noTone(); 

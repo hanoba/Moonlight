@@ -1040,19 +1040,28 @@ bool robotShouldMove(){
 }
 
 
-void triggerObstacle()
+void triggerObstacle(bool isBumperWithSwitch)
 {
     statMowObstacles++;
     //CONSOLE.print(F("=triggerObstacle "));
     //CONSOLE.println(statMowObstacles);
-    if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
-   {
-      if (maps.obstacle() == false) driveReverseStopTime = millis() + 3000;
-   } else { 
-      stateSensor = SENS_OBSTACLE;
-      setOperation(OP_ERROR);
-      buzzer.sound(SND_ERROR, true);        
-   }
+    //if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
+
+    if (isBumperWithSwitch)
+    {
+        if (maps.obstacle()) return;
+    }
+
+    if (cfgBumperEnable && maps.wayMode == WAY_MOW)
+    {
+        driveReverseStopTime = millis() + 3000;
+    }
+    else 
+    { 
+        stateSensor = SENS_OBSTACLE;
+        setOperation(OP_ERROR);
+        buzzer.sound(SND_ERROR, true);        
+    }
 }
 
 
@@ -1113,16 +1122,36 @@ void detectObstacle()
      }    
    }   
    
-   if (cfgBumperEnable)
+   //if (cfgBumperEnable)
    {
       if (millis() > bumperDeadTime && bumper.obstacle())
       {  
-         bumperDeadTime = millis() + BUMPER_DEAD_TIME;
-         statMowBumperCounter++;
-         CONSOLE.print(F("=bumper obstacle "));
-         CONSOLE.println(statMowBumperCounter);
-         triggerObstacle();
-         return;
+          bool leftBumperFreeWheel;
+          bool rightBumperWithSwitch;
+          bumper.getTriggeredBumper(leftBumperFreeWheel, rightBumperWithSwitch);
+
+          bumperDeadTime = millis() + BUMPER_DEAD_TIME;
+
+          // Check trigger from FreeWheelSensor
+          if (leftBumperFreeWheel)
+          {
+              CONSOLE.println(F("=ERROR BumperFreeWheel triggered"));
+              stateSensor = SENS_BUMPER;
+              setOperation(OP_ERROR);
+              return;
+          }
+
+          // Check trigger from BumperWithSwitch
+          if (rightBumperWithSwitch)
+          {
+              static const bool isBumperWithSwitch = true;
+              statMowBumperCounter++;
+              CONSOLE.print(F("=BumperSwitch obstacle "));
+              CONSOLE.println(statMowBumperCounter);
+              triggerObstacle(isBumperWithSwitch);
+          }
+          return;
+
       }
    }
    if (sonar.enabled && cfgSonarObstacleDist != 0)
@@ -1134,6 +1163,7 @@ void detectObstacle()
            CONSOLE.print(F("=sonar obstacle "));
            CONSOLE.println(statMowSonarCounter);
            triggerObstacle();
+
            return;
        }        
    }  
@@ -1352,10 +1382,10 @@ void run()
                   }
                   else 
                   {
-                     maps.skipNextMowingPoint();
-                     maps.skipNextMowingPoint();
-                     setOperation(stateOp, true);    // continue current operation
-                     bumperDeadTime = millis() + BUMPER_DEAD_TIME;
+                      maps.skipNextMowingPoint();
+                      maps.skipNextMowingPoint();
+                      setOperation(stateOp, true);    // continue current operation
+                      bumperDeadTime = millis() + BUMPER_DEAD_TIME;
                   }
                }
             } 
@@ -1508,8 +1538,9 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
       break;
     case OP_ERROR:            
       CONSOLE.println(F(" OP_ERROR")); 
-      motor.setLinearAngularSpeed(0,0);
-      motor.setMowState(false);      
+      motor.stopImmediately(true); // do not use PID to get to stop 
+      //motor.setLinearAngularSpeed(0,0);
+      //motor.setMowState(false);      
       break;
   }
   stateOp = op;  
