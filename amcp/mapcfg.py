@@ -43,7 +43,7 @@ mapCfg = [
    [  7, NormalMapU,    DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Tischtennis
    [  8, NormalMapU,    DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Hang
    [  9, NormalMapV,    FrontWheelDrive, PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
-   [ 10, NormalMapV,    FrontWheelDrive, PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Teststrecke
+   [ 10, NormalMapV,    BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Teststrecke
    [ 11, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
    [ 12, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
    [ 13, ObstacleMapIG, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen

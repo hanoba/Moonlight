@@ -162,7 +162,11 @@ void Buzzer::noTone(){
 // simple creation of a single beep 
 void Buzzer::beep()
 {
+    tone(2100);
+    delay(100);
     tone(4200);
-    delay(500);
+    delay(100);
+    tone(6300);
+    delay(100);
     noTone();
 }

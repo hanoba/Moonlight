@@ -165,7 +165,10 @@
     <ClCompile Include="comm.cpp" />
     <ClCompile Include="cpu.cpp" />
     <ClCompile Include="file_cmds.cpp" />
-    <ClCompile Include="fix_display.cpp" />
+    <ClCompile Include="fix_display.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="i2c.cpp" />
     <ClCompile Include="LineTracker.cpp" />

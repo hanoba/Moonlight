@@ -1047,21 +1047,23 @@ void triggerObstacle(bool isBumperWithSwitch)
     //CONSOLE.println(statMowObstacles);
     //if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
 
+    // handle obstacle maps
     if (isBumperWithSwitch)
     {
         if (maps.obstacle()) return;
     }
 
+    // handle other map types
     if (cfgBumperEnable && maps.wayMode == WAY_MOW)
     {
         driveReverseStopTime = millis() + 3000;
     }
-    else 
-    { 
-        stateSensor = SENS_OBSTACLE;
-        setOperation(OP_ERROR);
-        buzzer.sound(SND_ERROR, true);        
-    }
+    //else 
+    //{ 
+    //    stateSensor = SENS_OBSTACLE;
+    //    setOperation(OP_ERROR);
+    //    buzzer.sound(SND_ERROR, true);        
+    //}
 }
 
 
@@ -1133,7 +1135,7 @@ void detectObstacle()
           bumperDeadTime = millis() + BUMPER_DEAD_TIME;
 
           // Check trigger from FreeWheelSensor
-          if (leftBumperFreeWheel)
+          if (leftBumperFreeWheel && cfgBumperEnable)
           {
               CONSOLE.println(F("=ERROR BumperFreeWheel triggered"));
               stateSensor = SENS_BUMPER;
