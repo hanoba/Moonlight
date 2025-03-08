@@ -225,8 +225,8 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    # 15: bUseFloat                     # 0 or 1
    # 16: iMapType                      # 0 or 1
    # 17: iSonarObstacleDist            # in cm
-   # 18: iSonarNearDist                # in cm
-   # 19: fPitchPwmFactor               # factor to convert from pitch (in rad) to duty cycle (255=100%)
+   # 18: iPitchAngleDeg                # in degree ° 
+   # 19: fDeltaPitchPwmFactor          # factor to convert from delta pitch (in rad) to duty cycle (255=100%)
 
    # Note: -1 means no change, keep current value
 
@@ -236,7 +236,7 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    
    cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:d},{:d},{:.2f}', 
       iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
-      iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.pitchPwmFactor)     
+      iObstacleMap, config.sonarObstacleDist, config.pitchAngleDeg, config.pitchDeltaPwmFactor)     
    #  iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.sonarNearSpeed)     
    udp.ExecCmd(cmd)
 

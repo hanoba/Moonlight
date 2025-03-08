@@ -374,7 +374,7 @@ void Motor::control(){
   motorLeftPID.y_max = pwmMax;
   motorLeftPID.max_output = pwmMax;
   motorLeftPID.compute();
-  motorLeftPWMCurr = motorLeftPWMCurr + motorLeftPID.y - deltaPwm;
+  motorLeftPWMCurr = motorLeftPWMCurr + motorLeftPID.y;
   if (motorLeftRpmSet >= 0) motorLeftPWMCurr = min( max(0, (int)motorLeftPWMCurr), pwmMax); // 0.. pwmMax
   if (motorLeftRpmSet < 0) motorLeftPWMCurr = max(-pwmMax, min(0, (int)motorLeftPWMCurr));  // -pwmMax..0
   
@@ -384,7 +384,7 @@ void Motor::control(){
   motorRightPID.y_max = pwmMax;
   motorRightPID.max_output = pwmMax;
   motorRightPID.compute();
-  motorRightPWMCurr = motorRightPWMCurr + motorRightPID.y - deltaPwm;
+  motorRightPWMCurr = motorRightPWMCurr + motorRightPID.y;
   if (motorRightRpmSet >= 0) motorRightPWMCurr = min( max(0, (int)motorRightPWMCurr), pwmMax);  // 0.. pwmMax
   if (motorRightRpmSet < 0) motorRightPWMCurr = max(-pwmMax, min(0, (int)motorRightPWMCurr));   // -pwmMax..0  
 
@@ -393,7 +393,7 @@ void Motor::control(){
   
   motorMowPWMCurr = 0.99 * motorMowPWMCurr + 0.01 * motorMowPWMSet;
   
-  speedPWM(motorLeftPWMCurr, motorRightPWMCurr, motorMowPWMCurr);
+  speedPWM(motorLeftPWMCurr - deltaPwm, motorRightPWMCurr - deltaPwm, motorMowPWMCurr);
 }
 
 

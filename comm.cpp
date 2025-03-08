@@ -35,7 +35,8 @@ bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
 int cfgSonarObstacleDist = 10;  //HB cm (0=disabled)
 int cfgSonarNearDist = 60;      //HB cm (0=disabled)
 float cfgSonarNearSpeed = 0.2;
-float cfgPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
+float cfgDeltaPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
+float cfgPitchPwmFactor = 255. * 180. / PI / 45.0;	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
 float cfgAngularSpeed = 0.5;
 float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
 const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
@@ -291,9 +292,9 @@ void cmdControl(String cmd)
       } else if (counter == 17) {
           if (intValue >= 0) cfgSonarObstacleDist = intValue;
       } else if (counter == 18) {
-          if (intValue >= 0) cfgSonarNearDist = intValue;
+          if (intValue >= 0) cfgPitchPwmFactor = 255. * 180. / PI / (float) intValue;   //cfgSonarNearDist = intValue;
       } else if (counter == 19) {
-          if (floatValue >= 0) cfgPitchPwmFactor = floatValue;
+          if (floatValue >= 0) cfgDeltaPitchPwmFactor = floatValue;
       }
       counter++;
       lastCommaIdx = idx;
@@ -1375,6 +1376,14 @@ void outputConsole()
     PRINT("/%-3d", maps.mowPoints.numPoints);
 
     CONSOLE.println();
+
+    // logging for Kippschutz debugging
+    CONSOLE.print(F("maxDeltaPitch="));
+    CONSOLE.print(maxDeltaPitch * 180.0 / PI);
+    CONSOLE.print(F("°, maxDeltaPwm="));
+    CONSOLE.println(maxDeltaPwm);
+    maxDeltaPitch = -PI;
+    maxDeltaPwm = -255;
 
     // log additional info
     // PRINT(" posStep=%f ", sim.posStep);

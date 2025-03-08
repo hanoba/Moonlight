@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.80 HB 2025-02-22"
+#define VER "Ardumower Moonlight, V168.81 HB 2025-03-08"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -43,6 +43,7 @@ extern const float cfgSlowSpeedObstacleMap;
 extern int cfgSonarNearDist;
 extern int cfgSonarObstacleDist;
 extern float cfgSonarNearSpeed;
+extern float cfgDeltaPitchPwmFactor;
 extern float cfgPitchPwmFactor;
 extern float cfgObstacleMapGpsThreshold;
 
@@ -116,8 +117,10 @@ extern float statTempMax;
 extern float stateTemp;     //HB degreeC
 extern float stateHumidity; //HB percent
 
-extern float maxPitch;     //HB Used for patch display only
-extern bool upHillFlag;  //HB vermeiden, dass Mower kippt bei grossen Steigungen
+extern float maxPitch;      //HB Used for patch display only
+extern float maxDeltaPitch; //HB Used only for logging
+extern float maxDeltaPwm;   //HB Used only for logging
+extern bool upHillFlag;     //HB vermeiden, dass Mower kippt bei grossen Steigungen
 extern bool upHillDetectionFlag;
 
 extern unsigned long lastFixTime;
