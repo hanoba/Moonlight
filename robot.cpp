@@ -703,18 +703,22 @@ void readIMU(){
       //else upHillFlag = false;
 
       // Kippschutz
-      static const float pitchThreshold = 0;  // 2. / 180. * PI;	// 2 degrees
       bool frontFlag = motorDriver.reverseDrive ? !motorDriver.frontWheelDrive : motorDriver.frontWheelDrive;
-      //motor.deltaPwm = deltaPitch < 0 || imu.pitch < pitchThreshold || frontFlag ? 0 : deltaPitch * cfgDeltaPitchPwmFactor;
-      if (frontFlag) motor.deltaPwm = 0;
-      else
+      if (upHillDetectionFlag && !frontFlag && motor.robotPitch > cfgPitchThresholdRad)
       {
-          motor.deltaPwm = deltaPitch < 0  ? 0 : deltaPitch * cfgDeltaPitchPwmFactor;
-          motor.deltaPwm += imu.pitch < pitchThreshold ? 0 : motor.robotPitch * cfgPitchPwmFactor;
+          motor.stopCounter = cfgPitchStopTime;
       }
-      // compute variable used only for logging
+      // static const float pitchThreshold = 0;  // 2. / 180. * PI;	// 2 degrees
+      // //motor.deltaPwm = deltaPitch < 0 || imu.pitch < pitchThreshold || frontFlag ? 0 : deltaPitch * cfgDeltaPitchPwmFactor;
+      // if (frontFlag) motor.deltaPwm = 0;
+      // else
+      // {
+      //     motor.deltaPwm = deltaPitch < 0  ? 0 : deltaPitch * cfgDeltaPitchPwmFactor;
+      //     motor.deltaPwm += imu.pitch < pitchThreshold ? 0 : motor.robotPitch * cfgPitchPwmFactor;
+      // }
+      // // compute variable used only for logging
       maxDeltaPitch = max(maxDeltaPitch, deltaPitch);
-      maxDeltaPwm = max(maxDeltaPwm, motor.deltaPwm);
+      // maxDeltaPwm = max(maxDeltaPwm, motor.deltaPwm);
 
       imu.yaw = scalePI(imu.yaw);
       //CONSOLE.println(imu.yaw / PI * 180.0);

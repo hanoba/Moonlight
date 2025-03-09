@@ -1,7 +1,7 @@
 @echo off
 set BOSSAC=C:\Users\Harald\AppData\Local\Arduino15\packages\arduino\tools\bossac\1.6.1-arduino/bossac.exe
 set BIN=Moonlight.ino.bin
-set PORT=COM4
+set PORT=COM8
 echo Erzwinge Reset durch oeffnen/schliessen mit 1200 bps auf dem Port %PORT%
 mode %PORT%:1200
 :: timeout /T 10 wartet 10 Sekunden, die Wartezeit kann mit einer beliebigen Taste übersprungen werden, um dies zu verhindern gibt es den Parameter: /nobreak

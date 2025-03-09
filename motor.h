@@ -47,7 +47,8 @@ class Motor {
     float motorsSenseLP; // all motors current (amps, low-pass)
     float motorLeftSenseLPNorm; 
     float motorRightSenseLPNorm;
-    float deltaPwm;
+    //float deltaPwm;
+    int stopCounter;
     unsigned long motorMowSpinUpTime;
     void begin();
     void run();      

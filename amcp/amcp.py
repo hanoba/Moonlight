@@ -399,7 +399,7 @@ def ArdumowerControlProgram():
       events = pygame.event.get()
       for event in events:
          if event.type == pygame.QUIT:
-               cmdQuit()  #programActive = False
+               CmdQuit()  #programActive = False
          elif event.type == pygame.KEYDOWN:
                #PrintGuiMessage("")
                if event.key == pygame.K_ESCAPE:

@@ -32,11 +32,13 @@ bool cfgEnablePathFinder = ENABLE_PATH_FINDER_DEFAULT;
 bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
 bool cfgBumperEnable = BUMPER_ENABLE_DEFAULT;
 bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
-int cfgSonarObstacleDist = 10;  //HB cm (0=disabled)
-int cfgSonarNearDist = 60;      //HB cm (0=disabled)
+int cfgSonarObstacleDist = 0;  //HB cm (0=disabled) was 10
+int cfgSonarNearDist = 0;      //HB cm (0=disabled) was 60
 float cfgSonarNearSpeed = 0.2;
-float cfgDeltaPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
-float cfgPitchPwmFactor = 255. * 180. / PI / 45.0;	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
+//float cfgDeltaPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
+//float cfgPitchPwmFactor = 255. * 180. / PI / 45.0;	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
+float cfgPitchThresholdRad = 30. * PI / 180.0;
+int cfgPitchStopTime = 4;
 float cfgAngularSpeed = 0.5;
 float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
 const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
@@ -292,9 +294,9 @@ void cmdControl(String cmd)
       } else if (counter == 17) {
           if (intValue >= 0) cfgSonarObstacleDist = intValue;
       } else if (counter == 18) {
-          if (intValue >= 0) cfgPitchPwmFactor = 255. * 180. / PI / (float) intValue;   //cfgSonarNearDist = intValue;
+          if (intValue >= 0) cfgPitchStopTime = intValue;   //cfgSonarNearDist = intValue;
       } else if (counter == 19) {
-          if (floatValue >= 0) cfgDeltaPitchPwmFactor = floatValue;
+          if (floatValue >= 0) cfgPitchThresholdRad = floatValue * PI / 180.0;
       }
       counter++;
       lastCommaIdx = idx;
@@ -1339,7 +1341,8 @@ void outputConsole()
        PRINT(" %6.2f", gps.relPosN);
     }
     //PRINT(" %5.0f°", gps.relPosD*DEGREE);
-    PRINT(" %5.0f°", maxPitch*180.0/PI);
+    float maxPitchDeg = maxPitch * 180.0 / PI;
+    PRINT(" %5.0f°", maxPitchDeg);
     maxPitch = -PI;  // reset for next logging output
 
 	 float gps_height = gps.height - 412;		// 412m ist ungefähr die minimale Höhe des Gartens
@@ -1368,7 +1371,8 @@ void outputConsole()
     PRINT(" %c", bluetoothLoggingFlag ? 'B' : 'b');
     PRINT("%c", maps.useGPSfloatForPosEstimation ? 'P' : 'p');
     PRINT("%c", maps.useGPSfloatForDeltaEstimation ? 'D' : 'd');
-    PRINT("%c", gps.verbose ? 'G' : 'g');
+    //PRINT("%c", gps.verbose ? 'G' : 'g');
+    PRINT("%c", upHillDetectionFlag ? 'K' : 'k');
     PRINT("%c", cfgSmoothCurves ? 'S' : 's');
     PRINT("%c", cfgEnablePathFinder ? 'F' : 'f');
     PRINT(" MAP%d", maps.mapID);
@@ -1378,10 +1382,11 @@ void outputConsole()
     CONSOLE.println();
 
     // logging for Kippschutz debugging
-    CONSOLE.print(F("maxDeltaPitch="));
+    CONSOLE.print(F("=maxDeltaPitch="));
     CONSOLE.print(maxDeltaPitch * 180.0 / PI);
-    CONSOLE.print(F("°, maxDeltaPwm="));
-    CONSOLE.println(maxDeltaPwm);
+    CONSOLE.print(F("°, maxPitch="));
+    CONSOLE.print(maxPitchDeg);
+    CONSOLE.println("°");
     maxDeltaPitch = -PI;
     maxDeltaPwm = -255;
 

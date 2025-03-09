@@ -82,7 +82,8 @@ void Motor::begin() {
   setLinearAngularSpeedTimeout = 0;
   motorMowSpinUpTime = 0;
 
-  deltaPwm = 0.0;       //HB für Kippschutz
+  //deltaPwm = 0.0;       //HB für Kippschutz
+  stopCounter = 0;       //HB für Kippschutz
 }
 
 
@@ -368,32 +369,42 @@ void Motor::control(){
   CONSOLE.print(motorLeftRpmCurr);
   CONSOLE.print(",");
   CONSOLE.println(motorRightRpmCurr);*/
-  motorLeftPID.x = motorLeftRpmCurr;
-  motorLeftPID.w  = motorLeftRpmSet;
-  motorLeftPID.y_min = -pwmMax;
-  motorLeftPID.y_max = pwmMax;
-  motorLeftPID.max_output = pwmMax;
-  motorLeftPID.compute();
-  motorLeftPWMCurr = motorLeftPWMCurr + motorLeftPID.y;
-  if (motorLeftRpmSet >= 0) motorLeftPWMCurr = min( max(0, (int)motorLeftPWMCurr), pwmMax); // 0.. pwmMax
-  if (motorLeftRpmSet < 0) motorLeftPWMCurr = max(-pwmMax, min(0, (int)motorLeftPWMCurr));  // -pwmMax..0
-  
-  motorRightPID.x = motorRightRpmCurr;
-  motorRightPID.w = motorRightRpmSet;
-  motorRightPID.y_min = -pwmMax;
-  motorRightPID.y_max = pwmMax;
-  motorRightPID.max_output = pwmMax;
-  motorRightPID.compute();
-  motorRightPWMCurr = motorRightPWMCurr + motorRightPID.y;
-  if (motorRightRpmSet >= 0) motorRightPWMCurr = min( max(0, (int)motorRightPWMCurr), pwmMax);  // 0.. pwmMax
-  if (motorRightRpmSet < 0) motorRightPWMCurr = max(-pwmMax, min(0, (int)motorRightPWMCurr));   // -pwmMax..0  
+  // Kippschutz
+  if (stopCounter > 0)
+  {
+      stopCounter--;
+      motorLeftPWMCurr = 0;
+      motorRightPWMCurr = 0;
+  }
+  else
+  {
+      motorLeftPID.x = motorLeftRpmCurr;
+      motorLeftPID.w = motorLeftRpmSet;
+      motorLeftPID.y_min = -pwmMax;
+      motorLeftPID.y_max = pwmMax;
+      motorLeftPID.max_output = pwmMax;
+      motorLeftPID.compute();
+      motorLeftPWMCurr = motorLeftPWMCurr + motorLeftPID.y;
+      if (motorLeftRpmSet >= 0) motorLeftPWMCurr = min(max(0, (int)motorLeftPWMCurr), pwmMax); // 0.. pwmMax
+      if (motorLeftRpmSet < 0) motorLeftPWMCurr = max(-pwmMax, min(0, (int)motorLeftPWMCurr));  // -pwmMax..0
 
-  if ((abs(motorLeftRpmSet) < 0.01) && (motorLeftPWMCurr < 30)) motorLeftPWMCurr = 0;
-  if ((abs(motorRightRpmSet) < 0.01) && (motorRightPWMCurr < 30)) motorRightPWMCurr = 0;
+      motorRightPID.x = motorRightRpmCurr;
+      motorRightPID.w = motorRightRpmSet;
+      motorRightPID.y_min = -pwmMax;
+      motorRightPID.y_max = pwmMax;
+      motorRightPID.max_output = pwmMax;
+      motorRightPID.compute();
+      motorRightPWMCurr = motorRightPWMCurr + motorRightPID.y;
+      if (motorRightRpmSet >= 0) motorRightPWMCurr = min(max(0, (int)motorRightPWMCurr), pwmMax);  // 0.. pwmMax
+      if (motorRightRpmSet < 0) motorRightPWMCurr = max(-pwmMax, min(0, (int)motorRightPWMCurr));   // -pwmMax..0  
+
+      if ((abs(motorLeftRpmSet) < 0.01) && (motorLeftPWMCurr < 30)) motorLeftPWMCurr = 0;
+      if ((abs(motorRightRpmSet) < 0.01) && (motorRightPWMCurr < 30)) motorRightPWMCurr = 0;
+
+      motorMowPWMCurr = 0.99 * motorMowPWMCurr + 0.01 * motorMowPWMSet;
+  }
   
-  motorMowPWMCurr = 0.99 * motorMowPWMCurr + 0.01 * motorMowPWMSet;
-  
-  speedPWM(motorLeftPWMCurr - deltaPwm, motorRightPWMCurr - deltaPwm, motorMowPWMCurr);
+  speedPWM(motorLeftPWMCurr, motorRightPWMCurr, motorMowPWMCurr);
 }
 
 

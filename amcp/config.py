@@ -4,13 +4,17 @@ sonarObstacleDist=0  #20
 #sonarNearDist=0        #HB parameter removed 
 #sonarNearSpeed=0.1     #HB parameter removed
 
+# Kippschutz
+pitchThresholdDeg = 31.0    # motor stops immediately if pitch is higher than this value
+pitchStopTime = 8           # motor stops for pitchStopTime*50ms
+
 # Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
-pitchDeltaPwmFactor = 8.0*255  / (3.1415/2)
+# pitchDeltaPwmFactor = 8.0*255  / (3.1415/2) * 0.0
 
 # Kippschutz: Pitch angle in degree when duty cycle is reduced by 100% (255=100%)
-pitchAngleDeg = 90
+# pitchAngleDeg = 90*4
 
-# temporarily disable mow motor for tests
+# 0 means that mow motor is temporarily disabled for tests
 enableMowMotor = 0
 
 # Durchmesser der neuen Messer: 25 cm
