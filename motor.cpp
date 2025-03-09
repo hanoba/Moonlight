@@ -373,6 +373,9 @@ void Motor::control(){
   if (stopCounter > 0)
   {
       stopCounter--;
+      linearSpeedSet = 0;
+      motorRightRpmSet = 0;
+      motorLeftRpmSet = 0;
       motorLeftPWMCurr = 0;
       motorRightPWMCurr = 0;
   }
