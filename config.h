@@ -134,8 +134,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // ----- gear motors --------------------------------------------------
 #define MOTOR_OVERLOAD_CURRENT 0.8    // gear motors overload current (amps)
 
-//#define USE_LINEAR_SPEED_RAMP  true      // use a speed ramp for the linear speed
-#define USE_LINEAR_SPEED_RAMP  false      // do not use a speed ramp
+#define USE_LINEAR_SPEED_RAMP  true      // use a speed ramp for the linear speed
+//#define USE_LINEAR_SPEED_RAMP  false      // do not use a speed ramp
 
 // motor speed control (PID coefficients) - these values are tuned for Ardumower motors
 // general information about PID controllers: https://wiki.ardumower.de/index.php?title=PID_control
