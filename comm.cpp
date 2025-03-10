@@ -1382,13 +1382,15 @@ void outputConsole()
     CONSOLE.println();
 
     // logging for Kippschutz debugging
-    CONSOLE.print(F("=maxDeltaPitch="));
+    CONSOLE.print(F("maxDeltaPitch="));
     CONSOLE.print(maxDeltaPitch * 180.0 / PI);
     CONSOLE.print(F("°, maxPitch="));
     CONSOLE.print(maxPitchDeg);
-    CONSOLE.println("°");
+    CONSOLE.print("°, numKippSchutzEvents=");
+    CONSOLE.println(numKippSchutzEvents);
     maxDeltaPitch = -PI;
     maxDeltaPwm = -255;
+    numKippSchutzEvents = 0;
 
     // log additional info
     // PRINT(" posStep=%f ", sim.posStep);

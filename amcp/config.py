@@ -5,8 +5,8 @@ sonarObstacleDist=0  #20
 #sonarNearSpeed=0.1     #HB parameter removed
 
 # Kippschutz
-pitchThresholdDeg = 31.0    # motor stops immediately if pitch is higher than this value
-pitchStopTime = 8           # motor stops for pitchStopTime*50ms
+pitchThresholdDeg = 51.0    # motor stops immediately if pitch is higher than this value
+pitchStopTime = 1           # motor stops for pitchStopTime*50ms
 
 # Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
 # pitchDeltaPwmFactor = 8.0*255  / (3.1415/2) * 0.0

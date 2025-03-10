@@ -47,6 +47,7 @@ extern float cfgSonarNearSpeed;
 //extern float cfgPitchPwmFactor;
 extern float cfgPitchThresholdRad;
 extern int cfgPitchStopTime;
+extern int numKippSchutzEvents;
 extern float cfgObstacleMapGpsThreshold;
 
 

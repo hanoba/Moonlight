@@ -110,12 +110,15 @@ float pitchChange = 0;
 float lastGPSMotionX = 0;
 float lastGPSMotionY = 0;
 unsigned long nextGPSMotionCheckTime = 0;
-
 float maxPitch = -PI;      //HB Used for pitch display only
-float maxDeltaPitch = -PI; //HB Used only for logging 
-float maxDeltaPwm = 0;     //HB Used only for logging 
+
+//HB Variables used only for logging
+float maxDeltaPitch = -PI;
+float maxDeltaPwm = 0;
+int numKippSchutzEvents = 0;
+
 bool upHillFlag = false;   //HB vermeiden, dass Mower kippt bei grossen Steigungen
-bool upHillDetectionFlag = false;
+bool upHillDetectionFlag = true;
 
 UBLOX::SolType lastSolution = UBLOX::SOL_INVALID;    
 unsigned long nextStatTime = 0;
@@ -706,6 +709,7 @@ void readIMU(){
       bool frontFlag = motorDriver.reverseDrive ? !motorDriver.frontWheelDrive : motorDriver.frontWheelDrive;
       if (upHillDetectionFlag && !frontFlag && motor.robotPitch > cfgPitchThresholdRad)
       {
+          if (motor.stopCounter == 0) numKippSchutzEvents++;
           motor.stopCounter = cfgPitchStopTime;
       }
       // static const float pitchThreshold = 0;  // 2. / 180. * PI;	// 2 degrees
