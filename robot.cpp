@@ -707,9 +707,9 @@ void readIMU(){
 
       // Kippschutz
       bool frontFlag = motorDriver.reverseDrive ? !motorDriver.frontWheelDrive : motorDriver.frontWheelDrive;
-      if (upHillDetectionFlag && !frontFlag && motor.robotPitch > cfgPitchThresholdRad)
+      if (upHillDetectionFlag && !frontFlag && motor.robotPitch > cfgPitchThresholdRad && motor.stopCounter == 0)
       {
-          if (motor.stopCounter == 0) numKippSchutzEvents++;
+          numKippSchutzEvents++;
           motor.stopCounter = cfgPitchStopTime;
       }
       // static const float pitchThreshold = 0;  // 2. / 180. * PI;	// 2 degrees
@@ -1567,6 +1567,7 @@ void setOperation(OperationType op, bool allowRepeat, bool initiatedbyOperator){
   }
   stateOp = op;  
   saveState();
+  bumperDeadTime = millis() + BUMPER_DEAD_TIME;
 }
 
 

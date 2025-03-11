@@ -1,12 +1,13 @@
 # constant configuration parameters that cannot be changed via the amcp GUI
 sonarEnable=0   #HB was 1
-sonarObstacleDist=0  #20
+#sonarObstacleDist=0    #HB parameter removed 
 #sonarNearDist=0        #HB parameter removed 
 #sonarNearSpeed=0.1     #HB parameter removed
 
 # Kippschutz
 pitchThresholdDeg = 51.0    # motor stops immediately if pitch is higher than this value
 pitchStopTime = 1           # motor stops for pitchStopTime*50ms
+useSpeedRamp = 1
 
 # Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
 # pitchDeltaPwmFactor = 8.0*255  / (3.1415/2) * 0.0

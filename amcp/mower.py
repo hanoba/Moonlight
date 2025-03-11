@@ -61,7 +61,7 @@ CMD_ToggleUseGPSfloatForPosEstimation = "AT+YP"
 CMD_ToggleUseGPSfloatForDeltaEstimation = "AT+YD"
 CMD_ToggleSmoothCurves = "AT+YS"
 CMD_ToggleEnablePathFinder = "AT+YF"
-CMD_ToggleGpsLogging = "AT+YG"
+CMD_ToggleKippschutz = "AT+YG"
 CMD_GetSummary = "AT+S"
 CMD_GetRtcDateTime = "AT+D"
 
@@ -187,8 +187,8 @@ def ToggleSmoothCurves():
 def ToggleEnablePathFinder():
    udp.ExecCmd(CMD_ToggleEnablePathFinder)
 
-def ToggleGpsLogging():
-   udp.ExecCmd(CMD_ToggleGpsLogging)
+def ToggleKippschutz():
+   udp.ExecCmd(CMD_ToggleKippschutz)
 
 def Ping():
    udp.ExecCmd(CMD_Ping)
@@ -236,7 +236,7 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    
    cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:d},{:d},{:.2f}', 
       iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
-      iObstacleMap, config.sonarObstacleDist, config.pitchStopTime, config.pitchThresholdDeg)     
+      iObstacleMap, config.useSpeedRamp, config.pitchStopTime, config.pitchThresholdDeg)     
    #  iObstacleMap, config.sonarObstacleDist, config.pitchAngleDeg, config.pitchDeltaPwmFactor)     
    #  iObstacleMap, config.sonarObstacleDist, config.sonarNearDist, config.sonarNearSpeed)     
    udp.ExecCmd(cmd)

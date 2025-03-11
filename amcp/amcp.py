@@ -331,7 +331,7 @@ def ArdumowerControlProgram():
    config_menu.add.button('Toggle Bluetooth Logging (b=off,B=on)', mower.ToggleBluetoothLogging)
    config_menu.add.button('Toggle UseGPSfloatForPosEstimation (p=off,P=on)', mower.ToggleUseGPSfloatForPosEstimation)
    config_menu.add.button('Toggle UseGPSfloatForDeltaEstimation (d=off,D=on)', mower.ToggleUseGPSfloatForDeltaEstimation)
-   config_menu.add.button('Toggle GPS Logging (g=off,G=on)', mower.ToggleGpsLogging)
+   config_menu.add.button('Toggle Kippschutz (k=off,K=on)', mower.ToggleKippschutz)
    config_menu.add.button('Toggle SmoothCurves (s=off,S=on)', mower.ToggleSmoothCurves)
    config_menu.add.button('Toggle EnablePathFinder (f=off,F=on)', mower.ToggleEnablePathFinder)
    config_menu.add.button('GNSS Warm Reboot', mower.GnssWarmReboot)

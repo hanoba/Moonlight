@@ -292,7 +292,7 @@ void cmdControl(String cmd)
               maps.mapType = (MapType)(intValue & 3);
           }
       } else if (counter == 17) {
-          if (intValue >= 0) cfgSonarObstacleDist = intValue;
+          if (intValue >= 0) motor.activateLinearSpeedRamp = intValue;
       } else if (counter == 18) {
           if (intValue >= 0) cfgPitchStopTime = intValue;   //cfgSonarNearDist = intValue;
       } else if (counter == 19) {
