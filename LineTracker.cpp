@@ -282,7 +282,7 @@ void trackLine()
         // if in linear motion and not enough ground speed => obstacle
         if (GPS_SPEED_DETECTION){
           CONSOLE.println(F("gps no speed => obstacle!"));
-          triggerObstacle();
+          triggerObstacle(OT_GPS);
           return;
         }
       }
@@ -372,10 +372,11 @@ void trackLine()
      //   next waypoint          
      //  if (!straight) angleToTargetFits = false;      
      //}
-     motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
-     CONSOLE.print(F(" ReverseDrive="));
-     CONSOLE.println(motorDriver.reverseDrive);
+     //HB moved down! motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
+     //HB CONSOLE.print(F(" ReverseDrive="));
+     //HB CONSOLE.println(motorDriver.reverseDrive);
   }  
+  motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
   motor.setLinearAngularSpeed(linear, angular);
 
 }

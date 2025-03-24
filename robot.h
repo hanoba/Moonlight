@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.85 HB 2025-03-10"
+#define VER "Ardumower Moonlight, V168.86 HB 2025-03-24"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -79,6 +79,15 @@ enum Sensor {
       SENS_LIFT,
       SENS_RAIN,
       SENS_STOP_BUTTON,
+};
+
+enum ObstacleType {
+    OT_BUMPER_SWITCH,
+    OT_FREE_WHEEL,
+    OT_SONAR,
+    OT_PITCH,
+    OT_TOF,
+    OT_GPS
 };
 
 //extern bool simulationFlag;
@@ -168,7 +177,7 @@ int freeMemory();
 void start();
 void run();
 void setOperation(OperationType op, bool allowRepeat = false, bool initiatedbyOperator = false);
-void triggerObstacle(bool isBumperWithSwitch=false);
+void triggerObstacle(ObstacleType obstacleType);
 void sensorTest();
 void resetLinearMotionMeasurement();
 

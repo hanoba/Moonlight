@@ -1903,13 +1903,13 @@ bool Map::isMowPointNormalV()
    return mapType == MT_NORMAL_V && (mowPointsIdx & 1) == 1 && maps.wayMode == WAY_MOW;  
 }
 
-// inform LineTracker that obstacle has been hit
-bool Map::obstacle()
-{
-   if (isObstacleMowPoint())
-   {
-      obstacleTargetReached = true;
-      return true;
-   }
-   return mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_GPS;
-}
+//// inform LineTracker that obstacle has been hit
+//bool Map::obstacle()
+//{
+//   if (isObstacleMowPoint())
+//   {
+//      obstacleTargetReached = true;
+//      return true;
+//   }
+//   return mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_GPS;
+//}

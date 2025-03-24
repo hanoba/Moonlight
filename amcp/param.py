@@ -9,4 +9,4 @@ frontWheelDrive='0'
 mlLineTracking='1'
 enableTiltDetection='0'
 gpsConfigFilter='10,10,30'
-lastMapIndex=7
+lastMapIndex=1

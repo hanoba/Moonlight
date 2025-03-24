@@ -578,7 +578,7 @@ void cmdVersion(){
 void cmdObstacle(){
   String s = F("O");
   cmdAnswer(s);
-  triggerObstacle();
+  triggerObstacle(OT_BUMPER_SWITCH);
 }
 
 // perform pathfinder stress test
