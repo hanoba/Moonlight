@@ -372,11 +372,10 @@ void trackLine()
      //   next waypoint          
      //  if (!straight) angleToTargetFits = false;      
      //}
-     //HB moved down! motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
-     //HB CONSOLE.print(F(" ReverseDrive="));
-     //HB CONSOLE.println(motorDriver.reverseDrive);
+     motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
+     CONSOLE.print(F(" ReverseDrive="));
+     CONSOLE.println(motorDriver.reverseDrive);
   }  
-  motorDriver.reverseDrive = maps.isObstacleMowPoint() || maps.isMowPointNormalV();
   motor.setLinearAngularSpeed(linear, angular);
 
 }
