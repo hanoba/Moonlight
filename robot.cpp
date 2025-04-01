@@ -1085,14 +1085,14 @@ void triggerObstacle(ObstacleType obstacleType)
         if (cfgBumperEnable && maps.wayMode == WAY_MOW)
         {
             if (maps.mapType == MT_NORMAL_U) driveReverseStopTime = millis() + 3000;
-            else if (maps.mapType == MT_NORMAL_V) maps.skipNextMowingPoint();
+            else if (maps.mapType == MT_NORMAL_V) driveReverseStopTime = millis() + 500;
         }
         break;
     case OT_PITCH:
         if (upHillDetectionFlag && maps.wayMode == WAY_MOW)
         {
             if (maps.mapType == MT_NORMAL_U) driveReverseStopTime = millis() + 3000;
-            else if (maps.mapType == MT_NORMAL_V) maps.skipNextMowingPoint();
+            else if (maps.mapType == MT_NORMAL_V) driveReverseStopTime = millis() + 500;
         }
         break;
     case OT_TOF:
@@ -1426,7 +1426,7 @@ void run()
                motor.setLinearAngularSpeed(-0.2,0);
                if (millis() > driveReverseStopTime)
                {
-                  CONSOLE.println(F("driveReverseStopTime"));
+                  CONSOLE.println(F("driveReverseStopTime expired"));
                   motor.stopImmediately(false);
                   driveReverseStopTime = 0;
                   if (MOONLIGHT_ADD_OBSTACLE_TO_MAP) 
