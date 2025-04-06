@@ -113,8 +113,8 @@ unsigned long nextGPSMotionCheckTime = 0;
 float maxPitch = -PI;      //HB Used for pitch display only
 
 //HB Variables used only for logging
-float maxDeltaPitch = -PI;
-float maxDeltaPwm = 0;
+//float maxDeltaPitch = -PI;
+//float maxDeltaPwm = 0;
 int numKippSchutzEvents = 0;
 
 bool upHillFlag = false;   //HB vermeiden, dass Mower kippt bei grossen Steigungen
@@ -721,7 +721,7 @@ void readIMU(){
       //     motor.deltaPwm += imu.pitch < pitchThreshold ? 0 : motor.robotPitch * cfgPitchPwmFactor;
       // }
       // // compute variable used only for logging
-      maxDeltaPitch = max(maxDeltaPitch, deltaPitch);
+      // maxDeltaPitch = max(maxDeltaPitch, deltaPitch);
       // maxDeltaPwm = max(maxDeltaPwm, motor.deltaPwm);
 
       imu.yaw = scalePI(imu.yaw);
@@ -1089,6 +1089,12 @@ void triggerObstacle(ObstacleType obstacleType)
         }
         break;
     case OT_PITCH:
+        if (isObstacleMap)
+        {
+            // inform LineTracker that obstacle has been hit
+            if (maps.isObstacleMowPoint()) maps.obstacleTargetReached = true;
+            break;
+        }
         if (upHillDetectionFlag && maps.wayMode == WAY_MOW)
         {
             if (maps.mapType == MT_NORMAL_U) driveReverseStopTime = millis() + 3000;
@@ -1257,35 +1263,7 @@ void run()
    battery.run();
    batteryDriver.run();
    motorDriver.run();
-   //------------------------------------------------------------------------------------------------- 
-   // Handle IMU & motor
-   //------------------------------------------------------------------------------------------------- 
-   if (millis() > nextImuTime)
-   {
-       nextImuTime = millis() + 50;   //HB was 150;
-       //imu.resetFifo();    
-       if (imuIsCalibrating) {
-           motor.stopImmediately(true);
-           if (millis() > nextImuCalibrationSecond) {
-               nextImuCalibrationSecond = millis() + 1000;
-               imuCalibrationSeconds++;
-               CONSOLE.print(F("IMU gyro calibration (robot must be static)... "));
-               CONSOLE.println(imuCalibrationSeconds);
-               buzzer.sound(SND_PROGRESS, true);
-               if (imuCalibrationSeconds >= 9) {
-                   imuIsCalibrating = false;
-                   CONSOLE.println();
-                   lastIMUYaw = 0;
-                   imu.resetFifo();
-                   imuDataTimeout = millis() + 10000;
-               }
-           }
-       }
-       else {
-           readIMU();
-       }
        motor.run();
-   }
    sonar.run();
    maps.run();  
 #ifdef MOONLIGHT_ENABLE_FIX_DISPLAY
@@ -1328,6 +1306,33 @@ void run()
       //logCPUHealth();    
    }
 
+   //------------------------------------------------------------------------------------------------- 
+   // Handle IMU
+   //------------------------------------------------------------------------------------------------- 
+   if (millis() > nextImuTime)
+   {
+      nextImuTime = millis() + 150;        
+      //imu.resetFifo();    
+      if (imuIsCalibrating) {
+        motor.stopImmediately(true);   
+        if (millis() > nextImuCalibrationSecond){
+          nextImuCalibrationSecond = millis() + 1000;  
+          imuCalibrationSeconds++;
+          CONSOLE.print(F("IMU gyro calibration (robot must be static)... "));        
+          CONSOLE.println(imuCalibrationSeconds);        
+          buzzer.sound(SND_PROGRESS, true);        
+          if (imuCalibrationSeconds >= 9){
+            imuIsCalibrating = false;
+            CONSOLE.println();                
+            lastIMUYaw = 0;          
+            imu.resetFifo();
+            imuDataTimeout = millis() + 10000;
+          }
+        }       
+      } else {
+        readIMU();    
+      }
+   }
    
    //-------------------------------------------------------------------------------------------------
    // Handle GPS and compute Statistics

@@ -211,10 +211,11 @@ void trackLine()
 
     rotateLeft = false;
     rotateRight = false;
+    float slowSpeedDistThreshold = maps.isObstacleMowPoint() ? cfgObstacleMapDistThreshold : 0.5;
     if (maps.trackSlow && trackslow_allowed) {
       // planner forces slow tracking (e.g. docking etc)
       linear = 0.1;           
-    } else if (     ((setSpeed > 0.2) && (maps.distanceToTargetPoint(stateX, stateY) < 0.5) && (!straight))   // approaching
+    } else if (     ((setSpeed > 0.2) && (maps.distanceToTargetPoint(stateX, stateY) < slowSpeedDistThreshold) && (!straight))   // approaching
           || ((linearMotionStartTime != 0) && (millis() < linearMotionStartTime + 3000))                      // leaving  
        ) 
     {

@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.88 HB 2025-04-01"
+#define VER "Ardumower Moonlight, V168.90 HB 2025-04-06"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -39,14 +39,14 @@ extern bool cfgMoonlightLineTracking;
 extern bool cfgBumperEnable;
 extern bool cfgEnableTiltDetection;
 extern float cfgAngularSpeed;
-extern const float cfgSlowSpeedObstacleMap;
+extern float cfgSlowSpeedObstacleMap;
 extern int cfgSonarNearDist;
 extern int cfgSonarObstacleDist;
 extern float cfgSonarNearSpeed;
 //extern float cfgDeltaPitchPwmFactor;
 //extern float cfgPitchPwmFactor;
 extern float cfgPitchThresholdRad;
-extern int cfgPitchStopTime;
+extern float cfgObstacleMapDistThreshold;
 extern int numKippSchutzEvents;
 extern float cfgObstacleMapGpsThreshold;
 
@@ -130,8 +130,8 @@ extern float stateTemp;     //HB degreeC
 extern float stateHumidity; //HB percent
 
 extern float maxPitch;      //HB Used for patch display only
-extern float maxDeltaPitch; //HB Used only for logging
-extern float maxDeltaPwm;   //HB Used only for logging
+//extern float maxDeltaPitch; //HB Used only for logging
+//extern float maxDeltaPwm;   //HB Used only for logging
 extern bool upHillFlag;     //HB vermeiden, dass Mower kippt bei grossen Steigungen
 extern bool upHillDetectionFlag;
 

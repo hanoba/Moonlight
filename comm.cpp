@@ -38,10 +38,10 @@ float cfgSonarNearSpeed = 0.2;
 //float cfgDeltaPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
 //float cfgPitchPwmFactor = 255. * 180. / PI / 45.0;	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
 float cfgPitchThresholdRad = 30. * PI / 180.0;
-int cfgPitchStopTime = 4;
+float cfgObstacleMapDistThreshold = 1.5;       // Slow speed distance threshold for ObstacleMowPoint
 float cfgAngularSpeed = 0.5;
 float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
-const float cfgSlowSpeedObstacleMap = 0.3;     // for motor overload and close to target 
+float cfgSlowSpeedObstacleMap = 0.1;     // for motor overload and close to target 
 
 
 // answer Bluetooth with CRC
@@ -292,9 +292,9 @@ void cmdControl(String cmd)
               maps.mapType = (MapType)(intValue & 3);
           }
       } else if (counter == 17) {
-          if (intValue >= 0) motor.activateLinearSpeedRamp = intValue;
+          if (floatValue >= 0) cfgObstacleMapDistThreshold = floatValue;
       } else if (counter == 18) {
-          if (intValue >= 0) cfgPitchStopTime = intValue;   //cfgSonarNearDist = intValue;
+          if (floatValue >= 0) cfgSlowSpeedObstacleMap = floatValue;
       } else if (counter == 19) {
           if (floatValue >= 0) cfgPitchThresholdRad = floatValue * PI / 180.0;
       }
@@ -1382,15 +1382,15 @@ void outputConsole()
     CONSOLE.println();
 
     // logging for Kippschutz debugging
-    CONSOLE.print(F("maxDeltaPitch="));
-    CONSOLE.print(maxDeltaPitch * 180.0 / PI);
-    CONSOLE.print(F("°, maxPitch="));
-    CONSOLE.print(maxPitchDeg);
-    CONSOLE.print("°, numKippSchutzEvents=");
-    CONSOLE.println(numKippSchutzEvents);
-    maxDeltaPitch = -PI;
-    maxDeltaPwm = -255;
-    numKippSchutzEvents = 0;
+    // CONSOLE.print(F("maxDeltaPitch="));
+    // CONSOLE.print(maxDeltaPitch * 180.0 / PI);
+    // CONSOLE.print(F("°, maxPitch="));
+    // CONSOLE.print(maxPitchDeg);
+    // CONSOLE.print("°, numKippSchutzEvents=");
+    // CONSOLE.println(numKippSchutzEvents);
+    // maxDeltaPitch = -PI;
+    // maxDeltaPwm = -255;
+    // numKippSchutzEvents = 0;
 
     // log additional info
     // PRINT(" posStep=%f ", sim.posStep);

@@ -165,8 +165,7 @@ void Motor::stopImmediately(bool includeMowerMotor){
 
 
 void Motor::run() {
-  //HB The following "if" is now handled in robot.cpp
-  // if (millis() < lastControlTime + 50) return;
+  if (millis() < lastControlTime + 50) return;
   
   if (setLinearAngularSpeedTimeoutActive){
     if (millis() > setLinearAngularSpeedTimeout){
