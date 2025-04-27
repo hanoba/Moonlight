@@ -7,7 +7,7 @@ sonarEnable=0
 
 # Kippschutz
 pitchThresholdDeg = 40.0    # motor stops immediately if pitch is higher than this value
-obstMapslowSpeed = 0.1      # slow speed close to fence for obstacle maps
+obstMapslowSpeed = 0.2      # slow speed close to fence for obstacle maps
 obstMapDistThreshold = 1.5  # slow speed distance threshold in m for obstacle maps
 
 # Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
