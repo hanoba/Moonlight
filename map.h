@@ -207,7 +207,8 @@ class Map
     bool isMowPointNormalV();
     bool obstacle();
     bool obstacleTargetReached = false;
-  private:
+    void OverwriteStateXYwithFencePosition();
+private:
     void finishedUploadingMap();
     void checkMemoryErrors();
     bool nextMowPoint(bool sim);

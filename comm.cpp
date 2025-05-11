@@ -42,6 +42,7 @@ float cfgObstacleMapDistThreshold = 1.5;       // Slow speed distance threshold 
 float cfgAngularSpeed = 0.5;
 float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
 float cfgSlowSpeedObstacleMap = 0.1;     // for motor overload and close to target 
+float cfgOmapOutsideFenceDist = 0.6;     // distance between fence and waypoint for obstacle maps
 
 
 // answer Bluetooth with CRC

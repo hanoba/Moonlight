@@ -342,7 +342,8 @@ void trackLine()
      {
         //HB motorDriver.reverseDrive = true;
         maps.obstacleTargetReached = false;
-        CONSOLE.print(F(" Obstacle target reached! "));
+        maps.OverwriteStateXYwithFencePosition();
+        CONSOLE.print(F(" Obstacle target reached! Overwrite StateXY with Fence Position!"));
      }
      else if (maps.isMowPointNormalV()) CONSOLE.print(F(" V target reached! "));
      else CONSOLE.print(F(" U target reached! "));

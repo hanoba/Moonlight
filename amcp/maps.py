@@ -270,7 +270,7 @@ def CreateWaypoints(rectangle, n):
     return waypoints
 
 
-def CreateBumperWaypoints(rectangle, n):
+def CreateVmapWaypoints(rectangle, n):
     waypoints = []
     if len(rectangle) != 4:
         print("Error: CreateWaypoints needs a rectangle as input")
@@ -317,6 +317,67 @@ def CreateBumperWaypoints(rectangle, n):
             waypoints.append((Vnext[0],Vnext[1]))
         else:
             Vnext = np.add(Va, VlaneBottom*i)
+            waypoints.append((Vnext[0],Vnext[1]))
+        topFlag = not topFlag
+    waypoints.append((Vd[0],Vd[1]))
+    return waypoints
+
+
+def CreateBumperWaypoints(rectangle, n):
+    waypoints = []
+    if len(rectangle) != 4:
+        print("Error: CreateWaypoints needs a rectangle as input")
+        return waypoints
+    #maxLaneDistance = 0.16*scalingFactor
+    maxLaneDistance = (config.dmMesser-config.vLaneOverlap)*scalingFactor/2    # divide by 2 is needed for V waypoint creation
+    Va = np.array(rectangle[n])
+    Vb = np.array(rectangle[(n + 1) & 3])
+    Vc = np.array(rectangle[(n + 2) & 3])
+    Vd = np.array(rectangle[(n + 3) & 3])
+    Vba = np.subtract(Vb,Va)
+    Vcb = np.subtract(Vc,Vb)
+    Vda = np.subtract(Vd,Va)
+    #Vortho = np.array((-Vba[1], Vba[0]))
+    #Vortho = Vortho/np.linalg.norm(Vortho)
+    
+    Lcb = np.linalg.norm(Vcb)
+    Lda = np.linalg.norm(Vda)
+    Vcb_n = Vcb/Lcb
+    Vda_n = Vda/Lda
+    numLanesCb = 1 + math.floor(Lcb/maxLaneDistance+1)
+    numLanesDa = 1 + math.floor(Lda/maxLaneDistance+1)
+
+    if numLanesCb > numLanesDa: numLanes = numLanesCb
+    else: numLanes = numLanesDa
+    numLanes = numLanes | 1     # numLanes should be odd
+
+    laneDistanceCb = Lcb / (numLanes - 1)
+    laneDistanceDa = Lda / (numLanes - 1)
+
+    print(f"{numLanesCb=}")
+    print(f"{numLanesDa=}")
+    print("laneDistanceCb=", laneDistanceCb/scalingFactor)
+    print("laneDistanceDa=", laneDistanceDa/scalingFactor)
+
+    # distance to fence in pixels
+    fenceDistance = config.oMapOutsideFenceDist*scalingFactor
+
+    VlaneTop = Vcb_n * laneDistanceCb
+    VlaneBottom = Vda_n * laneDistanceDa
+
+    topFlag = True
+    waypoints.append((Va[0],Va[1]))
+    Vbottom = Va
+    for i in range(numLanes):
+        if topFlag:
+            Vnext = np.add(Vb, VlaneTop*i)
+            Vdiff = np.subtract(Vnext,Vbottom)
+            Vdiff = Vdiff / np.linalg.norm(Vdiff) * fenceDistance
+            Vnext = np.add(Vnext,Vdiff)
+            waypoints.append((Vnext[0],Vnext[1]))
+        else:
+            Vnext = np.add(Va, VlaneBottom*i)
+            Vbottom = Vnext
             waypoints.append((Vnext[0],Vnext[1]))
         topFlag = not topFlag
     waypoints.append((Vd[0],Vd[1]))

@@ -1,20 +1,13 @@
 # constant configuration parameters that cannot be changed via the amcp GUI
 sonarEnable=0   
-#sonarObstacleDist=0    #HB parameter removed 
-#sonarNearDist=0        #HB parameter removed 
-#sonarNearSpeed=0.1     #HB parameter removed
-#pitchStopTime = 2      #HB parameter removed
 
-# Kippschutz
+# Pitch detection
 pitchThresholdDeg = 40.0    # motor stops immediately if pitch is higher than this value
-obstMapslowSpeed = 0.2      # slow speed close to fence for obstacle maps
-obstMapDistThreshold = 1.5  # slow speed distance threshold in m for obstacle maps
 
-# Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
-# pitchDeltaPwmFactor = 8.0*255  / (3.1415/2) * 0.0
-
-# Kippschutz: Pitch angle in degree when duty cycle is reduced by 100% (255=100%)
-# pitchAngleDeg = 90*4
+# Obstacle map configuration
+oMapOutsideFenceDist = 1.5                         # distance from fence to odd waypoints in m
+oMapSlowSpeed = 0.25                               # slow speed close to fence for obstacle maps
+oMapDistThreshold = oMapOutsideFenceDist + 0.4     # slow speed distance threshold in m for obstacle maps
 
 # 0 means that mow motor is temporarily disabled for tests
 enableMowMotor = 1

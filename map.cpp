@@ -1913,3 +1913,22 @@ bool Map::isMowPointNormalV()
 //   }
 //   return mapType==MT_OBSTACLE || mapType==MT_OBSTACLE_IGNORE_GPS;
 //}
+
+// This function set the robot state to the position where the robot hits the fence.
+// This improves the accuracy when no GPS fix is available.
+void Map::OverwriteStateXYwithFencePosition()
+{
+    // Compute the point where mower hits the fence
+    // Note: The waypoint is always cfgOmapOutsideFenceDist away from this point.
+    //       This is secured by amcp waypoint generation!
+    float lastTargetPointX = lastTargetPoint.x();
+    float lastTargetPointY = lastTargetPoint.y();
+    float targetPointX = targetPoint.x();
+    float targetPointY = targetPoint.y();
+    float dx = lastTargetPointX - targetPointX;
+    float dy = lastTargetPointY - targetPointY;
+    float scalingFactor = cfgOmapOutsideFenceDist / sqrt(sq(dx) + sq(dy));
+    float x = targetPointX + dx*scalingFactor;
+    float y = targetPointY + dy*scalingFactor;
+    OverwriteStateXY(x, y);
+}

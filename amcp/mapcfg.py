@@ -49,7 +49,7 @@ mapCfg = [
    [ 13, ObstacleMapIG, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
    [ 14, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
    [ 15, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner oben
-   [ 16, NormalMapV,    FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
+   [ 16, ObstacleMap,    BackWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
    [ 17, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus/Wald
    [ 18, NormalMapV,    FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Rhododendron Brunner
    [ 19, ObstacleMapIG, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner unten

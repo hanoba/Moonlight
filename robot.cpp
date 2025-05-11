@@ -1632,3 +1632,10 @@ char *Sprintf(const char *format, ...)
    return text;
 }
 
+// stateX and stateY are global variables, so anybody can modify it
+// We use this function only to make overwrites in trackline explixit!
+void OverwriteStateXY(float x, float y)
+{
+    stateX = x;
+    stateY = y;
+}

@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.90 HB 2025-04-06"
+#define VER "Ardumower Moonlight, V168.91 HB 2025-05-10"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -49,6 +49,7 @@ extern float cfgPitchThresholdRad;
 extern float cfgObstacleMapDistThreshold;
 extern int numKippSchutzEvents;
 extern float cfgObstacleMapGpsThreshold;
+extern float cfgOmapOutsideFenceDist;
 
 
 enum OperationType {
@@ -180,6 +181,7 @@ void setOperation(OperationType op, bool allowRepeat = false, bool initiatedbyOp
 void triggerObstacle(ObstacleType obstacleType);
 void sensorTest();
 void resetLinearMotionMeasurement();
+void OverwriteStateXY(float x, float y);
 
 char *Sprintf(const char *format, ...);
 
