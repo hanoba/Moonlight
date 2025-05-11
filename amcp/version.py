@@ -1,1 +1,1 @@
-versionString = "ArduMower Control Program - Version 91, 2025-05-10"
+versionString = "ArduMower Control Program - Version 92, 2025-05-11"

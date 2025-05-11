@@ -197,6 +197,7 @@ def PrintHelpText():
    WriteTextBox("^w  Show/hide waypoints      ")
    WriteTextBox("^u  Create U waypoints       ")
    WriteTextBox("^v  Create V waypoints       ")
+   WriteTextBox("^o  Create O waypoints       ")
    WriteTextBox("^p  Make parallel            ")
    WriteTextBox("^r  Reorder rectangle        ")
    WriteTextBox("TAB Select next point        ")
@@ -472,7 +473,8 @@ def ArdumowerControlProgram():
                      if event.mod & pygame.KMOD_SHIFT: CmdStartMowingFromWaypoint()
                      else: CmdStartMowing()
                   elif event.key == pygame.K_o:
-                     mower.SwitchOffRobot()
+                     if event.mod & pygame.KMOD_CTRL: CmdCreateOtypeWaypoints()
+                     else: mower.SwitchOffRobot()
                   elif event.key == pygame.K_p:
                      if event.mod & pygame.KMOD_CTRL:
                         if editMode:
@@ -765,6 +767,14 @@ def CmdCreateUtypeWaypoints():
 
    
 def CmdCreateVtypeWaypoints():
+   global lastPerimeter
+   global showCurrentWayPoints
+   lastPerimeter=maps.perimeters[currentMapIndex].copy()
+   maps.wayPoints[currentMapIndex] = maps.CreateVmapWaypoints(maps.perimeters[currentMapIndex], r)
+   showCurrentWayPoints = True
+
+   
+def CmdCreateOtypeWaypoints():
    global lastPerimeter
    global showCurrentWayPoints
    lastPerimeter=maps.perimeters[currentMapIndex].copy()

@@ -42,7 +42,7 @@ float cfgObstacleMapDistThreshold = 1.5;       // Slow speed distance threshold 
 float cfgAngularSpeed = 0.5;
 float cfgObstacleMapGpsThreshold = 1.0;        // in m*m
 float cfgSlowSpeedObstacleMap = 0.1;     // for motor overload and close to target 
-float cfgOmapOutsideFenceDist = 0.6;     // distance between fence and waypoint for obstacle maps
+float cfgOmapOutsideFenceDist = 1.5;     // distance between fence and waypoint for obstacle maps
 
 
 // answer Bluetooth with CRC
@@ -298,6 +298,8 @@ void cmdControl(String cmd)
           if (floatValue >= 0) cfgSlowSpeedObstacleMap = floatValue;
       } else if (counter == 19) {
           if (floatValue >= 0) cfgPitchThresholdRad = floatValue * PI / 180.0;
+      } else if (counter == 20) {
+          if (floatValue >= 0) cfgOmapOutsideFenceDist = floatValue;
       }
       counter++;
       lastCommaIdx = idx;

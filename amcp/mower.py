@@ -227,6 +227,7 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    # 17: iSonarObstacleDist            # in cm
    # 18: iPitchAngleDeg                # in degree ° 
    # 19: fDeltaPitchPwmFactor          # factor to convert from delta pitch (in rad) to duty cycle (255=100%)
+   # 20: oMapOutsideFenceDist          # in m 
 
    # Note: -1 means no change, keep current value
 
@@ -234,9 +235,9 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    if iOpType == OP_MOW: iEnableMowMotor = config.enableMowMotor
    else: iEnableMowMotor = 0
    
-   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:.2f},{:.2f},{:.2f}', 
+   cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:.2f},{:.2f},{:.2f},{:.2f}', 
       iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
-      iObstacleMap, config.oMapDistThreshold, config.oMapSlowSpeed, config.pitchThresholdDeg)     
+      iObstacleMap, config.oMapDistThreshold, config.oMapSlowSpeed, config.pitchThresholdDeg, config.oMapOutsideFenceDist)     
    udp.ExecCmd(cmd)
 
 def StartMowing(fSpeed=0.5, iFixTimeout=0, iBumperEnable=1, iFrontWheelDrive=0, iMlLineTracking=0, iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
