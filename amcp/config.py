@@ -7,7 +7,7 @@ pitchThresholdDeg = 40.0    # motor stops immediately if pitch is higher than th
 # Obstacle map configuration
 oMapOutsideFenceDist = 1.5                         # distance from fence to odd waypoints in m
 oMapSlowSpeed = 0.25                               # slow speed close to fence for obstacle maps
-oMapDistThreshold = oMapOutsideFenceDist + 0.4     # slow speed distance threshold in m for obstacle maps
+oMapDistThreshold = oMapOutsideFenceDist + 1.0     # slow speed distance threshold in m for obstacle maps
 
 # 0 means that mow motor is temporarily disabled for tests
 enableMowMotor = 1

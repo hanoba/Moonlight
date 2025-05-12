@@ -1068,10 +1068,21 @@ void triggerObstacle(ObstacleType obstacleType)
     //if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
 
     bool isObstacleMap = maps.mapType == MT_OBSTACLE || maps.mapType == MT_OBSTACLE_IGNORE_GPS;
+    static unsigned long lastFreeWheelTime = 0;
+    unsigned long currentTime;
 
     switch (obstacleType)
     {
     case OT_FREE_WHEEL:
+        currentTime = millis();
+        if (isObstacleMap && currentTime > lastFreeWheelTime + 5000)
+        {
+            lastFreeWheelTime = currentTime;
+            // inform LineTracker that obstacle has been hit
+            if (maps.isObstacleMowPoint()) maps.obstacleTargetReached = true;
+            break;
+        }
+        lastFreeWheelTime = currentTime;
         stateSensor = SENS_BUMPER;
         setOperation(OP_ERROR);
         break;
