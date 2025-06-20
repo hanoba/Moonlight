@@ -53,6 +53,7 @@ bool UBLOX::configure(){
 #endif
   }     
   CONSOLE.println(F("GPS receiver found!"));
+#if 1
   const int usbNtripEnabled = 0;
   int timeout = 2000;
   int idx = 0;
@@ -107,7 +108,8 @@ bool UBLOX::configure(){
               // ----- uart2 messages 
               setValueSuccess &= configGPS.newCfgValset8(0x209100a8, 0, VAL_LAYER_RAM); // CFG-MSGOUT-NMEA_ID_DTM_UART2  (off)
               setValueSuccess &= configGPS.addCfgValset8(0x209100df, 0); // CFG-MSGOUT-NMEA_ID_GBS_UART2   (off)
-              setValueSuccess &= configGPS.addCfgValset8(0x209100bc, 60); // CFG-MSGOUT-NMEA_ID_GGA_UART2  (every 60 solutions)
+              //HB setValueSuccess &= configGPS.addCfgValset8(0x209100bc, 60); // CFG-MSGOUT-NMEA_ID_GGA_UART2  (every 60 solutions)
+              setValueSuccess &= configGPS.addCfgValset8(0x209100bc, 0); // CFG-MSGOUT-NMEA_ID_GGA_UART2   (off)
               setValueSuccess &= configGPS.addCfgValset8(0x209100cb, 0); // CFG-MSGOUT-NMEA_ID_GLL_UART2   (off)
               setValueSuccess &= configGPS.addCfgValset8(0x209100b7, 0); // CFG-MSGOUT-NMEA_ID_GNS_UART2   (off)
               setValueSuccess &= configGPS.addCfgValset8(0x209100d0, 0); // CFG-MSGOUT-NMEA_ID_GRS_UART2   (off)
@@ -127,10 +129,12 @@ bool UBLOX::configure(){
               setValueSuccess &= configGPS.addCfgValset8(0x10750002, 0); // CFG-UART2INPROT-NMEA       (off)
               setValueSuccess &= configGPS.addCfgValset8(0x10750004, 1); // CFG-UART2INPROT-RTCM3X     (on)
               setValueSuccess &= configGPS.addCfgValset8(0x10760001, 0); // CFG-UART2OUTPROT-UBX       (off)
-              setValueSuccess &= configGPS.addCfgValset8(0x10760002, 1); // CFG-UART2OUTPROT-NMEA      (on) 
+              //HB setValueSuccess &= configGPS.addCfgValset8(0x10760002, 1); // CFG-UART2OUTPROT-NMEA      (on) 
+              setValueSuccess &= configGPS.addCfgValset8(0x10760002, 0); // CFG-UART2OUTPROT-NMEA      (off) 
               setValueSuccess &= configGPS.addCfgValset8(0x10760004, 0); // CFG-UART2OUTPROT-RTCM3X    (off)
               // uart2 baudrate  (Xbee/NTRIP)
-              setValueSuccess &= configGPS.addCfgValset32(0x40530001, 115200); // CFG-UART2-BAUDRATE        
+              //HB setValueSuccess &= configGPS.addCfgValset32(0x40530001, 115200); // CFG-UART2-BAUDRATE        
+              setValueSuccess &= configGPS.sendCfgValset32(0x40530001, 115200, timeout); // CFG-UART2-BAUDRATE        
           }
           else if (idx == 5) 
           {
@@ -234,7 +238,7 @@ bool UBLOX::configure(){
       return false;
   }
 
-#if 0   
+#else  
   bool setValueSuccess = true;
   
   CONSOLE.print(F("ublox f9p: sending GPS rover configuration..."));
