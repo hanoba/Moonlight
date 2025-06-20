@@ -1353,10 +1353,11 @@ void outputConsole()
 	 gps_height = max(gps_height,-99.99);
 	 PRINT(" %6.2f", gps_height);
     
-         if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(F(" INVAL")); }
-	 else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(F(" FLOAT")); }
-	 else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(F(" FIX  ")); }
-    else                                         { CONSOLE.print(F(" ???  ")); }
+     //if (gps.solution == UBLOX::SOL_INVALID) { CONSOLE.print(F(" INVAL")); }
+	 //else if (gps.solution == UBLOX::SOL_FLOAT)   { CONSOLE.print(F(" FLOAT")); }
+	 //else if (gps.solution == UBLOX::SOL_FIXED)   { CONSOLE.print(F(" FIX  ")); }
+     //else                                         { CONSOLE.print(F(" ???  ")); }
+     PRINT(" %s", gps.GetGpsSolution());
 
     float age = (millis() - gps.dgpsAge) / 1000.0;
     age = min(age, 999.00);
@@ -1404,3 +1405,4 @@ void outputConsole()
   }
 }
 #endif
+

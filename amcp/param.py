@@ -8,5 +8,5 @@ bumperEnable='1'
 frontWheelDrive='0'
 mlLineTracking='1'
 enableTiltDetection='0'
-gpsConfigFilter='10,10,30'
-lastMapIndex=11
+gpsConfigFilter='10,5,15'
+lastMapIndex=14

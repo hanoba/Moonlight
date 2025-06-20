@@ -1,6 +1,6 @@
 @echo off
 set BOSSAC=C:\Users\Harald\AppData\Local\Arduino15\packages\arduino\tools\bossac\1.6.1-arduino/bossac.exe
-set BIN=Moonlight.V55.bin
+set BIN=Moonlight.ino_V93.bin
 set PORT=COM4
 echo Erzwinge Reset durch oeffnen/schliessen mit 1200 bps auf dem Port %PORT%
 mode %PORT%:1200

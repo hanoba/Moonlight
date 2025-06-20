@@ -76,6 +76,8 @@ class UBLOX{
     bool SetGpsConfigFilter(uint8_t minElev, uint8_t nSV, uint8_t minCN0);
     void WarmRestart();
     void ColdRestart();
+    char* GetGpsSolution();
+
   private:
     uint32_t _baud;  	
     HardwareSerial* _bus;
@@ -97,6 +99,7 @@ class UBLOX{
     long unpack_int8(int offset);
     long unpack(int offset, int size);
     void parse(int b);	  	    
+    void CountGpsSolutions(UBLOX::SolType solution);
 };
 
 #endif
