@@ -3,7 +3,8 @@
 
 import os
 import sys
-from datetime import date;
+from datetime import date
+from config import GetLogFileName
 
 def ZeichneBalkendiagramm(uhrzeit, x, symbol='█', breite=50):
     max_wert = 100  # max(daten.values())
@@ -31,7 +32,7 @@ def main():
    elif argc==3: 
       ProcessOption(sys.argv[1])
       datum=sys.argv[2]
-   dateiname = f"/home/pi/amcp/log/{datum}-amcp-log.txt"
+   dateiname = GetLogFileName()
    if not os.path.exists(dateiname):
       print(f"File not found: {dateiname}")
       sys.exit()
