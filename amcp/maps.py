@@ -301,8 +301,8 @@ def CreateVmapWaypoints(rectangle, n):
     laneDistanceCb = Lcb / (numLanes - 1)
     laneDistanceDa = Lda / (numLanes - 1)
 
-    print(f"{numLanesCb=}")
-    print(f"{numLanesDa=}")
+    print(f"numLanesCb={numLanesCb}")
+    print(f"numLanesDa={numLanesDa}")
     print("laneDistanceCb=", laneDistanceCb/scalingFactor)
     print("laneDistanceDa=", laneDistanceDa/scalingFactor)
 
@@ -354,8 +354,8 @@ def CreateBumperWaypoints(rectangle, n):
     laneDistanceCb = Lcb / (numLanes - 1)
     laneDistanceDa = Lda / (numLanes - 1)
 
-    print(f"{numLanesCb=}")
-    print(f"{numLanesDa=}")
+    print(f"numLanesCb={numLanesCb}")
+    print(f"numLanesDa={numLanesDa}")
     print("laneDistanceCb=", laneDistanceCb/scalingFactor)
     print("laneDistanceDa=", laneDistanceDa/scalingFactor)
 

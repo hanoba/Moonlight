@@ -1,3 +1,5 @@
+from datetime import date
+
 # constant configuration parameters that cannot be changed via the amcp GUI
 sonarEnable=0   
 
@@ -17,4 +19,9 @@ enableMowMotor = 1
 dmMesser = 0.25      # in meter
 uLaneOverlap = 0.09  # in meter
 vLaneOverlap = 0.03  # in meter
+
+
+def GetLogFileName():
+   today = date.today()
+   return today.strftime("/home/pi/amcp/log/%Y-%m-%d-amcp-log.txt")
 

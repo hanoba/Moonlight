@@ -15,6 +15,7 @@ NormalMapU = 0
 NormalMapV = 1
 ObstacleMap = 2
 ObstacleMapIG = 3 + 4*DistIgnoreGps
+ObstacleMapIG0 = 3
 
 BackWheelDrive = 0
 FrontWheelDrive = 1
@@ -44,11 +45,11 @@ mapCfg = [
    [  8, NormalMapU,    DefaultDrive,    PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Schuppen/Hang
    [  9, ObstacleMapIG,    FrontWheelDrive, PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus
    [ 10, NormalMapV,    BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Teststrecke
-   [ 11, ObstacleMapIG,   BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
+   [ 11, ObstacleMap,   BackWheelDrive,  PosFix,   BumperDefault, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat vorne
    [ 12, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Terrassenmauer
    [ 13, ObstacleMapIG, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Wald/Schuppen
    [ 14, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Grigelat hinten  
-   [ 15, ObstacleMapIG, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner oben
+   [ 15, ObstacleMap, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Zaun Brunner oben
    [ 16, ObstacleMapIG, BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Bassin
    [ 17, ObstacleMap,   BackWheelDrive,  PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Hinterm Haus/Wald
    [ 18, NormalMapV,    FrontWheelDrive, PosFix,   BumperEnabled, MoonlightTracking, DefaultSpeed ],        # Rhododendron Brunner

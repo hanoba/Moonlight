@@ -9,9 +9,8 @@ from time import sleep
 from datetime import date;
 from datetime import datetime
 import os
-#from msg import PrintGuiMessage
 import version
-#from mower import Ping
+from config import GetLogFileName
 
 logHeadline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map Info    "
 logMessage = " "
@@ -38,7 +37,7 @@ def WriteLog(text, end="\n"):
       text = text[0:i] + "\n"
    #print(time+text, end=str(end), flush=True)
    print(time+text, end='', flush=True)
-   with open(LogFileName, 'a') as f:
+   with open(GetLogFileName(), 'a') as f:
       f.write(time+text)
       f.close
 
@@ -69,10 +68,8 @@ UDPSockRc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDPSockRc.bind(addrRc)
 UDPSockRc.setblocking(0)
 
-
-today = date.today()
-LogFileName = today.strftime("log/%Y-%m-%d-amcp-log.txt")
-print(LogFileName)
+#LogFileName = today.strftime("log/%Y-%m-%d-amcp-log.txt")
+#print(LogFileName)
 
 WriteLog("[udp] waiting for messages (port: " + str(port) + ") ...")
 
