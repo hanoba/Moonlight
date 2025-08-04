@@ -32,11 +32,12 @@ def main():
    elif argc==3: 
       ProcessOption(sys.argv[1])
       datum=sys.argv[2]
-   dateiname = GetLogFileName()
+   dateiname = GetLogFileName(datum)
    if not os.path.exists(dateiname):
       print(f"File not found: {dateiname}")
       sys.exit()
 
+   print(dateiname)
    fixTime = []
    fixValue = []
    
