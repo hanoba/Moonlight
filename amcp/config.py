@@ -1,5 +1,6 @@
 from datetime import date
 import os
+import getpass
 
 # constant configuration parameters that cannot be changed via the amcp GUI
 sonarEnable=0   
@@ -24,7 +25,7 @@ vLaneOverlap = 0.03  # in meter
 
 def GetLogFileName():
    today = date.today()
-   import os
-   if os.name=="posix": return today.strftime("/home/pi/logs/%Y-%m-%d-amcp-log.txt")
+
+   if os.name=="posix": return today.strftime(f"/home/{getpass.getuser()}/logs/%Y-%m-%d-amcp-log.txt")
    return today.strftime("log/%Y-%m-%d-amcp-log.txt")
 
