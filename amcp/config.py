@@ -23,9 +23,9 @@ uLaneOverlap = 0.09  # in meter
 vLaneOverlap = 0.03  # in meter
 
 
-def GetLogFileName():
-   today = date.today()
+def GetLogFileName(today):
+   #today = date.today()
 
-   if os.name=="posix": return today.strftime(f"/home/{getpass.getuser()}/logs/%Y-%m-%d-amcp-log.txt")
-   return today.strftime("log/%Y-%m-%d-amcp-log.txt")
+   if os.name=="posix": return f"/home/{getpass.getuser()}/logs/{today}-amcp-log.txt"
+   return f"log/{today}-amcp-log.txt"
 

@@ -7,6 +7,7 @@ import time
 import requests
 import json
 import os
+from datetime import date
 from config import GetLogFileName
 
 
@@ -56,13 +57,14 @@ def SetDockingStation(onFlag):
 
 SOCKET_PATH = "/tmp/amlog.sock"
 
+today =  date.today().strftime("%Y-%m-%d")
 argc = len(sys.argv)
 if argc==3 and sys.argv[1]=="setds":
    if sys.argv[2]=="off": SetDockingStation(False)
    elif sys.argv[2]=="on": SetDockingStation(True)
    else: PrintHelpText();
 if argc==2 and sys.argv[1]=="log":
-   os.system(f"tail -f {GetLogFileName()}")
+   os.system(f"tail -f {GetLogFileName(today)}")
 elif argc > 1: 
    cmdLine = sys.argv[0]
    for i in range(1, argc):
@@ -74,6 +76,6 @@ elif argc > 1:
       result = response.decode()
       if result=="ERROR": PrintHelpText()
       else:
-         os.system(f"tail -n 36 {GetLogFileName()}")
+         os.system(f"tail -n 36 {GetLogFileName(today)}")
          print(result)
 else: PrintHelpText()
