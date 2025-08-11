@@ -1,0 +1,15 @@
+[Unit]
+Description=amserver
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/Moonlight/amcp/amserver.py
+Restart=always
+User=pi
+WorkingDirectory=/home/pi/Moonlight/amcp
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
