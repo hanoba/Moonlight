@@ -55,6 +55,7 @@ def SetDockingStation(onFlag):
         print(resp)
         print(resp.content)
 
+
 SOCKET_PATH = "/tmp/amlog.sock"
 
 today =  date.today().strftime("%Y-%m-%d")
@@ -63,7 +64,7 @@ if argc==3 and sys.argv[1]=="setds":
    if sys.argv[2]=="off": SetDockingStation(False)
    elif sys.argv[2]=="on": SetDockingStation(True)
    else: PrintHelpText();
-if argc==2 and sys.argv[1]=="log":
+elif argc==2 and sys.argv[1]=="log":
    os.system(f"tail -f {GetLogFileName(today)}")
 elif argc > 1: 
    cmdLine = sys.argv[0]
