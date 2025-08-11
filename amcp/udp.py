@@ -37,7 +37,7 @@ def WriteLog(text, end="\n"):
       text = text[0:i] + "\n"
    #print(time+text, end=str(end), flush=True)
    print(time+text, end='', flush=True)
-   with open(GetLogFileName(), 'a') as f:
+   with open(GetLogFileName(date.today().strftime("%Y-%m-%d")), 'a') as f:
       f.write(time+text)
       f.close
 
