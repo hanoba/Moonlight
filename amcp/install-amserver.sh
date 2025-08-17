@@ -1,5 +1,1 @@
-sudo cp amserver.service /etc/systemd/system/
-sudo systemctl daemon-reload      # oder "daemon-reexec", wenn completter Neustart von systemd erforderlich ist
-sudo systemctl enable amserver
-sudo systemctl start amserver
-
+sudo ln -s /home/harald/Moonlight/amcp/amserver.service /etc/systemd/system/amserver.service
