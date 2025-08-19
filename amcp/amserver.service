@@ -1,12 +1,14 @@
 [Unit]
 Description=amserver
 After=network.target
+After=systemd-timesyncd.service
+Requires=systemd-timesyncd.service
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/Moonlight/amcp/amserver.py
+ExecStart=/usr/bin/python3 /home/harald/Moonlight/amcp/amserver.py
 Restart=always
-User=pi
-WorkingDirectory=/home/pi/Moonlight/amcp
+User=harald
+WorkingDirectory=/home/harald/Moonlight/amcp
 StandardOutput=null
 StandardError=journal
 
