@@ -31,6 +31,7 @@ def PrintHelpText():
    print("       amcmd td                       # ToggleUseGPSfloatForDeltaEstimation")
    print("       amcmd tp                       # ToggleUseGPSfloatForPosEstimation")
    print("       amcmd reboot                   # Reboot and power-cycle Ardumower")
+   print("       amcmd shutdown                 # Switch docking station and Ardumower off")
    print("       amcmd start                    # StartMowing")
    print("       amcmd stop                     # StopMowing (IDLE mode)")
    print("       amcmd dock                     # Go to docking station")
@@ -85,6 +86,12 @@ elif argc==2 and sys.argv[1]=="reboot":
    print("wait...")
    time.sleep(3)
    SetDockingStation(True)
+elif argc==2 and sys.argv[1]=="shutdown":
+   print("Switching off docking station and Ardumower.")
+   SetDockingStation(False)
+   print("wait...")
+   time.sleep(3)
+   ExecCmd("amcmd off")
 elif argc==2 and sys.argv[1]=="log":
    os.system(f"tail -f {GetLogFileName(today)}")
 elif argc > 1: 
