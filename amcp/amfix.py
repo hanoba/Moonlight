@@ -49,6 +49,10 @@ def main():
                continue  # Leere Zeilen überspringen
 
            felder = zeile.split()  # Standardmäßig nach beliebigen Leerzeichen aufteilen
+           
+           # detect power-cycle and reboot
+           if len(felder) > 2 and felder[1]=="ublox" and felder[2]=="f9p:":
+              print(f"{felder[0][0:5]} power-cycle and reboot")
 
            if len(felder) > 16 and felder[1][0]==":":
                fixTime.append(felder[0][0:5])

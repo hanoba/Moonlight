@@ -30,6 +30,8 @@ def PrintHelpText():
    print("       amcmd tb                       # ToggleBluetoothLogging")
    print("       amcmd td                       # ToggleUseGPSfloatForDeltaEstimation")
    print("       amcmd tp                       # ToggleUseGPSfloatForPosEstimation")
+   print("       amcmd reboot                   # Reboot and power-cycle Ardumower")
+   print("       amcmd shutdown                 # Switch docking station and Ardumower off")
    print("       amcmd start                    # StartMowing")
    print("       amcmd stop                     # StopMowing (IDLE mode)")
    print("       amcmd dock                     # Go to docking station")
@@ -55,21 +57,7 @@ def SetDockingStation(onFlag):
         print(resp)
         print(resp.content)
 
-
-SOCKET_PATH = "/tmp/amlog.sock"
-
-today =  date.today().strftime("%Y-%m-%d")
-argc = len(sys.argv)
-if argc==3 and sys.argv[1]=="setds":
-   if sys.argv[2]=="off": SetDockingStation(False)
-   elif sys.argv[2]=="on": SetDockingStation(True)
-   else: PrintHelpText();
-elif argc==2 and sys.argv[1]=="log":
-   os.system(f"tail -f {GetLogFileName(today)}")
-elif argc > 1: 
-   cmdLine = sys.argv[0]
-   for i in range(1, argc):
-      cmdLine += " " + sys.argv[i]
+def ExecCmd(cmdLine):
    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
       client.connect(SOCKET_PATH)
       client.sendall(cmdLine.encode("utf-8"))
@@ -79,4 +67,36 @@ elif argc > 1:
       else:
          os.system(f"tail -n 36 {GetLogFileName(today)}")
          print(result)
+
+
+SOCKET_PATH = "/tmp/amlog.sock"
+
+today =  date.today().strftime("%Y-%m-%d")
+argc = len(sys.argv)
+if argc==3 and sys.argv[1]=="setds":
+   if sys.argv[2]=="off": SetDockingStation(False)
+   elif sys.argv[2]=="on": SetDockingStation(True)
+   else: PrintHelpText();
+elif argc==2 and sys.argv[1]=="reboot":
+   print("Rebooting Ardumower with power-cycle. Ardumower must be in docking station!")
+   SetDockingStation(False)
+   print("wait...")
+   time.sleep(3)
+   ExecCmd("amcmd off")
+   print("wait...")
+   time.sleep(3)
+   SetDockingStation(True)
+elif argc==2 and sys.argv[1]=="shutdown":
+   print("Switching off docking station and Ardumower.")
+   SetDockingStation(False)
+   print("wait...")
+   time.sleep(3)
+   ExecCmd("amcmd off")
+elif argc==2 and sys.argv[1]=="log":
+   os.system(f"tail -f {GetLogFileName(today)}")
+elif argc > 1: 
+   cmdLine = sys.argv[0]
+   for i in range(1, argc):
+      cmdLine += " " + sys.argv[i]
+   ExecCmd(cmdLine)
 else: PrintHelpText()
