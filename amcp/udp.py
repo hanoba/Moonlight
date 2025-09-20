@@ -11,6 +11,7 @@ from datetime import datetime
 import os
 import version
 from config import GetLogFileName
+from playback import PlaybackMode, PlaybackReadLine
 
 logHeadline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map Info    "
 logMessage = " "
@@ -88,6 +89,8 @@ print(f"Client IP address: {clientAddr}")
 # Receive message if available
 def ReceiveRaw():
    global clientAddr
+   if PlaybackMode(): return PlaybackReadLine()
+
    msg = ""
    try: 
       (data, clientAddr) = UDPSock.recvfrom(bufsize)

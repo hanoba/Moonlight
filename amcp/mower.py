@@ -27,6 +27,7 @@ import config
 from udp import PrintGuiMessage
 from datetime import datetime
 from time import sleep
+from playback import PlaybackMode
 
 currentMapChecksum = 0
 showCurrentWayPoints = False
@@ -191,7 +192,7 @@ def ToggleKippschutz():
    udp.ExecCmd(CMD_ToggleKippschutz)
 
 def Ping():
-   udp.ExecCmd(CMD_Ping)
+   if not PlaybackMode(): udp.ExecCmd(CMD_Ping)
    
 def ReadMapFromSdCard(mapId):
    #udp.send(str.format('AT+R,{:d}', mapId))

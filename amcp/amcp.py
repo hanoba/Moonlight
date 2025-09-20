@@ -13,6 +13,7 @@ from version import versionString
 import pygame_menu
 #from msg import guiMessage
 from udp import PrintGuiMessage, GetGuiMessage
+from playback import PlaybackHandleKey
 
 
 def HideWindow():
@@ -20,6 +21,7 @@ def HideWindow():
    
 def ShowWindow():
    screen = pygame.display.set_mode((maps.screenX, maps.screenY), flags=pygame.SHOWN)
+
 
 LEFT = 1
 RIGHT = 3
@@ -406,7 +408,9 @@ def ArdumowerControlProgram():
                if event.key == pygame.K_ESCAPE:
                   CmdShowHideMainMenu()
                elif not menu.is_enabled():
-                  if event.key == pygame.K_RIGHT and editMode:
+                  if PlaybackHandleKey(event.key):
+                     pass
+                  elif event.key == pygame.K_RIGHT and editMode:
                      (x,y) = maps.perimeters[currentMapIndex][r]
                      maps.perimeters[currentMapIndex][r] = (x+1,y)
                      PrintDistance()
