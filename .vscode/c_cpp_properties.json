@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "name": "Arduino Due",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/system/libsam",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/system/CMSIS/CMSIS/Include/",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/system/CMSIS/Device/ATMEL/",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/cores/arduino",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/variants/arduino_due_x",
+        "C:/Program Files (x86)/Arduino/libraries/SD/src",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/cores/arduino",
+        "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/hardware/sam/1.6.12/variants/arduino_due_x",
+        "C:/DriveX/hba/2-Dokumente/Projekte/Roboter/Moonlight"
+      ],
+      "defines": [
+        "ARDUINO=10819",
+        "ARDUINO_SAM_DUE",
+        "ARDUINO_ARCH_SAM"
+      ],
+      "compilerPath": "C:/Users/Harald/AppData/Local/Arduino15/packages/arduino/tools/gcc-arm-none-eabi/4.8.3-2014q1/bin/arm-none-eabi-gcc.exe",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "gcc-arm"
+    }
+  ],
+  "version": 4
+}
