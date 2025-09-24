@@ -24,9 +24,6 @@ float statControlCycleTime = 0;
 float statMaxControlCycleTime = 0;
 
 
-//HB New map control
-//static uint8_t currentMapIndex = 0;
-//static bool writeMapFlag = false;
 bool cfgSmoothCurves = SMOOTH_CURVES_DEFAULT;
 bool cfgEnablePathFinder = ENABLE_PATH_FINDER_DEFAULT;
 bool cfgMoonlightLineTracking = MOONLIGHT_LINE_TRACKING_DEFAULT;
@@ -35,8 +32,6 @@ bool cfgEnableTiltDetection = ENABLE_TILT_DETECTION_DEFAULT;
 int cfgSonarObstacleDist = 0;  //HB cm (0=disabled) was 10
 int cfgSonarNearDist = 0;      //HB cm (0=disabled) was 60
 float cfgSonarNearSpeed = 0.2;
-//float cfgDeltaPitchPwmFactor = 0.5*255 / (PI/2);	   // Kippschutz: Factor to convert from delta pitch (in rad) to duty cycle (255=100%)
-//float cfgPitchPwmFactor = 255. * 180. / PI / 45.0;	   // Kippschutz: Factor to convert from pitch (in rad) to duty cycle (255=100%)
 float cfgPitchThresholdRad = 30. * PI / 180.0;
 float cfgObstacleMapDistThreshold = 1.5;       // Slow speed distance threshold for ObstacleMowPoint
 float cfgAngularSpeed = 0.5;
@@ -61,42 +56,6 @@ void cmdAnswer(String s)
    cmdResponse = s;
 }
 
-//void WriteMap(String cmd)
-//{
-//   if (!writeMapFlag) return;
-//
-//   char mapFileName[32];
-//   sprintf(mapFileName, "MAP%d.TXT", maps.mapID);
-//   SDFile mapFile;
-//
-//   if (cmd == "")
-//   {
-//      CONSOLE.print(F("Create map file "));
-//      CONSOLE.println(mapFileName);
-//      SD.remove(mapFileName);
-//      return;
-//   }
-//   else
-//   {
-//      mapFile = SD.open(mapFileName, FILE_WRITE);
-//      if (mapFile)
-//      {
-//         const int BUF_SIZE = 128;
-//         char buf[BUF_SIZE];
-//
-//         cmd.toCharArray(buf, BUF_SIZE-2);
-//         int i = strlen(buf);
-//         buf[i++] = 13;
-//         buf[i++] = 10;
-//         buf[i] = 0;
-//         mapFile.write(buf);
-//         mapFile.flush();
-//         mapFile.close();
-//         return;
-//      }
-//   }
-//   CONSOLE.println(F("=ERROR opening map file for writing"));
-//}
 
 // Get/set data/time of the RTC
 void cmdRtc(String cmd)
@@ -179,53 +138,6 @@ static void cmdReadMapFile(String cmd)
       maps.mapID = mapId;
       maps.load(fileName);
       mapCheckSum = maps.mapCRC;
-      //HB CONSOLE.print(F("=Loading map from file "));
-      //HB CONSOLE.println(fileName);
-      //HB 
-      //HB udpSerial.DisableLogging();
-      //HB SDFile dataFile = SD.open(fileName);
-      //HB 
-      //HB // if the file is available, read it:
-      //HB if (dataFile)
-      //HB {
-      //HB    const bool NO_CHECKSUM_CHECK = false;
-      //HB    const int LINE_SIZE = 256;
-      //HB    char line[LINE_SIZE];
-      //HB    maps.mapID = mapId;
-      //HB    int i = 0;
-      //HB    while (dataFile.available())
-      //HB    {
-      //HB       char ch = dataFile.read();
-      //HB       //CONSOLE.write(ch);
-      //HB       if (ch != 10)
-      //HB       {
-      //HB          if (ch == 13 || i == LINE_SIZE - 1)
-      //HB          {
-      //HB             line[i] = 0;
-      //HB             processCmd(NO_CHECKSUM_CHECK, line);
-      //HB             i = 0;
-      //HB             watchdogReset();
-      //HB          }
-      //HB          else
-      //HB          {
-      //HB             line[i++] = ch;
-      //HB          }
-      //HB       }
-      //HB    }
-      //HB    if (i)
-      //HB    {
-      //HB       line[i] = 0;
-      //HB       processCmd(NO_CHECKSUM_CHECK, line);
-      //HB    }
-      //HB    mapCheckSum = maps.mapCRC;
-      //HB }
-      //HB else 
-      //HB {
-      //HB    CONSOLE.print(F("=error opening file "));
-      //HB    CONSOLE.println(fileName);
-      //HB }
-      //HB dataFile.close();
-      //HB udpSerial.EnableLogging();
    }
    String s = F("R,");
    s += mapCheckSum;
@@ -266,7 +178,8 @@ void cmdControl(String cmd)
       } else if (counter == 7){
           if (intValue > 0) maps.skipNextMowingPoint();
       } else if (counter == 8){
-          if (intValue >= 0) sonar.enabled = (intValue == 1);
+          //if (intValue >= 0) sonar.enabled = (intValue == 1);
+          if (intValue >= 0) gps.gpsFixRunLengthTheshold = intValue;
       } else if (counter == 9) {  // bBumperEnable
           if (intValue == 0) cfgBumperEnable = false; 
           if (intValue == 1) cfgBumperEnable = true; 
@@ -1363,8 +1276,8 @@ void outputConsole()
     age = min(age, 999.00);
     age = max(age,   0.00);
     PRINT(" %5.1f", age);
-    PRINT(" %-2d", gps.numSVdgps)
-    PRINT("/%2d", gps.numSV)
+    PRINT(" %2d", gps.numSVdgps)
+    PRINT("/%-2d", gps.numSV)
     PRINT(" %4.0f", motor.motorLeftSenseLP*1000.);
     PRINT(" %4.0f", motor.motorRightSenseLP*1000.);
     PRINT(" %4.0f", motor.motorMowSenseLP*1000.);

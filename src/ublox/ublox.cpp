@@ -369,6 +369,7 @@ void UBLOX::begin()
   this->chksumErrorCounter = 0;
   this->dgpsChecksumErrorCounter = 0;
   this->dgpsPacketCounter = 0;
+  this->gpsFixRunLengthTheshold = 25;
 	// begin the serial port for uBlox	
   _bus->begin(_baud);
   if (GPS_CONFIG){
@@ -769,13 +770,24 @@ void UBLOX::run()
 static uint8_t cntGpsFix;
 static uint8_t cntGpsFloat;
 static uint8_t cntGpsInvalid;
+static uint32_t cntGpsFixRunLength;
 
 
 void UBLOX::CountGpsSolutions(SolType solution)
 {
     cntGpsInvalid += solution == SOL_INVALID;
     cntGpsFloat += solution == SOL_FLOAT;
-    cntGpsFix += solution == SOL_FIXED;
+    if (solution == SOL_FIXED)
+    {
+        cntGpsFix++;
+        cntGpsFixRunLength++;
+    }
+    else cntGpsFixRunLength = 0;
+}
+
+bool UBLOX::IsGpsFixReliable()
+{
+    return cntGpsFixRunLength >= gpsFixRunLengthTheshold;
 }
 
 // returns the GPS solution that appeared most often since the last call to this function.

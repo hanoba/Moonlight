@@ -11,9 +11,8 @@ import param
 from datetime import datetime
 from version import versionString
 import pygame_menu
-#from msg import guiMessage
 from udp import PrintGuiMessage, GetGuiMessage
-from playback import PlaybackHandleKey
+from playback import PlaybackHandleKey, PlaybackMode
 
 
 def HideWindow():
@@ -260,7 +259,8 @@ screen = pygame.display.set_mode((maps.screenX, maps.screenY))
 
 # Titel für Fensterkopf
 #pygame.display.set_caption("ArduMower Control Program")
-pygame.display.set_caption(versionString)
+if PlaybackMode: pygame.display.set_caption(f"{versionString} - Playback Mode")
+else: pygame.display.set_caption(versionString)
 
 gartenImg = pygame.image.load("garten-google-maps-zoom.png")
 
@@ -396,6 +396,7 @@ def ArdumowerControlProgram():
    # Init heatmap
    heatmap.CreateHeatMap()
    DrawHeatmapFlag = False
+   if PlaybackMode: CmdShowHideMainMenu()
    
    while programActive:
       # Überprüfen, ob Nutzer eine Aktion durchgeführt hat

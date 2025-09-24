@@ -27,7 +27,7 @@
 
 // 168 = Sunray firmware version used as baseline
 // .XX = Moonlight firmware version
-#define VER "Ardumower Moonlight, V168.95 HB 2025-06-20"
+#define VER "Ardumower Moonlight, V168.96 HB 2025-09-22"
 
 #define CHECK(a,b) if (a==0. && b==0.) CONSOLE.println(String(__FILE__) + " " + String(__LINE__)); 
 
@@ -43,8 +43,6 @@ extern float cfgSlowSpeedObstacleMap;
 extern int cfgSonarNearDist;
 extern int cfgSonarObstacleDist;
 extern float cfgSonarNearSpeed;
-//extern float cfgDeltaPitchPwmFactor;
-//extern float cfgPitchPwmFactor;
 extern float cfgPitchThresholdRad;
 extern float cfgObstacleMapDistThreshold;
 extern int numKippSchutzEvents;

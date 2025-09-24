@@ -1018,7 +1018,7 @@ void computeRobotState()
           lastPosN = posN;
           lastPosE = posE;
       } 
-      if (gps.solution == UBLOX::SOL_FIXED && useGps)
+      if (gps.solution == UBLOX::SOL_FIXED && useGps && gps.IsGpsFixReliable())
       {
           // fix
           lastFixTime = millis();
@@ -1063,10 +1063,6 @@ bool robotShouldMove(){
 void triggerObstacle(ObstacleType obstacleType)
 {
     statMowObstacles++;
-    //CONSOLE.print(F("=triggerObstacle "));
-    //CONSOLE.println(statMowObstacles);
-    //if ((OBSTACLE_AVOIDANCE) && (maps.wayMode != WAY_DOCK))
-
     bool isObstacleMap = maps.mapType == MT_OBSTACLE || maps.mapType == MT_OBSTACLE_IGNORE_GPS;
     static unsigned long lastFreeWheelTime = 0;
     unsigned long currentTime;
@@ -1116,18 +1112,6 @@ void triggerObstacle(ObstacleType obstacleType)
     case OT_SONAR:
         break;
     }
-
-    // handle other map types
-    //if (cfgBumperEnable && maps.wayMode == WAY_MOW)
-    //{
-    //    driveReverseStopTime = millis() + 3000;
-    //}
-    //else 
-    //{ 
-    //    stateSensor = SENS_OBSTACLE;
-    //    setOperation(OP_ERROR);
-    //    buzzer.sound(SND_ERROR, true);        
-    //}
 }
 
 

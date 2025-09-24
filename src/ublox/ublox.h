@@ -68,6 +68,9 @@ class UBLOX{
     unsigned long ttffValue;
     unsigned long ttffStart;
 
+    //HB GPS fix only considered as "good" if there were 25 consecutive fixes before
+    int gpsFixRunLengthTheshold; 
+
     
     UBLOX(HardwareSerial& bus,uint32_t baud);
     void begin();
@@ -77,6 +80,7 @@ class UBLOX{
     void WarmRestart();
     void ColdRestart();
     char* GetGpsSolution();
+    bool IsGpsFixReliable();
 
   private:
     uint32_t _baud;  	

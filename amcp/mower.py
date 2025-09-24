@@ -192,10 +192,9 @@ def ToggleKippschutz():
    udp.ExecCmd(CMD_ToggleKippschutz)
 
 def Ping():
-   if not PlaybackMode(): udp.ExecCmd(CMD_Ping)
+   udp.ExecCmd(CMD_Ping)
    
 def ReadMapFromSdCard(mapId):
-   #udp.send(str.format('AT+R,{:d}', mapId))
    udp.ExecCmd(str.format('AT+R,{:d}', mapId))
    mapIndex = mapId - 1
    expectedCheckSum = maps.ComputeMapChecksum(mapIndex)
@@ -204,7 +203,6 @@ def ReadMapFromSdCard(mapId):
    print("Expected Checksum:", expectedCheckSum)
    if expectedCheckSum == mowerChecksum: PrintGuiMessage("Map successfully loaded from SD Card")
    else: PrintGuiMessage("Maps not synchronized")
-   #udp.ExecCmd(str.format('AT+R,{:d}', mapId))
 
 def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFrontWheelDrive=-1, iMlLineTracking=-1, 
             iMowingPoint=-1, iEnableTiltDetetction=1, fAngular=0.9, iUseFloat=-1, iObstacleMap=-1):
@@ -237,7 +235,7 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    else: iEnableMowMotor = 0
    
    cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:.2f},{:.2f},{:.2f},{:.2f}', 
-      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.sonarEnable, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
+      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.gpsFixRunLengthTheshold, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
       iObstacleMap, config.oMapDistThreshold, config.oMapSlowSpeed, config.pitchThresholdDeg, config.oMapOutsideFenceDist)     
    udp.ExecCmd(cmd)
 

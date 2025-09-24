@@ -13,7 +13,7 @@ import version
 from config import GetLogFileName
 from playback import PlaybackMode, PlaybackReadLine
 
-logHeadline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map Info    "
+logHeadline = "Time     Tctl State  Volt   Ic    Tx     Ty     Sx     Sy     Sd     Gx     Gy     Gd     Gz  SOL     Age  Sat.   Il   Ir   Im Temp Hum Flags Map  WayPts "
 logMessage = " "
 
 guiMessage = version.versionString
@@ -136,11 +136,14 @@ def ReceiveMowerMessage():
          stateDeltaDegree = float(f)
          gpsX = float(fields[n+5])
          gpsY = float(fields[n+6])
-         logMessage = msg[1:len(msg)-2]
+         #logMessage = msg[1:len(msg)-2]
+         logMessage = msg[1:len(msg)].rstrip()
       elif msg[0] == '#':
-         logHeadline = msg[1:len(msg)-2]
+         #logHeadline = msg[1:len(msg)-2]
+         logHeadline = msg[1:len(msg)].rstrip()
       elif msg[0] == '=':
-         PrintGuiMessage(msg[1:len(msg)-2])
+         #PrintGuiMessage(msg[1:len(msg)-2])
+         PrintGuiMessage(msg[1:len(msg)].rstrip())
    return msg
 
 def CheckSum(send_data):
@@ -161,6 +164,7 @@ def close():
   print ("[udp] terminating ...")
   
 def ExecCmd(cmd):
+   if PlaybackMode(): return ""
    sleep(0.1)
    WriteLog("[udp.ExecCmd] " + cmd)
    for transmission in range(3):
