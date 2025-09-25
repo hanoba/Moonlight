@@ -179,7 +179,7 @@ void cmdControl(String cmd)
           if (intValue > 0) maps.skipNextMowingPoint();
       } else if (counter == 8){
           //if (intValue >= 0) sonar.enabled = (intValue == 1);
-          if (intValue >= 0) gps.gpsFixRunLengthTheshold = intValue;
+          if (intValue >= 0) gps.gpsFixRunLengthThreshold = intValue;
       } else if (counter == 9) {  // bBumperEnable
           if (intValue == 0) cfgBumperEnable = false; 
           if (intValue == 1) cfgBumperEnable = true; 

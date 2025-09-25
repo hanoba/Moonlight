@@ -23,7 +23,7 @@ uLaneOverlap = 0.09  # in meter
 vLaneOverlap = 0.03  # in meter
 
 # fix only considered as "good" if there were 25 consecutive fixes before
-gpsFixRunLengthTheshold = 25
+gpsFixRunLengthThreshold = 25
 
 def GetLogFileName(today):
    #today = date.today()

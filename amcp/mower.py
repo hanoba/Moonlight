@@ -235,7 +235,7 @@ def SetOperationType(iOpType, fSpeed=0.25, iFixTimeout=-1, iBumperEnable=-1, iFr
    else: iEnableMowMotor = 0
    
    cmd = str.format('AT+C,{:d},{:d},{:.2f},{:d},0,-1,-1,{:d},{:d},{:d},{:d},{:d},{:d},{:.2f},{:d},{:d},{:.2f},{:.2f},{:.2f},{:.2f}', 
-      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.gpsFixRunLengthTheshold, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
+      iEnableMowMotor, iOpType, fSpeed, iFixTimeout, config.gpsFixRunLengthThreshold, iBumperEnable, iFrontWheelDrive, iMlLineTracking, iMowingPoint, iEnableTiltDetetction, fAngular, iUseFloat, 
       iObstacleMap, config.oMapDistThreshold, config.oMapSlowSpeed, config.pitchThresholdDeg, config.oMapOutsideFenceDist)     
    udp.ExecCmd(cmd)
 
