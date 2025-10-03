@@ -126,8 +126,8 @@ def main(dateiname, argMap, verbose):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Ardumower Logfile Anaylzer")
-    parser.add_argument("files", nargs="*", help="List of logfiles to be processed")
+    parser = argparse.ArgumentParser(description="Ardumower Logfile Anaylzer - Show summary of all mowed maps in one or more logfiles")
+    parser.add_argument("files", nargs="*", help="List of logfiles to be processed (today's logfile is used as default) ")
     parser.add_argument("-m", "--map", help="Search for specific map ", default="*")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 

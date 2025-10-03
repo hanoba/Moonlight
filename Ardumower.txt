@@ -58,6 +58,7 @@
         <File name="amcp\config.py" />
         <File name="amcp\date.py" />
         <File name="amcp\maps.py" />
+        <File name="amcp\mapcfg.py" />
         <File name="amcp\mower.py" />
         <File name="amcp\plan.py" />
         <File name="amcp\send.py" />
@@ -65,7 +66,12 @@
         <File name="amcp\version.py" />
         <File name="amcp\amcmd.bat" />
         <File name="amcp\maps.json" />
-        <File name="amcp\mapcfg.py" />
         <File name="amcp\param.py" />
+    </Project>
+    <Project name="amtools">
+        <File name="amcp\amfix.py" />
+        <File name="amcp\amgrep.py" />
+        <File name="amcp\amloga.py" />
+        <File name="amcp\amserver.py" />
     </Project>
 </NotepadPlus>
