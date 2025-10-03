@@ -97,7 +97,11 @@ def main(dateiname, argMap, verbose):
                         invalCnt = 0
                         floatCnt = 0
                         fixCnt = 0
-                        numErrors = 0
+                        errTot = 0
+                        errMotor = 0
+                        errOdo = 0
+                        errUblox = 0
+                        errFreeWheel = 0
                         mowStartTime = time                        
                         w = wayPoint.split("/")
                         firstWayPoint = w[0]
@@ -113,7 +117,7 @@ def main(dateiname, argMap, verbose):
                         if verbose or lastWayPoint[:2]!="0/":
                             print(f"{datum} {mowStartTime} {map:5} {firstWayPoint:>3}-{lastWayPoint:7} {mowerState:5} Summary: "
                                   f"FIX:{100*fixCnt/solCnt:4.0f}%, FLOAT:{100*floatCnt/solCnt:4.0f}%, INVAL:{100*invalCnt/solCnt:4.0f}%, "
-                                  f"{time}, {TimeDiff(mowStartTime, time)}, {numErrors=}")
+                                  f"{time}, {TimeDiff(mowStartTime, time)}, {errTot} errors (m={errMotor},o={errOdo},u={errUblox},b={errFreeWheel})")
                 oldMowerState = mowerState    
             
             # detect power-cycle and reboot
@@ -122,7 +126,11 @@ def main(dateiname, argMap, verbose):
     
             # detect error messages
             elif ("error" in zeile.lower() or "=BumperFreeWheel" in zeile) and oldMowerState=="MOW" and (map==argMap or argMap=="*"):
-                numErrors += 1
+                errMotor += "motor overload" in zeile
+                errOdo += "odometry" in zeile
+                errUblox += "ublox chka" in zeile
+                errFreeWheel += "=BumperFreeWheel" in zeile
+                errTot += 1
                 if (verbose): print(f"{datum} {time} {map:5} {zeile}")
     
 
