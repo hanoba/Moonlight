@@ -10,8 +10,8 @@ from config import GetLogFileName
 def Usage():
     print("Usage: amgrep [--date=yyyy-mm-dd] grepArgs...")
     print("\nExamples:")
-    print("    amgrep Moonlight     # find Ardumower reboots")
-    print("    amgrep TTFF          # find time to first fix")
+    print("    amgrep f9p:     # find Ardumower reboots")
+    print("    amgrep TTFF     # find time to first fix")
 
 def main():
     i=0;

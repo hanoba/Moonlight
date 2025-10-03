@@ -42,11 +42,13 @@ iSol = 15
 iSat = 17
 iMap = 24
 iWayPoint = 25
+iMax = 25
 
 
 def main(dateiname, argMap, verbose):    
     #print(f"{dateiname} {argMap=}")
-    datum = dateiname[:10]
+    datum =  os.path.basename(dateiname)[:10]
+    if verbose: print(dateiname)
     
     map = "MAP?"
     # Datei zeilenweise öffnen und lesen alle relevanten zeilen
@@ -62,7 +64,7 @@ def main(dateiname, argMap, verbose):
             if numFelder>1 and felder[1]=="[am]": felder.pop(1)  # remove "[am]" in amcmd logs (logs from amserver.py do not have this prefix)
     
             # fix problem with blanks in satellite display. Convert "0 /30" into "0/30" and "0 / 0" to "0/0"
-            if numFelder >= 25 and felder[1][0]==":":
+            if numFelder > iMax and felder[1][0]==":":
                 sat = felder[iSat]
                 if len(sat)==1:
                     felder.pop(iSat)
@@ -76,7 +78,7 @@ def main(dateiname, argMap, verbose):
             time = felder[iTime]
             
             # detect periodic log message
-            if numFelder >= 25 and felder[1][0]==":":
+            if numFelder > iMax and felder[1][0]==":":
                 mowerState = felder[iState]
                 solution = felder[iSol][:2]
                 wayPoint = felder[iWayPoint]
@@ -109,9 +111,9 @@ def main(dateiname, argMap, verbose):
                 elif oldMowerState=="MOW":
                     if argMap=="*" or argMap==map:
                         if verbose or lastWayPoint[:2]!="0/":
-                            print(f"{datum} {time} {map:5} {firstWayPoint:>3}-{lastWayPoint:7} {mowerState:5} Summary: "
+                            print(f"{datum} {mowStartTime} {map:5} {firstWayPoint:>3}-{lastWayPoint:7} {mowerState:5} Summary: "
                                   f"FIX:{100*fixCnt/solCnt:4.0f}%, FLOAT:{100*floatCnt/solCnt:4.0f}%, INVAL:{100*invalCnt/solCnt:4.0f}%, "
-                                  f"{mowStartTime}, {TimeDiff(mowStartTime, time)}, {numErrors=}")
+                                  f"{time}, {TimeDiff(mowStartTime, time)}, {numErrors=}")
                 oldMowerState = mowerState    
             
             # detect power-cycle and reboot
